@@ -1,34 +1,62 @@
 # CLAUDE.md — Consulting Framer
 
-> Visual engagement builder for consultants. Turns discovery → canvas → professional deliverables.
+> Visual engagement builder for consultants. AI discovery → frameworks → professional SOWs.
 
-## Reference Docs (Read These)
+## Reference Docs (Read These First)
 
 | Doc | Purpose | When to Check |
 |-----|---------|---------------|
-| `REQUIREMENTS.md` | FRs/NFRs with acceptance criteria | Starting a new feature |
-| `ARCHITECTURE.md` | Data model, interfaces, tech stack | Implementing components |
-| `STATUS.md` | Current phase, active tasks | Daily; before picking work |
-| `EVALS.md` | Golden test cases, pass/fail | Changing AI logic |
+| `REQUIREMENTS.md` | FRs/NFRs with acceptance criteria | Starting any feature |
+| `ARCHITECTURE.md` | Service layer, repos, Stripe, AI patterns | Implementing backend |
+| `STATUS.md` | Current phase, tasks, blockers | Daily; before picking work |
+| `EVALS.md` | Test scenarios and golden cases | Adding/changing AI logic |
 
-**Workflow:**
-1. Check `STATUS.md` → find task
-2. Look up FR in `REQUIREMENTS.md` → acceptance criteria
-3. Check `ARCHITECTURE.md` → schema, interfaces
-4. Implement → tests + evals
-5. Update `STATUS.md` → shipped
-6. Commit with `(FR-NNN)`
+## Workflow
+
+1. Check `STATUS.md` → find task in "Next" or "Now"
+2. Look up FR in `REQUIREMENTS.md` → read acceptance criteria
+3. Check `ARCHITECTURE.md` → find relevant service/repo pattern
+4. Implement → run lint + typecheck + build
+5. Update `STATUS.md` → move task to "Shipped"
+6. Commit with `type(scope): description (FR-NNN)`
 
 ---
 
 ## Stack
 
-- **Frontend:** Next.js 14 + React Flow + Tailwind + shadcn/ui
-- **State:** Zustand + Immer (with undo/redo via zundo)
-- **Backend:** Supabase (Postgres + Auth + Storage + Realtime)
-- **AI:** Claude API (claude-sonnet-4-20250514)
-- **Export:** react-pdf + docx
-- **Hosting:** Vercel
+| Layer | Technology |
+|-------|------------|
+| Framework | Next.js 14 (App Router) |
+| Language | TypeScript (strict) |
+| UI | React 18 + Tailwind CSS |
+| Canvas | React Flow (@xyflow/react) |
+| State | Zustand (client) |
+| Database | Supabase (PostgreSQL + RLS) |
+| Auth | Supabase Auth |
+| Payments | Stripe (Checkout + Webhooks) |
+| AI | Anthropic Claude API |
+| Background Jobs | Inngest |
+| Hosting | Vercel |
+
+---
+
+## Architecture Pattern: Thin Routes, Fat Services
+
+```
+API Route (thin)          Service (fat)           Repository
+     │                        │                       │
+     │ 1. Auth check          │                       │
+     │ 2. Parse input         │                       │
+     │ 3. Call service ──────▶│ Business logic        │
+     │                        │ Validation            │
+     │                        │ Usage checks          │
+     │                        │ Call repo ───────────▶│ Database access
+     │                        │                       │ Map to entities
+     │◀────────────────────── │◀──────────────────────│
+     │ 4. Return response     │                       │
+```
+
+**Rule:** API routes do auth + input parsing only. All business logic in services.
 
 ---
 
@@ -36,215 +64,347 @@
 
 ```
 src/
-├── app/                      # Next.js App Router
-│   ├── (auth)/              # Login, signup
-│   ├── (dashboard)/         # Main app
-│   │   ├── engagements/     # Canvas, discovery, export
-│   │   ├── templates/
-│   │   └── settings/
-│   └── api/                 # API routes
-│       ├── ai/              # Discovery, generate, verify
-│       └── export/          # PDF/DOCX
+├── app/
+│   ├── (auth)/           # Login, signup pages
+│   ├── (dashboard)/      # Protected app pages
+│   └── api/              # ⚠️ THIN ROUTES ONLY
+│       ├── ai/
+│       ├── engagements/
+│       ├── billing/
+│       └── webhooks/
+│
+├── services/             # ⭐ BUSINESS LOGIC HERE
+│   ├── ai.service.ts
+│   ├── engagement.service.ts
+│   ├── billing.service.ts
+│   └── usage.service.ts
+│
+├── repositories/         # ⭐ DATABASE ACCESS HERE
+│   ├── engagement.repo.ts
+│   ├── user.repo.ts
+│   └── usage.repo.ts
+│
+├── jobs/                 # ⭐ BACKGROUND JOBS
+│   ├── inngest.ts
+│   ├── generate-sow.ts
+│   └── sync-usage.ts
+│
 ├── components/
-│   ├── canvas/              # Canvas, blocks
-│   ├── discovery/           # Discovery wizard
-│   ├── export/              # Document preview
-│   └── ui/                  # shadcn components
+│   ├── canvas/
+│   ├── discovery/
+│   └── billing/
+│
 ├── lib/
-│   ├── supabase/           # Client, server
-│   ├── ai/                 # Claude wrapper, prompts
-│   └── export/             # PDF, DOCX generators
-├── store/                   # Zustand stores
-└── types/                   # TypeScript definitions
+│   ├── supabase/
+│   ├── stripe/
+│   ├── ai/
+│   └── errors.ts
+│
+├── store/                # Zustand (client state)
+│
+└── types/
 ```
 
 ---
 
-## Commands
+## Slash Commands
+
+Located in `.claude/commands/`. Use with `/ws-command-name` in Claude Code.
+
+| Command | Purpose | When to Use |
+|---------|---------|-------------|
+| `/ws-start-task` | Begin work on a task | Starting any new feature |
+| `/ws-verify` | Run lint, typecheck, build | Before committing |
+| `/ws-skeptic` | Adversarial code review | After implementing AI features |
+| `/ws-commit` | Commit, push, create PR | After verify passes |
+| `/ws-status` | Update STATUS.md | Start/end of session |
+| `/ws-mistake` | Log mistake to CLAUDE.md | When something breaks |
+
+---
+
+## Shell Commands
 
 ```bash
-# Dev server
-pnpm dev
+# Development
+npm run dev           # Start dev server (localhost:3000)
 
-# Tests
-pnpm test
+# Quality checks (ALL MUST PASS)
+npm run lint          # ESLint
+npm run typecheck     # TypeScript strict
+npm run build         # Production build
 
-# Evals (AI golden tests)
-pnpm eval
+# Database
+npx supabase db push  # Push schema changes
+npx supabase gen types typescript --local > src/types/database.ts
 
-# Lint + format
-pnpm lint
-pnpm format
-
-# Type check
-pnpm typecheck
-
-# Build
-pnpm build
+# Background jobs (local dev)
+npx inngest-cli dev   # Start Inngest dev server
 ```
 
 ---
 
-## Invariants — Current (Enforced Now)
+## Invariants — NEVER Violate
 
-🚨 **NEVER violate:**
-
-1. **Human approval required** — No AI-generated content goes to client without explicit user approval
-2. **Canvas is source of truth** — Generated documents must trace every claim to a canvas block
-3. **Audit everything** — All AI generations logged with input, output, model, timestamp
-4. **Multi-tenant isolation** — RLS on all tables; users only see their org's data
-5. **No data invention** — AI must flag missing data with `[NEEDS: ...]`, not make it up
-
----
-
-## Invariants — Planned
-
-| Rule | FR | Phase |
-|------|-----|-------|
-| Offline canvas editing | FR-107 | Phase 2 |
-| Real-time collaboration | FR-702 | Phase 5 |
+| Rule | Why | Enforcement |
+|------|-----|-------------|
+| **Business logic in services, not routes** | Testable, reusable | Code review |
+| **API keys server-side only** | Security | Never import in components |
+| **RLS on all user tables** | Multi-tenant isolation | Supabase policies |
+| **Check usage before AI calls** | Tier limits | `UsageService.canPerformAction()` |
+| **Stripe webhooks = billing truth** | Consistency | Never update tier from client |
+| **"use client" for interactivity** | Next.js 14 requirement | React hooks = client |
+| **Background jobs for > 10s tasks** | Vercel timeout | Inngest for SOW generation |
 
 ---
 
-## Quality Gates
+## Key Patterns
 
-| Check | Command | Blocks PR |
-|-------|---------|-----------|
-| Lint | `pnpm lint` | ✅ Yes |
-| Types | `pnpm typecheck` | ✅ Yes |
-| Unit tests | `pnpm test` | ✅ Yes |
-| Evals | `pnpm eval` | ✅ Yes (95%+) |
-| Build | `pnpm build` | ✅ Yes |
+### 1. API Route (Thin)
 
-**No exceptions.** Fix before merging.
+```typescript
+// src/app/api/engagements/route.ts
+import { createClient } from '@/lib/supabase/server';
+import { EngagementService } from '@/services/engagement.service';
+import { handleApiError } from '@/lib/api-utils';
 
----
+export async function POST(req: Request) {
+  try {
+    // 1. Auth
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
-## Commit Convention
+    // 2. Parse input
+    const input = await req.json();
 
+    // 3. Call service (all business logic there)
+    const service = new EngagementService(supabase);
+    const result = await service.create(user.id, input);
+
+    // 4. Return response
+    return Response.json({ engagement: result }, { status: 201 });
+  } catch (error) {
+    return handleApiError(error);
+  }
+}
 ```
-type(scope): description (FR-NNN)
 
-# Examples:
-feat(canvas): add SWOT block component (FR-201)
-feat(ai): implement discovery question generation (FR-302)
-fix(export): handle missing deliverables gracefully (FR-408)
-test(evals): add SOW generation golden tests
+### 2. Service (Fat)
+
+```typescript
+// src/services/engagement.service.ts
+export class EngagementService extends BaseService {
+  private repo: EngagementRepository;
+  private usageRepo: UsageRepository;
+
+  constructor(supabase: SupabaseClient) {
+    super(supabase);
+    this.repo = new EngagementRepository(supabase);
+    this.usageRepo = new UsageRepository(supabase);
+  }
+
+  async create(userId: string, input: CreateEngagementInput): Promise<Engagement> {
+    // Business logic: check limits
+    const canCreate = await this.usageRepo.checkLimit(userId, 'engagements');
+    if (!canCreate) {
+      throw new UsageLimitError('Engagement limit reached');
+    }
+
+    // Create via repository
+    const engagement = await this.repo.create({
+      userId,
+      ...input,
+    });
+
+    // Track usage
+    await this.usageRepo.increment(userId, 'engagements_created');
+
+    return engagement;
+  }
+}
 ```
 
-Types: `feat`, `fix`, `test`, `docs`, `refactor`, `chore`
+### 3. Repository (Database Access)
+
+```typescript
+// src/repositories/engagement.repo.ts
+export class EngagementRepository extends BaseRepository<Engagement> {
+  constructor(supabase: SupabaseClient) {
+    super(supabase, 'engagements');
+  }
+
+  async findById(id: string): Promise<Engagement | null> {
+    const { data, error } = await this.supabase
+      .from(this.tableName)
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error && error.code !== 'PGRST116') throw error;
+    return data ? this.mapToEntity(data) : null;
+  }
+
+  private mapToEntity(row: any): Engagement {
+    return {
+      id: row.id,
+      userId: row.user_id,
+      title: row.title,
+      // ... map snake_case to camelCase
+    };
+  }
+}
+```
+
+### 4. Background Job (Long-running)
+
+```typescript
+// src/jobs/generate-sow.ts
+export const generateSOW = inngest.createFunction(
+  { id: 'generate-sow' },
+  { event: 'sow/generate.requested' },
+  async ({ event, step }) => {
+    const { engagementId, userId } = event.data;
+
+    // Step 1: Fetch data
+    const engagement = await step.run('fetch', async () => {
+      // ...
+    });
+
+    // Step 2: Generate (can take 30-60s)
+    const content = await step.run('generate', async () => {
+      // ...
+    });
+
+    // Step 3: Save
+    await step.run('save', async () => {
+      // ...
+    });
+  }
+);
+```
 
 ---
 
-## Mistakes (Learn from These)
+## Common Mistakes (Learn from These)
 
-| Date | Mistake | Rule Added |
-|------|---------|------------|
-| — | — | (No mistakes yet — document as they happen) |
-
-**Rule:** Every mistake becomes a documented rule.
+| Mistake | Rule |
+|---------|------|
+| Business logic in API route | Move to service; route should be < 20 lines |
+| Direct Supabase calls in service | Use repository; service shouldn't know about `supabase.from()` |
+| Forgot "use client" on component | Add directive at top of interactive components |
+| Exposed ANTHROPIC_API_KEY | Never use process.env without NEXT_PUBLIC_ in components |
+| Updated subscription tier from client | Only Stripe webhooks update billing state |
+| Long AI call in API route | Use Inngest for > 10s tasks |
+| Missing RLS policy on new table | Every table needs policies before deploy |
 
 ---
 
 ## Red Flags — Stop and Ask
 
-- Removing verification/traceability from document generation
-- Bypassing human approval workflow
-- Logging raw client data without redaction
-- Skipping evals for AI changes
-- Any change to `lib/ai/prompts.ts` without eval coverage
+- Adding business logic to API routes (> 20 lines)
+- Importing `@supabase/supabase-js` directly in services
+- Removing or bypassing usage limit checks
+- Adding API keys to client components
+- Disabling RLS policies "for testing"
+- Skipping typecheck because "it's just a quick fix"
+- AI calls without timeout handling
 
 ---
 
-## Key Files (Read First)
+## Quality Gates
 
-| File | Purpose |
-|------|---------|
-| `REQUIREMENTS.md` | What to build |
-| `ARCHITECTURE.md` | How to build |
-| `STATUS.md` | What to do now |
-| `EVALS.md` | How to verify AI |
-| `src/lib/ai/prompts.ts` | AI prompt templates |
-| `src/lib/ai/verify.ts` | Document verification |
-| `src/store/canvas.ts` | Canvas state management |
-| `src/types/blocks.ts` | Block type definitions |
-
----
-
-## Environment Variables
+All must pass before merge:
 
 ```bash
-# Required
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
-SUPABASE_SERVICE_ROLE_KEY=
-ANTHROPIC_API_KEY=
-
-# Optional
-NEXT_PUBLIC_APP_URL=http://localhost:3000
+npm run lint       # Zero errors
+npm run typecheck  # Zero errors
+npm run build      # Builds successfully
 ```
 
 ---
 
-## AI Guidelines
+## Error Handling
 
-### Discovery Questions
-- Generate 10-20 questions per engagement type
-- Cover: problem, stakeholders, constraints, success, risks
-- Include `suggestedBlocks` to auto-populate canvas
-- Support follow-up questions based on answers
+Use custom error classes:
 
-### Document Generation
-- Always include `[Source: block_type]` tags for traceability
-- Flag missing data as `[NEEDS: description]`
-- Never invent information not in canvas
-- Calculate confidence score 0-100%
+```typescript
+// Throwing errors in services
+throw new NotFoundError('Engagement');
+throw new UsageLimitError('AI queries');
+throw new ForbiddenError();
 
-### Verification
-- Check every claim has canvas source
-- Detect timeline vs deliverable conflicts
-- Detect scope vs deliverable gaps
-- Block export if confidence < 80%
+// API routes catch and format
+try {
+  // ...
+} catch (error) {
+  return handleApiError(error);  // Returns proper status codes
+}
+```
 
 ---
 
-## Testing Strategy
+## AI Service Usage
 
-### Unit Tests
-- Block components render correctly
-- Canvas state updates properly
-- Export templates compile
+All Claude API calls go through `AIService`:
 
-### Integration Tests
-- Discovery flow end-to-end
-- Document generation pipeline
-- Auth and RLS
+```typescript
+const aiService = new AIService(supabase);
 
-### Evals (AI Golden Tests)
-- Discovery questions cover all categories
-- Generated SOW includes all canvas data
-- Verification catches inconsistencies
-- No fabricated information
+// Discovery follow-up
+const response = await aiService.generateDiscoveryFollowUp(userId, {
+  question: userAnswer,
+  previousAnswers: context,
+});
 
----
+// Framework recommendations
+const frameworks = await aiService.recommendFrameworks(userId, discoveryAnswers);
 
-## Performance Targets
-
-| Metric | Target |
-|--------|--------|
-| Canvas load | < 2s |
-| Block drag | < 16ms |
-| AI discovery | < 3s |
-| AI generation | < 10s |
-| Export PDF | < 30s |
+// SOW generation (triggers background job)
+await inngest.send({
+  name: 'sow/generate.requested',
+  data: { engagementId, userId },
+});
+```
 
 ---
 
-## Security Checklist
+## Stripe Billing
 
-- [ ] RLS enabled on all tables
-- [ ] API routes validate auth
-- [ ] AI prompts sanitize user input
-- [ ] Document generation escapes HTML
-- [ ] Rate limiting on AI endpoints
-- [ ] Audit logging for sensitive actions
+**Golden rule:** Never trust client-side payment status.
+
+```typescript
+// ✅ CORRECT: Check from database (synced by webhook)
+const { data: profile } = await supabase
+  .from('profiles')
+  .select('subscription_tier')
+  .eq('id', userId)
+  .single();
+
+if (profile.subscription_tier === 'pro') {
+  // User has paid
+}
+
+// ❌ WRONG: Trust client-side claim
+if (request.body.isPro) {
+  // Never do this
+}
+```
+
+---
+
+## Quick Reference
+
+| Need | Location |
+|------|----------|
+| Database schema | `supabase/schema.sql` |
+| Service patterns | `ARCHITECTURE.md` → Service Layer |
+| API endpoints | `ARCHITECTURE.md` → API Route Patterns |
+| Feature specs | `REQUIREMENTS.md` → FR-xxx |
+| Current tasks | `STATUS.md` → Now / Next |
+| Test scenarios | `EVALS.md` |
+| Stripe config | `src/lib/stripe/config.ts` |
+| AI prompts | `src/lib/ai/prompts.ts` |
+| Error classes | `src/lib/errors.ts` |
+| Type definitions | `src/types/index.ts` |

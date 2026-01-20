@@ -1,10 +1,20 @@
-# Consulting Framer — Requirements v1.0
+# Consulting Framer — Requirements v1.1
 
-> **The visual engagement builder that turns discovery conversations into professional deliverables in minutes, not days.**
+> **Visual engagement builder: AI discovery → frameworks → professional deliverables in minutes.**
 
-**Version:** 1.0  
+**Version:** 1.1  
 **Last Updated:** January 2026  
+**Target:** 100-1000 paying users  
 **Status:** Active Development
+
+---
+
+## Changelog
+
+| Version | Date | Changes |
+|---------|------|---------|
+| v1.1 | Jan 2026 | Added FR-900 (Billing), FR-1000 (Organizations), NFR-500 (Scale) |
+| v1.0 | Jan 2026 | Initial release — 60 FRs, 16 NFRs |
 
 ---
 
@@ -16,194 +26,192 @@ Consultants waste **7+ hours per engagement** on administrative work:
 - 2-3 hours on discovery calls without structured capture
 - 2-3 hours manually writing SOWs and proposals
 - 1-2 hours formatting and revising documents
-- Ongoing scope creep from poorly defined boundaries
-
-**Result:** 40% of consulting engagements experience scope creep, and 64% of project failures trace back to poorly defined scope.
 
 ### The Solution
 
-**Consulting Framer** is a visual engagement builder that:
-1. **Guides discovery** with AI-powered questions tailored to engagement type
-2. **Visualizes scope** on an interactive canvas using proven consulting frameworks
-3. **Generates deliverables** (SOW, proposals, contracts) with one click
-4. **Tracks engagements** from proposal to completion
+**Consulting Framer** combines:
+1. **AI Discovery** — Guided questions tailored to engagement type
+2. **Visual Canvas** — Drag-drop consulting frameworks
+3. **Auto-Generation** — One-click SOW/proposal creation
 
-### Time Savings (Validated Targets)
+### Time Savings Target
 
 | Activity | Before | After | Savings |
 |----------|--------|-------|---------|
-| Discovery capture | 2-3 hrs | 30 min | **75%** |
-| SOW creation | 2-3 hrs | 15 min | **90%** |
-| Proposal formatting | 1-2 hrs | 5 min | **95%** |
-| Scope change tracking | Manual | Automatic | **100%** |
-| **Total per engagement** | **7+ hrs** | **< 1 hr** | **85%+** |
-
-### Trust & Accuracy Guarantees
-
-- ✅ **Framework-validated** — Built on proven consulting methodologies (McKinsey 7-S, SWOT, etc.)
-- ✅ **AI-verified outputs** — Every generated document checked against canvas data
-- ✅ **Version-controlled** — Full audit trail of all changes
-- ✅ **Human-in-the-loop** — AI suggests, consultant approves
-- ✅ **Test coverage** — 95%+ automated test coverage on all AI outputs
+| Discovery | 2-3 hrs | 30 min | 75% |
+| SOW creation | 2-3 hrs | 15 min | 90% |
+| Total | 7+ hrs | < 1 hr | **85%** |
 
 ---
 
-## Product Goals
+## Business Model
 
-### Primary Goals
+### Subscription Tiers
 
-1. **Reduce engagement setup time by 85%** — From 7+ hours to under 1 hour
-2. **Eliminate scope creep** — Clear visual boundaries with change tracking
-3. **Increase proposal win rates** — Professional, consistent deliverables
-4. **Build institutional knowledge** — Reusable templates and frameworks
+| Tier | Price | Target | Limits |
+|------|-------|--------|--------|
+| **Free** | $0 | Trial users | 2 engagements, 10 AI queries/mo |
+| **Pro** | $49/mo | Solo consultants | Unlimited engagements, 500 AI queries/mo |
+| **Team** | $149/mo | Firms (5 seats) | + Shared templates, team analytics |
 
-### Success Metrics
+### Revenue Targets
 
-| Metric | Target | Measurement |
-|--------|--------|-------------|
-| Time to first SOW | < 30 minutes | Analytics |
-| Proposal completion rate | > 90% | Funnel tracking |
-| User-reported time savings | > 80% | Survey |
-| AI suggestion acceptance rate | > 70% | Usage analytics |
-| Document accuracy (no manual fixes) | > 95% | User feedback |
-
-### Non-Goals (v1)
-
-- Full project management (use Monday, Asana, etc.)
-- Time tracking and invoicing (use Harvest, FreshBooks, etc.)
-- CRM functionality (use HubSpot, Pipedrive, etc.)
-- Legal contract review (consult attorney)
+| Users | Mix | MRR |
+|-------|-----|-----|
+| 100 | 60% Pro, 5% Team | $3,700 |
+| 500 | 55% Pro, 10% Team | $21,200 |
+| 1000 | 50% Pro, 15% Team | $47,000 |
 
 ---
 
 ## User Personas
 
-### Primary: Independent Consultant
+### Primary: Solo Consultant ("Sarah")
+- 5-10 engagements/year
+- Needs professional deliverables
+- Price sensitive, values simplicity
+- **Tier:** Pro ($49/mo)
 
-**"Sarah" — Strategy Consultant, Solo Practice**
-- 5-10 client engagements per year
-- Spends 20% of time on admin instead of billable work
-- Needs professional deliverables to compete with big firms
-- Values speed and simplicity over features
-
-### Secondary: Boutique Consulting Firm
-
-**"Marcus" — Partner at 10-person firm**
-- 30-50 engagements per year across team
-- Needs consistency across consultants
-- Wants to build reusable IP and templates
-- Values collaboration and oversight
+### Secondary: Boutique Firm ("Marcus")
+- 30-50 engagements/year across team
+- Needs consistency and templates
+- Values collaboration features
+- **Tier:** Team ($149/mo)
 
 ---
 
 ## Functional Requirements
 
-### FR-100: Core Canvas (Phase 1)
+### FR-100: Authentication & Profiles (Phase 1)
 
 | ID | Requirement | Acceptance Criteria | Priority |
 |----|-------------|---------------------|----------|
-| FR-101 | Create new engagement canvas | User can create canvas with name, client, type; persists across sessions | P0 |
-| FR-102 | Add framework blocks to canvas | Drag-drop framework components; blocks snap to grid | P0 |
-| FR-103 | Edit block content inline | Click any block and edit directly; auto-save within 2s | P0 |
-| FR-104 | Connect blocks with relationships | Draw arrows between blocks; types: depends on, informs, delivers to | P0 |
-| FR-105 | Zoom and pan canvas | Zoom 25%-400%; pan with mouse drag; minimap shows full canvas | P0 |
-| FR-106 | Undo/redo all actions | Ctrl+Z undoes; Ctrl+Shift+Z redoes; 50-action history | P0 |
-| FR-107 | Auto-save with conflict resolution | Saves every 5 seconds; conflict prompts merge or overwrite | P0 |
-| FR-108 | Canvas templates library | 10+ pre-built templates (strategy, implementation, etc.) | P1 |
-| FR-109 | Duplicate and fork canvases | Duplicate own canvas; fork creates linked copy | P1 |
-| FR-110 | Canvas version history | View/restore any previous version; versions auto-created | P1 |
+| FR-101 | Email/password signup | User registers with email; verification email sent | P0 |
+| FR-102 | OAuth login (Google) | One-click Google sign-in; creates profile | P0 |
+| FR-103 | User profile | Name, avatar, company; editable in settings | P0 |
+| FR-104 | Password reset | Email link; expires in 1 hour | P0 |
+| FR-105 | Session management | JWT tokens; 7-day refresh; logout all devices | P1 |
+| FR-106 | Delete account | User can delete; data purged within 30 days | P1 |
 
-### FR-200: Framework Library (Phase 1)
+### FR-200: Core Canvas (Phase 1)
 
 | ID | Requirement | Acceptance Criteria | Priority |
 |----|-------------|---------------------|----------|
-| FR-201 | SWOT Analysis block | 4-quadrant visual; AI suggests items; export standalone | P0 |
-| FR-202 | Stakeholder Map block | Power/interest matrix; add/remove stakeholders inline | P0 |
-| FR-203 | Timeline/Roadmap block | Gantt-style; drag to adjust dates; milestones and phases | P0 |
-| FR-204 | Scope Definition block | In-scope/out-scope lists; assumptions; dependencies | P0 |
-| FR-205 | Deliverables List block | Name, description, acceptance criteria, owner, due date | P0 |
-| FR-206 | Risk Register block | Risk, likelihood, impact, mitigation; auto-priority score | P0 |
-| FR-207 | Pricing Calculator block | Effort estimation; T&M vs fixed price; margin calculator | P1 |
-| FR-208 | RACI Matrix block | Roles and responsibilities; visual R/A/C/I indicators | P1 |
-| FR-209 | Problem Statement block | Current state, desired state, gap analysis | P1 |
-| FR-210 | Success Metrics block | KPIs with targets, baselines, measurement methods | P1 |
+| FR-201 | Create engagement | Name, client, type; persists to database | P0 |
+| FR-202 | Drag-drop frameworks | Add SWOT, Porter, McKinsey to canvas | P0 |
+| FR-203 | Inline editing | Click block → edit content; auto-save 2s | P0 |
+| FR-204 | Connect blocks | Draw arrows; relationship types | P1 |
+| FR-205 | Zoom/pan canvas | 25%-400% zoom; mouse pan; minimap | P0 |
+| FR-206 | Undo/redo | Ctrl+Z/Ctrl+Shift+Z; 50-action history | P0 |
+| FR-207 | Auto-save | Save every 5 seconds; dirty indicator | P0 |
+| FR-208 | Canvas templates | 5+ pre-built templates | P1 |
+| FR-209 | Duplicate canvas | Copy engagement with all content | P1 |
+| FR-210 | Version history | View/restore previous versions | P2 |
 
-### FR-300: AI Discovery Copilot (Phase 2)
-
-| ID | Requirement | Acceptance Criteria | Priority |
-|----|-------------|---------------------|----------|
-| FR-301 | Engagement type selection | Select type (strategy, implementation, etc.); AI tailors questions | P0 |
-| FR-302 | AI-generated discovery questions | 10-20 questions per type; user can add/remove | P0 |
-| FR-303 | Question branching logic | Answers trigger follow-up questions; configurable | P0 |
-| FR-304 | Voice/text input for answers | Type or dictate; speech-to-text with punctuation | P1 |
-| FR-305 | AI summary of discovery | Executive summary of key findings after discovery | P0 |
-| FR-306 | Auto-populate canvas from discovery | AI suggests blocks based on answers; user approves each | P0 |
-| FR-307 | Discovery session recording | Record call; AI transcribes and extracts key points | P2 |
-| FR-308 | Client-facing discovery form | Shareable link for client async answers | P1 |
-| FR-309 | Discovery completeness score | 0-100% complete; highlights gaps | P0 |
-| FR-310 | Framework recommendations | AI recommends frameworks based on discovery; explains why | P0 |
-
-### FR-400: Deliverable Generation (Phase 3)
+### FR-300: Framework Library (Phase 1)
 
 | ID | Requirement | Acceptance Criteria | Priority |
 |----|-------------|---------------------|----------|
-| FR-401 | Generate Statement of Work | One click generates SOW from canvas; all data included | P0 |
-| FR-402 | Generate Proposal | Client-facing proposal; professional formatting; branding | P0 |
-| FR-403 | Generate Executive Summary | One-page summary suitable for stakeholder briefing | P0 |
-| FR-404 | Multiple export formats | PDF, DOCX, Google Docs; formatting preserved | P0 |
-| FR-405 | Custom branding/templates | Upload logo, colors, fonts; applied to all exports | P1 |
-| FR-406 | Section-by-section generation | Regenerate individual sections; accept/reject each | P0 |
-| FR-407 | AI writing style options | Professional, conversational, technical tone | P1 |
-| FR-408 | Placeholder detection | AI flags [PLACEHOLDER] or incomplete sections before export | P0 |
-| FR-409 | Version comparison | Compare two versions; highlight changes | P1 |
-| FR-410 | E-signature integration | DocuSign/HelloSign for client signature | P2 |
+| FR-301 | SWOT Analysis | 4-quadrant; add/edit items inline | P0 |
+| FR-302 | Porter's Five Forces | Diamond layout; 5 force sections | P0 |
+| FR-303 | McKinsey 7-S | 7 elements; hard/soft grouping | P0 |
+| FR-304 | Business Model Canvas | 9 blocks; standard layout | P1 |
+| FR-305 | Stakeholder Map | Power/interest matrix | P1 |
+| FR-306 | Timeline/Roadmap | Gantt-style; milestones | P1 |
+| FR-307 | Scope Definition | In/out of scope lists | P1 |
+| FR-308 | Risk Register | Risk, impact, mitigation | P1 |
+| FR-309 | RACI Matrix | Roles grid | P2 |
+| FR-310 | Custom Note | Free-form text block | P0 |
 
-### FR-500: AI Verification & Trust (Phase 3)
-
-| ID | Requirement | Acceptance Criteria | Priority |
-|----|-------------|---------------------|----------|
-| FR-501 | Canvas-to-document traceability | Every sentence links back to canvas source | P0 |
-| FR-502 | Completeness checker | AI checks all required fields before generation | P0 |
-| FR-503 | Consistency validator | AI flags inconsistencies (timeline vs deliverables, etc.) | P0 |
-| FR-504 | Scope creep detector | Compares current to original; highlights additions | P0 |
-| FR-505 | Pricing sanity check | AI flags if pricing seems too high/low for type | P1 |
-| FR-506 | Risk assessment summary | Auto-generates risk summary from scope and timeline | P0 |
-| FR-507 | Confidence score per section | 0-100% confidence for each generated section | P1 |
-| FR-508 | Human approval workflow | Preview before export; require explicit approval | P0 |
-| FR-509 | Audit log | All AI generations logged with inputs, outputs, approvals | P0 |
-| FR-510 | Feedback loop | User rates AI output; feedback improves suggestions | P1 |
-
-### FR-600: Engagement Tracking (Phase 4)
+### FR-400: AI Discovery Copilot (Phase 2)
 
 | ID | Requirement | Acceptance Criteria | Priority |
 |----|-------------|---------------------|----------|
-| FR-601 | Engagement status workflow | Draft → Proposed → Accepted → Active → Completed → Archived | P0 |
-| FR-602 | Milestone tracking | Mark milestones complete; auto-update progress | P0 |
-| FR-603 | Deliverable checklist | Track status; link to actual files when complete | P0 |
-| FR-604 | Change request workflow | Log scope changes; show timeline/budget impact; approval | P1 |
-| FR-605 | Client portal (read-only) | Shareable link for client to view progress | P1 |
-| FR-606 | Engagement dashboard | List view; filter by status, client, date | P0 |
+| FR-401 | Discovery questionnaire | 7-15 questions per engagement type | P0 |
+| FR-402 | AI follow-up questions | Claude asks clarifying questions | P0 |
+| FR-403 | Progress tracking | % complete; skip/required indicators | P0 |
+| FR-404 | Discovery summary | AI generates executive summary | P0 |
+| FR-405 | Framework recommendations | AI suggests frameworks based on answers | P0 |
+| FR-406 | Auto-populate canvas | AI fills framework blocks from discovery | P1 |
+| FR-407 | Question branching | Answers trigger conditional questions | P1 |
+| FR-408 | Discovery templates | Different question sets by industry | P1 |
+| FR-409 | Export discovery notes | PDF/DOCX of Q&A transcript | P2 |
+| FR-410 | Client discovery form | Shareable link for async input | P2 |
 
-### FR-700: Collaboration (Phase 5)
-
-| ID | Requirement | Acceptance Criteria | Priority |
-|----|-------------|---------------------|----------|
-| FR-701 | Invite team members | Add by email; assign role (owner, editor, viewer) | P0 |
-| FR-702 | Real-time collaboration | Multiple users edit simultaneously; see cursors | P1 |
-| FR-703 | Comments and mentions | Comment on any block; @mention users; notifications | P0 |
-| FR-704 | Approval workflows | Require approval before status changes | P1 |
-| FR-705 | Activity feed | Recent activity; who did what when | P0 |
-
-### FR-800: User Experience
+### FR-500: Deliverable Generation (Phase 3)
 
 | ID | Requirement | Acceptance Criteria | Priority |
 |----|-------------|---------------------|----------|
-| FR-801 | Onboarding flow | First canvas in < 10 minutes with guided tour | P0 |
-| FR-802 | Keyboard shortcuts | Common actions have shortcuts; ? shows cheat sheet | P0 |
-| FR-803 | Mobile-responsive viewer | View (not edit) on mobile; full edit on tablet+ | P1 |
-| FR-804 | Dark mode | System-preference or manual toggle | P1 |
-| FR-805 | Search across engagements | Full-text search of content, client names, tags | P0 |
-| FR-806 | Quick actions menu | Cmd+K opens command palette | P1 |
+| FR-501 | Generate SOW | One-click; includes all canvas data | P0 |
+| FR-502 | Generate proposal | Client-facing; professional format | P0 |
+| FR-503 | Export PDF | High-quality PDF output | P0 |
+| FR-504 | Export DOCX | Editable Word document | P0 |
+| FR-505 | Custom branding | Logo, colors in exports | P1 |
+| FR-506 | Section regeneration | Regenerate individual sections | P1 |
+| FR-507 | Tone selection | Professional/conversational/technical | P1 |
+| FR-508 | Placeholder detection | Flag incomplete sections | P0 |
+| FR-509 | Preview before export | Full preview with approval | P0 |
+| FR-510 | Template library | 5+ SOW/proposal templates | P1 |
+
+### FR-600: AI Verification & Trust (Phase 3)
+
+| ID | Requirement | Acceptance Criteria | Priority |
+|----|-------------|---------------------|----------|
+| FR-601 | Source traceability | Every sentence links to canvas source | P0 |
+| FR-602 | Completeness check | Require all fields before generation | P0 |
+| FR-603 | Consistency validation | Flag timeline/deliverable mismatches | P1 |
+| FR-604 | Confidence scores | 0-100% per generated section | P1 |
+| FR-605 | Human approval gate | Explicit approve before export | P0 |
+| FR-606 | Generation audit log | Log all AI inputs/outputs | P0 |
+
+### FR-700: Engagement Management (Phase 4)
+
+| ID | Requirement | Acceptance Criteria | Priority |
+|----|-------------|---------------------|----------|
+| FR-701 | Engagement list | Dashboard with all engagements | P0 |
+| FR-702 | Status workflow | Draft → Proposed → Active → Complete | P0 |
+| FR-703 | Search/filter | By client, status, date, tags | P0 |
+| FR-704 | Archive engagements | Hide from list; recoverable | P0 |
+| FR-705 | Duplicate engagement | Copy as new draft | P1 |
+| FR-706 | Tags/labels | Custom tags for organization | P1 |
+
+### FR-800: Collaboration (Phase 5) — Team Tier Only
+
+| ID | Requirement | Acceptance Criteria | Priority |
+|----|-------------|---------------------|----------|
+| FR-801 | Invite team members | Email invite; assign role | P0 |
+| FR-802 | Role permissions | Owner, Editor, Viewer | P0 |
+| FR-803 | Shared templates | Org-wide framework templates | P0 |
+| FR-804 | Comments | Comment on any block | P1 |
+| FR-805 | Activity feed | Who did what when | P1 |
+| FR-806 | Real-time collab | Multiple cursors (future) | P2 |
+
+### FR-900: Billing & Subscriptions (Phase 2)
+
+| ID | Requirement | Acceptance Criteria | Priority |
+|----|-------------|---------------------|----------|
+| FR-901 | Subscription tiers | Free, Pro ($49), Team ($149) | P0 |
+| FR-902 | Stripe integration | Checkout, portal, webhooks | P0 |
+| FR-903 | Usage limits | Enforce per-tier limits | P0 |
+| FR-904 | Upgrade flow | In-app upgrade prompts | P0 |
+| FR-905 | Downgrade flow | Handled at period end | P0 |
+| FR-906 | Trial period | 14-day Pro trial; no card required | P0 |
+| FR-907 | Billing portal | Stripe customer portal link | P0 |
+| FR-908 | Usage display | Show current usage vs limits | P0 |
+| FR-909 | Overage handling | Soft block with upgrade prompt | P0 |
+| FR-910 | Invoices | Access via Stripe portal | P1 |
+
+### FR-1000: Organizations (Phase 5) — Team Tier
+
+| ID | Requirement | Acceptance Criteria | Priority |
+|----|-------------|---------------------|----------|
+| FR-1001 | Create organization | Name, owner; linked to Team subscription | P0 |
+| FR-1002 | Seat management | Add/remove members up to limit | P0 |
+| FR-1003 | Member roles | Admin, Member; permissions differ | P0 |
+| FR-1004 | Org-wide templates | Shared framework templates | P0 |
+| FR-1005 | Usage dashboard | Org usage across all members | P1 |
+| FR-1006 | Transfer ownership | Owner can transfer to admin | P1 |
+| FR-1007 | Leave organization | Member can leave; data stays | P1 |
 
 ---
 
@@ -211,70 +219,120 @@ Consultants waste **7+ hours per engagement** on administrative work:
 
 ### NFR-100: Performance
 
-| ID | Requirement | Acceptance Criteria |
-|----|-------------|---------------------|
-| NFR-101 | Canvas load time | < 2 seconds for 50 blocks |
-| NFR-102 | AI response time | Discovery questions < 3s; document generation < 10s |
-| NFR-103 | Real-time sync latency | < 500ms for edits to appear |
-| NFR-104 | Export generation time | < 30 seconds for typical engagement |
+| ID | Requirement | Target |
+|----|-------------|--------|
+| NFR-101 | Canvas load | < 2s for 50 nodes |
+| NFR-102 | AI response | < 3s discovery, < 10s generation |
+| NFR-103 | Page load | < 1.5s LCP |
+| NFR-104 | Export generation | < 30s for typical SOW |
 
 ### NFR-200: Reliability
 
-| ID | Requirement | Acceptance Criteria |
-|----|-------------|---------------------|
-| NFR-201 | Uptime SLA | 99.9% uptime |
-| NFR-202 | Data durability | No data loss; auto-save every 5 seconds |
+| ID | Requirement | Target |
+|----|-------------|--------|
+| NFR-201 | Uptime | 99.9% |
+| NFR-202 | Data durability | Auto-save; no data loss |
 | NFR-203 | Graceful degradation | Canvas works if AI unavailable |
-| NFR-204 | Backup and recovery | Daily backups; point-in-time recovery |
+| NFR-204 | Backups | Daily; 30-day retention |
 
 ### NFR-300: Security
 
-| ID | Requirement | Acceptance Criteria |
-|----|-------------|---------------------|
-| NFR-301 | Authentication | Email/password + MFA; SSO for enterprise |
-| NFR-302 | Authorization | Role-based access; least privilege |
-| NFR-303 | Encryption | TLS 1.3 in transit; AES-256 at rest |
-| NFR-304 | Audit logging | All changes logged with user, timestamp |
+| ID | Requirement | Target |
+|----|-------------|--------|
+| NFR-301 | Authentication | Supabase Auth; MFA optional |
+| NFR-302 | Authorization | RLS on all tables |
+| NFR-303 | Encryption | TLS 1.3 transit; AES-256 rest |
+| NFR-304 | API keys | Server-side only; never exposed |
+| NFR-305 | GDPR | Data export; account deletion |
 
-### NFR-400: AI Quality & Trust
+### NFR-400: AI Quality
 
-| ID | Requirement | Acceptance Criteria |
-|----|-------------|---------------------|
-| NFR-401 | AI output accuracy | > 95% content requires no manual fixes |
-| NFR-402 | AI consistency | Same inputs produce semantically similar outputs |
-| NFR-403 | Human-in-the-loop | No AI output goes to client without approval |
-| NFR-404 | Eval test coverage | 95%+ coverage with golden test cases |
+| ID | Requirement | Target |
+|----|-------------|--------|
+| NFR-401 | Output accuracy | > 95% no manual fixes |
+| NFR-402 | Hallucination rate | < 2% fabricated content |
+| NFR-403 | Human approval | 100% before client-facing |
+| NFR-404 | Eval coverage | 90%+ golden test cases |
+
+### NFR-500: Scalability (100-1000 Users)
+
+| ID | Requirement | Target |
+|----|-------------|--------|
+| NFR-501 | Concurrent users | 100 simultaneous |
+| NFR-502 | Database connections | Pool 20-50 |
+| NFR-503 | API rate limits | 100 req/min per user |
+| NFR-504 | Storage per user | 100MB canvas data |
+| NFR-505 | Cost per user | < $0.50/mo infrastructure |
+
+---
+
+## Data Model Summary
+
+| Table | Purpose | Key Fields |
+|-------|---------|------------|
+| profiles | User data | id, email, full_name, avatar_url, subscription_tier |
+| subscriptions | Billing state | user_id, stripe_customer_id, status, current_period_end |
+| organizations | Team accounts | id, name, owner_id, subscription_id |
+| org_members | Team membership | org_id, user_id, role |
+| engagements | Canvas + discovery | id, user_id, org_id, title, canvas_data, discovery_answers |
+| framework_templates | Reusable templates | id, org_id, name, canvas_data |
+| usage_daily | Limit tracking | user_id, date, ai_queries, engagements_created |
+| ai_interactions | Audit log | id, user_id, engagement_id, prompt, response, tokens |
+
+> **Full schema:** See ARCHITECTURE.md
 
 ---
 
 ## Phasing Summary
 
-| Phase | Timeline | FRs | Goal |
-|-------|----------|-----|------|
-| **1. Core Canvas** | Weeks 1-4 | FR-100, FR-200 | Visual builder with 6 framework blocks |
-| **2. AI Discovery** | Weeks 5-8 | FR-300 | AI-guided discovery populates canvas |
-| **3. Deliverables** | Weeks 9-12 | FR-400, FR-500 | One-click SOW/proposal with verification |
-| **4. Tracking** | Weeks 13-16 | FR-600 | Engagement lifecycle management |
-| **5. Collaboration** | Weeks 17-20 | FR-700 | Multi-user teams |
+| Phase | Weeks | FRs | Goal | Revenue Gate |
+|-------|-------|-----|------|--------------|
+| **1. MVP** | 1-4 | FR-100, FR-200, FR-300 | Canvas + 3 frameworks + auth | — |
+| **2. Monetize** | 5-8 | FR-400, FR-900 | AI discovery + Stripe billing | ✅ Can charge |
+| **3. Deliver** | 9-12 | FR-500, FR-600 | SOW generation + verification | ✅ Full value |
+| **4. Manage** | 13-16 | FR-700 | Engagement dashboard | — |
+| **5. Scale** | 17-20 | FR-800, FR-1000 | Teams + organizations | ✅ Team tier |
 
 ---
 
-## Competitive Positioning
+## API Surface (Minimum)
 
-| Feature | Consulting Framer | PandaDoc | Miro | Bonsai |
-|---------|-------------------|----------|------|--------|
-| Visual canvas | ✅ Purpose-built | ❌ | ✅ Generic | ❌ |
-| Consulting frameworks | ✅ 15+ | ❌ | ⚠️ Templates | ❌ |
-| AI discovery | ✅ Guided Q&A | ❌ | ❌ | ❌ |
-| SOW generation | ✅ One-click | ⚠️ Manual | ❌ | ⚠️ Templates |
-| Scope verification | ✅ AI-powered | ❌ | ❌ | ❌ |
-
-**Our unique value:** The only tool that combines visual scoping + AI discovery + verified deliverable generation in one workflow.
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| POST | /api/auth/signup | Create account | Public |
+| POST | /api/auth/login | Login | Public |
+| GET | /api/engagements | List user's engagements | User |
+| POST | /api/engagements | Create engagement | User |
+| GET | /api/engagements/[id] | Get engagement | Owner |
+| PATCH | /api/engagements/[id] | Update engagement | Owner |
+| DELETE | /api/engagements/[id] | Delete engagement | Owner |
+| POST | /api/ai/discovery | AI follow-up question | User |
+| POST | /api/ai/recommend | Framework recommendations | User |
+| POST | /api/ai/generate | Generate SOW/proposal | User |
+| POST | /api/billing/checkout | Create Stripe checkout | User |
+| POST | /api/billing/portal | Stripe portal link | User |
+| POST | /api/webhooks/stripe | Stripe webhook handler | Stripe |
 
 ---
 
-## Changelog
+## Success Criteria
 
-| Version | Date | Changes |
-|---------|------|---------|
-| v1.0 | Jan 2026 | Initial release — 60 FRs, 16 NFRs |
+### Phase 1 Complete When:
+- [ ] User can sign up, log in, log out
+- [ ] User can create engagement with canvas
+- [ ] User can add SWOT, Porter, McKinsey frameworks
+- [ ] Canvas persists to database
+- [ ] Works on desktop Chrome/Safari/Firefox
+
+### Phase 2 Complete When:
+- [ ] AI discovery questionnaire works
+- [ ] AI recommends frameworks
+- [ ] Stripe checkout works
+- [ ] Usage limits enforced
+- [ ] First paying customer
+
+### MVP Success (90 days):
+- [ ] 100 registered users
+- [ ] 20 paying users
+- [ ] $1,000 MRR
+- [ ] < 5% churn

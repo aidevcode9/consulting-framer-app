@@ -13,7 +13,19 @@ import type {
   CanvasData,
 } from "@/types";
 
-// Initialize Anthropic client (server-side only)
+/**
+ * Initialize and validate Anthropic API client for server-side operations.
+ *
+ * Creates a new Anthropic client instance with API key from environment variables.
+ * This function should only be called in server-side contexts (API routes, server components).
+ *
+ * @returns Configured Anthropic client instance
+ * @throws Error if ANTHROPIC_API_KEY environment variable is not set
+ *
+ * @example
+ * const client = getAnthropicClient();
+ * const response = await client.messages.create({...});
+ */
 const getAnthropicClient = () => {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
@@ -42,6 +54,24 @@ RESPONSE FORMAT:
 - If you need clarification, ask ONE focused question
 - Never ask multiple questions at once`;
 
+/**
+ * Generate AI-powered follow-up questions during discovery phase.
+ *
+ * Analyzes the current engagement context and previous discovery answers to determine
+ * if additional clarification is needed or if the discovery process is complete for this question.
+ * Uses Claude to intelligently probe for hidden requirements, stakeholders, and constraints.
+ *
+ * @param context - Discovery context including engagement details, current question, and previous answers
+ * @returns Promise resolving to object with followUp question (or null if complete) and isComplete flag
+ *
+ * @example
+ * const result = await generateDiscoveryFollowUp({
+ *   engagement: { client_name: "Acme Corp", client_industry: "tech", title: "Digital Transformation" },
+ *   current_question: { id: "q1", question: "What are your main objectives?", category: "scope" },
+ *   answers: { "q1": { value: "Cloud migration", category: "scope" } }
+ * });
+ * // Returns: { followUp: "Which cloud provider are you targeting?", isComplete: false }
+ */
 export async function generateDiscoveryFollowUp(
   context: DiscoveryContext
 ): Promise<{ followUp: string | null; isComplete: boolean }> {
@@ -115,6 +145,26 @@ RESPONSE FORMAT (JSON):
 
 Return 1-3 recommendations, ordered by relevance.`;
 
+/**
+ * Recommend consulting frameworks based on engagement context and discovery answers.
+ *
+ * Uses AI to analyze the engagement details and discovery responses to suggest the most
+ * appropriate analytical frameworks (SWOT, Porter's Five Forces, McKinsey 7-S, etc.).
+ * Returns 1-3 recommendations ordered by relevance with confidence scores and reasoning.
+ *
+ * @param engagement - Partial engagement object with title, client info, and description
+ * @param discoveryAnswers - Collected discovery question answers
+ * @param availableFrameworks - List of available framework templates to choose from
+ * @returns Promise resolving to array of framework recommendations with confidence and focus areas
+ *
+ * @example
+ * const recommendations = await recommendFrameworks(
+ *   { title: "Market Entry Strategy", client_name: "TechCo", client_industry: "SaaS" },
+ *   { "q1": { value: "New market analysis", category: "scope" } },
+ *   [swotTemplate, porterTemplate, mckinsey7sTemplate]
+ * );
+ * // Returns: [{ framework: porterTemplate, confidence: 0.9, reasoning: "..." }]
+ */
 export async function recommendFrameworks(
   engagement: Pick<Engagement, "title" | "client_name" | "client_industry" | "description">,
   discoveryAnswers: Record<string, DiscoveryAnswer>,
@@ -224,6 +274,25 @@ OUTPUT FORMAT (JSON):
 
 Be specific, professional, and realistic. Tailor to the client's industry.`;
 
+/**
+ * Generate comprehensive Statement of Work (SOW) from engagement data and framework analysis.
+ *
+ * Creates a professional SOW document including executive summary, objectives, deliverables,
+ * timeline, assumptions, and risk assessment. Analyzes canvas framework data and discovery
+ * answers to produce tailored, industry-specific scope documentation.
+ *
+ * @param input - Scope generation input including engagement details, discovery answers, and canvas data
+ * @returns Promise resolving to generated scope with structured deliverables, phases, and risks
+ * @throws Error if Anthropic API call fails or JSON parsing fails
+ *
+ * @example
+ * const scope = await generateScope({
+ *   engagement: { title: "Digital Transformation", client_name: "Acme" },
+ *   discovery_answers: { "q1": { value: "Cloud migration" } },
+ *   canvas_data: { nodes: [...], edges: [...] }
+ * });
+ * // Returns: { executive_summary: "...", objectives: [...], deliverables: [...], timeline: [...] }
+ */
 export async function generateScope(
   input: ScopeGenerationInput
 ): Promise<GeneratedScope> {

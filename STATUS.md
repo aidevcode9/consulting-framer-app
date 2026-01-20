@@ -4,10 +4,32 @@ Last updated: 2026-01-20
 
 ---
 
-## Current Phase: 1 — Core Canvas
+## ⚡ What Works Right Now
 
-**Goal:** Visual engagement builder with framework library  
-**Target:** End of February 2026
+**Working (can demo):**
+- ✅ Landing page at `/`
+- ✅ Workspace UI at `/app` (mock data, no auth)
+- ✅ Canvas with drag-drop, zoom, pan, undo/redo
+- ✅ 3 framework nodes: SWOT, Porter, McKinsey
+- ✅ Discovery panel UI (mock questions, no AI)
+- ✅ Framework panel (drag-drop to canvas)
+- ✅ Note block
+
+**Not Working Yet:**
+- ❌ No login/signup (anyone can access `/app`)
+- ❌ No database persistence (refresh = data lost)
+- ❌ No real AI (discovery uses hardcoded questions)
+- ❌ No Stripe/billing (tier limits not enforced)
+- ❌ No SOW generation
+
+**To Demo:** Run `npm run dev` → visit `localhost:3000/app`
+
+---
+
+## Current Phase: 1 — MVP Foundation
+
+**Goal:** Canvas + 3 frameworks + auth + persistence  
+**Target:** End of January 2026
 
 ---
 
@@ -15,22 +37,17 @@ Last updated: 2026-01-20
 
 | Task | FR | Branch | Started | Notes |
 |------|-----|--------|---------|-------|
-| Project setup | — | main | 01-20 | Initialize Next.js + Supabase + React Flow |
+| — | — | — | — | Ready to start Phase 1 |
 
 ## Next (Priority Order)
 
 | Task | FR | Depends On | Notes |
 |------|-----|------------|-------|
-| Database schema setup | FR-001 | Project setup | Create Supabase tables per ARCHITECTURE.md |
-| Canvas component | FR-002 | Database | React Flow integration with node types |
-| Framework node library | FR-003 | Canvas | SWOT, Porter's 5 Forces, McKinsey 7-S |
-| Node connections | FR-004 | Framework nodes | Drag-to-connect with relationship labels |
-| Auto-save | FR-005 | Canvas | Debounced save to Supabase |
-| Canvas zoom/pan | FR-006 | Canvas | Standard navigation controls |
-| Undo/redo | FR-007 | Auto-save | Command pattern implementation |
-| Export to PNG/PDF | FR-008 | Canvas | Canvas snapshot functionality |
-| Framework templates | FR-009 | Framework nodes | Pre-built starter canvases |
-| Engagement dashboard | FR-010 | Database | List/search/filter engagements |
+| Supabase Auth integration | FR-101, FR-102 | — | Email + Google OAuth |
+| Protected routes middleware | FR-103 | Auth | Redirect unauthenticated users |
+| Save engagement to database | FR-201, FR-207 | Auth | Canvas data → Supabase |
+| Load engagements on login | FR-701 | Save | Dashboard list view |
+| User profile page | FR-103 | Auth | Settings + account |
 
 ## Blocked
 
@@ -38,32 +55,80 @@ Last updated: 2026-01-20
 |------|-----|------------|-------|--------|
 | — | — | — | — | — |
 
-## Shipped
+## Shipped (This Week)
 
 | Task | FR | PR | Date |
 |------|-----|-----|------|
-| Requirements documentation | — | — | 01-20 |
-| Architecture documentation | — | — | 01-20 |
-| Project planning | — | — | 01-20 |
+| Landing page | — | — | 01-20 |
+| Canvas with React Flow | FR-202, FR-205, FR-206 | — | 01-20 |
+| SWOT framework node | FR-301 | — | 01-20 |
+| Porter's Five Forces node | FR-302 | — | 01-20 |
+| McKinsey 7-S node | FR-303 | — | 01-20 |
+| Discovery panel (mock) | FR-401, FR-403 | — | 01-20 |
+| Framework panel (drag-drop) | FR-202 | — | 01-20 |
+| Canvas toolbar | FR-206 | — | 01-20 |
+| Zustand state management | — | — | 01-20 |
+| Project documentation | — | — | 01-20 |
 
 ---
 
-## Phase 1 Progress
+## Phase Overview
 
-| FR | Requirement | Status |
-|----|-------------|--------|
-| FR-001 | Create new engagement | ⬜ TODO |
-| FR-002 | Visual canvas with drag-drop | ⬜ TODO |
-| FR-003 | Framework node library | ⬜ TODO |
-| FR-004 | Connect nodes with relationships | ⬜ TODO |
-| FR-005 | Auto-save canvas state | ⬜ TODO |
-| FR-006 | Canvas zoom/pan/navigation | ⬜ TODO |
-| FR-007 | Undo/redo operations | ⬜ TODO |
-| FR-008 | Export canvas to PNG/PDF | ⬜ TODO |
-| FR-009 | Framework templates | ⬜ TODO |
-| FR-010 | Engagement list/dashboard | ⬜ TODO |
+| Phase | Weeks | Goal | Revenue Gate |
+|-------|-------|------|--------------|
+| **1. MVP** | 1-2 | Canvas + auth + save | — |
+| **2. Billing** | 3-4 | Stripe + usage limits | ✅ Can charge |
+| **3. AI Discovery** | 5-6 | Real Claude integration | ✅ Core value |
+| **4. Deliverables** | 7-8 | SOW generation | ✅ Full value |
+| **5. Polish** | 9-10 | More frameworks, UX | — |
 
-**Remaining:** 10 of 10 FRs
+---
+
+## Phase 1 Checklist
+
+### Auth (FR-100)
+- [ ] FR-101: Email/password signup
+- [ ] FR-102: Google OAuth
+- [ ] FR-103: User profile
+- [ ] FR-104: Password reset
+
+### Canvas (FR-200) 
+- [x] FR-201: Create engagement *(UI only, no DB)*
+- [x] FR-202: Drag-drop frameworks
+- [x] FR-203: Inline editing
+- [ ] FR-204: Connect blocks
+- [x] FR-205: Zoom/pan
+- [x] FR-206: Undo/redo
+- [ ] FR-207: Auto-save to database
+
+### Frameworks (FR-300)
+- [x] FR-301: SWOT Analysis
+- [x] FR-302: Porter's Five Forces
+- [x] FR-303: McKinsey 7-S
+- [x] FR-310: Note block
+
+### Engagement Management (FR-700)
+- [ ] FR-701: Engagement list
+- [ ] FR-702: Status workflow
+- [ ] FR-703: Search/filter
+
+---
+
+## Phase 2 Checklist
+
+### Billing (FR-900)
+- [ ] FR-901: Subscription tiers defined
+- [ ] FR-902: Stripe Checkout integration
+- [ ] FR-903: Usage limits enforcement
+- [ ] FR-904: Upgrade flow
+- [ ] FR-906: 14-day trial
+- [ ] FR-907: Billing portal
+
+### AI Discovery (FR-400)
+- [x] FR-401: Discovery questionnaire *(mock)*
+- [ ] FR-402: Claude follow-up questions
+- [x] FR-403: Progress tracking
+- [ ] FR-405: Framework recommendations
 
 ---
 
@@ -71,12 +136,11 @@ Last updated: 2026-01-20
 
 | Date | Decision | Rationale |
 |------|----------|-----------|
-| 01-20 | **Next.js 14 + App Router** | Best DX, server components for performance |
-| 01-20 | **React Flow for canvas** | Most mature, best docs, MIT license |
-| 01-20 | **Supabase for backend** | Auth + DB + Storage in one; fast setup |
-| 01-20 | **Claude API for AI features** | Best reasoning for consulting frameworks |
-| 01-20 | **5-phase approach** | Ship working canvas first, add AI second |
-| 01-20 | **PostgreSQL JSON columns** | Flexible canvas_data storage; no schema migrations for node changes |
+| 01-20 | Next.js + Supabase + Stripe stack | Fastest to market; scales to 1000 users |
+| 01-20 | Three tiers: Free/Pro/Team | Covers solo consultants + small firms |
+| 01-20 | 14-day trial, no card required | Reduce friction; convert with value |
+| 01-20 | Start with 3 frameworks | SWOT, Porter, McKinsey most requested |
+| 01-20 | Defer real-time collab | Adds complexity; do after PMF |
 
 ---
 
@@ -84,11 +148,10 @@ Last updated: 2026-01-20
 
 | Risk | Impact | Mitigation | Status |
 |------|--------|------------|--------|
-| React Flow learning curve | Delays Phase 1 | Prototype early; use examples | ⬜ TODO |
-| Canvas performance with many nodes | Poor UX | Virtualization; test with 100+ nodes | ⬜ TODO |
-| AI response latency | User frustration | Streaming responses; optimistic UI | ⬜ Phase 2 |
-| Claude API rate limits | Feature blocked | Caching; request batching | ⬜ Phase 2 |
-| SOW generation quality | Low trust | Extensive EVALS; human review step | ⬜ Phase 3 |
+| Stripe webhook reliability | Billing state mismatch | Idempotent handlers + reconciliation job | ⬜ TODO |
+| Claude API rate limits | User experience | Implement retry + queue | ⬜ TODO |
+| Canvas performance at scale | Slow with 50+ nodes | Virtualization if needed | ⬜ TODO |
+| SOW quality consistency | User trust | Extensive evals + human review | ⬜ TODO |
 
 ---
 
@@ -96,70 +159,31 @@ Last updated: 2026-01-20
 
 | Condition | Deadline | Action |
 |-----------|----------|--------|
-| Canvas unusable after 2 weeks dev | 02-07 | Switch to Excalidraw or simpler approach |
-| No user interest after demo | 03-15 | Pivot to simpler tool or different market |
-| AI features don't save time | 04-01 | Focus on manual workflow, reduce AI scope |
+| < 50 signups after launch | 30 days post-launch | Pivot positioning or market |
+| < 5 paying users | 45 days post-launch | Re-evaluate pricing/value prop |
+| > 30% churn in month 2 | 60 days post-launch | User research; fix retention |
 
 ---
 
-## Time Savings Targets (Key Metrics)
+## Metrics to Track (Post-Launch)
 
-| Activity | Current (Manual) | Target (With Tool) | Savings |
-|----------|------------------|-------------------|---------|
-| Discovery intake | 2-4 hours | 30-45 min | **75%** |
-| Framework selection | 30-60 min | 5-10 min | **80%** |
-| SOW/Proposal draft | 4-8 hours | 1-2 hours | **75%** |
-| Scope visualization | 2-3 hours | 30 min | **80%** |
-| **Total engagement framing** | **10-18 hours** | **2.5-4 hours** | **75%** |
-
-> These targets will be validated in EVALS.md test scenarios.
+| Metric | Target | Current |
+|--------|--------|---------|
+| Signups | 100 in 30 days | — |
+| Activation (create 1 engagement) | 60% | — |
+| Trial → Paid conversion | 20% | — |
+| MRR | $1,000 | — |
+| Churn | < 10% monthly | — |
 
 ---
 
-## Upcoming Phases (Reference)
+## Archive
 
-| Phase | FRs | Goal | Target |
-|-------|-----|------|--------|
-| 1. Core Canvas | FR-001 to FR-010 | Visual engagement builder | Feb 2026 |
-| 2. AI Discovery | FR-011 to FR-020 | AI-guided intake & frameworks | Mar 2026 |
-| 3. Deliverables | FR-021 to FR-030 | SOW/Proposal generation | Apr 2026 |
-| 4. Tracking | FR-031 to FR-040 | Milestones, status, billing | May 2026 |
-| 5. Collaboration | FR-041 to FR-050 | Multi-user, templates marketplace | Jun 2026 |
+<details>
+<summary>Pre-launch (Jan 2026)</summary>
 
----
+- Initial project setup
+- Documentation structure
+- MVP codebase created
 
-## Quality Checkpoints
-
-Before shipping each phase:
-
-- [ ] All FRs have acceptance criteria met
-- [ ] EVALS pass rate ≥ 95%
-- [ ] No critical/high severity bugs
-- [ ] Performance targets met (p95 < 500ms for canvas ops)
-- [ ] User testing feedback incorporated
-
----
-
-## Quick Links
-
-| Doc | Purpose |
-|-----|---------|
-| [REQUIREMENTS.md](./REQUIREMENTS.md) | What to build |
-| [ARCHITECTURE.md](./ARCHITECTURE.md) | How to build |
-| [CLAUDE.md](./CLAUDE.md) | AI context & rules |
-| [EVALS.md](./EVALS.md) | Test scenarios |
-| [README.md](./README.md) | Project overview |
-
----
-
-## Daily Workflow
-
-```
-1. Check STATUS.md → find task in "Next"
-2. Move to "Now" → create branch
-3. Look up FR in REQUIREMENTS.md → acceptance criteria
-4. Check ARCHITECTURE.md → relevant schema/component
-5. Implement → run tests
-6. Update STATUS.md → move to "Shipped"
-7. Commit with (FR-NNN) reference
-```
+</details>

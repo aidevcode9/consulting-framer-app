@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(git remote set-url:*)",
-      "Read(//c/Users/chuck-iykyk/Documents/dev/github/**)"
-    ]
-  }
-}

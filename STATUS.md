@@ -1,6 +1,6 @@
 # STATUS.md — Consulting Framer
 
-Last updated: 2026-01-21
+Last updated: 2026-01-22
 
 ---
 
@@ -11,15 +11,18 @@ Last updated: 2026-01-21
 - ✅ Login/signup at `/login` and `/signup`
 - ✅ Google OAuth integration
 - ✅ Protected routes (redirects to login)
-- ✅ Workspace UI at `/app` (mock data)
+- ✅ Sign out functionality
+- ✅ Workspace UI at `/app`
 - ✅ Canvas with drag-drop, zoom, pan, undo/redo
 - ✅ 3 framework nodes: SWOT, Porter, McKinsey
 - ✅ Discovery panel UI (mock questions, no AI)
 - ✅ Framework panel (drag-drop to canvas)
 - ✅ Note block
+- ✅ **Database persistence** (engagements save to Supabase)
+- ✅ **Auto-save** (canvas saves every 5 seconds)
+- ✅ **Engagement list** (loads from database on login)
 
 **Not Working Yet:**
-- ❌ No database persistence (refresh = data lost)
 - ❌ No real AI (discovery uses hardcoded questions)
 - ❌ No Stripe/billing (tier limits not enforced)
 - ❌ No SOW generation
@@ -30,7 +33,7 @@ Last updated: 2026-01-21
 
 ## Current Phase: 1 — MVP Foundation
 
-**Goal:** Canvas + 3 frameworks + auth + persistence  
+**Goal:** Canvas + 3 frameworks + auth + persistence
 **Target:** End of January 2026
 
 ---
@@ -45,10 +48,10 @@ Last updated: 2026-01-21
 
 | Task | FR | Depends On | Notes |
 |------|-----|------------|-------|
-| Save engagement to database | FR-201, FR-207 | ✅ Auth | Canvas data → Supabase |
-| Load engagements on login | FR-701 | Save | Dashboard list view |
 | User profile page | FR-103 | ✅ Auth | Settings + account |
 | Password reset | FR-104 | ✅ Auth | Email link flow |
+| Status workflow | FR-702 | ✅ FR-701 | Draft → Active → Complete |
+| Search/filter | FR-703 | ✅ FR-701 | Filter by client, status |
 
 ## Blocked
 
@@ -60,6 +63,10 @@ Last updated: 2026-01-21
 
 | Task | FR | PR | Date |
 |------|-----|-----|------|
+| Database persistence | FR-201, FR-207 | — | 01-22 |
+| Engagement list | FR-701 | — | 01-22 |
+| Sign out button | FR-101 | — | 01-22 |
+| Auto-save (5 sec) | FR-207 | — | 01-22 |
 | Supabase Auth (email + Google) | FR-101, FR-102 | #1 | 01-21 |
 | Protected routes middleware | — | #1 | 01-21 |
 | Error handling foundation | — | #1 | 01-21 |
@@ -96,14 +103,14 @@ Last updated: 2026-01-21
 - [ ] FR-103: User profile
 - [ ] FR-104: Password reset
 
-### Canvas (FR-200) 
-- [x] FR-201: Create engagement *(UI only, no DB)*
+### Canvas (FR-200)
+- [x] FR-201: Create engagement ✅ **With DB persistence**
 - [x] FR-202: Drag-drop frameworks
 - [x] FR-203: Inline editing
 - [ ] FR-204: Connect blocks
 - [x] FR-205: Zoom/pan
 - [x] FR-206: Undo/redo
-- [ ] FR-207: Auto-save to database
+- [x] FR-207: Auto-save to database ✅
 
 ### Frameworks (FR-300)
 - [x] FR-301: SWOT Analysis
@@ -112,7 +119,7 @@ Last updated: 2026-01-21
 - [x] FR-310: Note block
 
 ### Engagement Management (FR-700)
-- [ ] FR-701: Engagement list
+- [x] FR-701: Engagement list ✅
 - [ ] FR-702: Status workflow
 - [ ] FR-703: Search/filter
 
@@ -140,6 +147,8 @@ Last updated: 2026-01-21
 
 | Date | Decision | Rationale |
 |------|----------|-----------|
+| 01-22 | Thin routes, fat services pattern | Matches ARCHITECTURE.md; testable |
+| 01-22 | 5-second auto-save debounce | Balance between data safety and API load |
 | 01-21 | Server-side auth with @supabase/ssr | Secure cookies; works with SSR/RSC |
 | 01-21 | Server Actions for auth forms | Simpler than API routes; type-safe |
 | 01-20 | Next.js + Supabase + Stripe stack | Fastest to market; scales to 1000 users |

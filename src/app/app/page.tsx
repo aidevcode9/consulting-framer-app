@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
 import {
   Layers,
@@ -16,10 +16,14 @@ import {
   Sparkles,
   LayoutGrid,
   ClipboardList,
+  LogOut,
 } from "lucide-react";
+import { signOut } from "@/app/(auth)/actions";
 import { CanvasWithProvider } from "@/components/canvas/Canvas";
 import { DiscoveryPanel } from "@/components/discovery/DiscoveryPanel";
 import { useUIStore, useEngagementStore, useCanvasStore } from "@/lib/store";
+
+import type { Engagement } from "@/types";
 
 // Tab types for the right panel
 type RightPanelTab = "discovery" | "scope" | null;
@@ -27,62 +31,128 @@ type RightPanelTab = "discovery" | "scope" | null;
 export default function AppPage() {
   const { sidebarOpen, setSidebarOpen } = useUIStore();
   const { currentEngagement, setCurrentEngagement } = useEngagementStore();
-  const { markSaved, getCanvasData } = useCanvasStore();
-  
+  const { markSaved, getCanvasData, setNodes, setEdges } = useCanvasStore();
+
   const [rightPanelTab, setRightPanelTab] = useState<RightPanelTab>("discovery");
   const [showNewEngagementModal, setShowNewEngagementModal] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const [engagements, setEngagements] = useState<Engagement[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+  const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Mock engagements for demo
-  const [engagements] = useState([
-    {
-      id: "1",
-      title: "Acme Corp Strategic Review",
-      client_name: "Acme Corporation",
-      status: "discovery",
-      updated_at: "2026-01-18",
-    },
-    {
-      id: "2",
-      title: "TechStart Digital Transformation",
-      client_name: "TechStart Inc",
-      status: "framing",
-      updated_at: "2026-01-15",
-    },
-    {
-      id: "3",
-      title: "Global Retail Market Entry",
-      client_name: "Global Retail Co",
-      status: "scoping",
-      updated_at: "2026-01-10",
-    },
-  ]);
+  // Close user menu when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setShowUserMenu(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
-  const handleSave = useCallback(() => {
+  // Fetch engagements on mount
+  useEffect(() => {
+    async function fetchEngagements() {
+      try {
+        const res = await fetch("/api/engagements");
+        if (res.ok) {
+          const data = await res.json();
+          setEngagements(data.engagements || []);
+        }
+      } catch (error) {
+        console.error("Failed to fetch engagements:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchEngagements();
+  }, []);
+
+  // Save canvas to database
+  const saveCanvasToDb = useCallback(async () => {
+    if (!currentEngagement) return;
+
     const canvasData = getCanvasData();
-    console.log("Saving canvas data:", canvasData);
-    // In production: save to Supabase
-    markSaved();
-  }, [getCanvasData, markSaved]);
+    setIsSaving(true);
 
-  const handleSelectEngagement = (engagement: typeof engagements[0]) => {
-    setCurrentEngagement({
-      id: engagement.id,
-      user_id: "demo-user",
-      title: engagement.title,
-      client_name: engagement.client_name,
-      client_industry: null,
-      description: null,
-      status: engagement.status as "discovery" | "framing" | "scoping",
-      canvas_data: { nodes: [], edges: [], viewport: { x: 0, y: 0, zoom: 1 } },
-      discovery_answers: {},
-      discovery_completed: false,
-      tags: [],
-      estimated_value: null,
-      estimated_duration_weeks: null,
-      created_at: new Date().toISOString(),
-      updated_at: engagement.updated_at,
-      completed_at: null,
-    });
+    try {
+      const res = await fetch(`/api/engagements/${currentEngagement.id}/canvas`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ canvas_data: canvasData }),
+      });
+
+      if (res.ok) {
+        markSaved();
+      }
+    } catch (error) {
+      console.error("Failed to save canvas:", error);
+    } finally {
+      setIsSaving(false);
+    }
+  }, [currentEngagement, getCanvasData, markSaved]);
+
+  // Auto-save every 5 seconds when dirty
+  const handleSave = useCallback(() => {
+    // Clear existing timer
+    if (autoSaveTimerRef.current) {
+      clearTimeout(autoSaveTimerRef.current);
+    }
+
+    // Set new timer for auto-save
+    autoSaveTimerRef.current = setTimeout(() => {
+      saveCanvasToDb();
+    }, 5000);
+  }, [saveCanvasToDb]);
+
+  // Cleanup auto-save timer on unmount
+  useEffect(() => {
+    return () => {
+      if (autoSaveTimerRef.current) {
+        clearTimeout(autoSaveTimerRef.current);
+      }
+    };
+  }, []);
+
+  const handleSignOut = async () => {
+    await signOut();
+  };
+
+  const handleSelectEngagement = (engagement: Engagement) => {
+    // Load canvas data from the engagement
+    if (engagement.canvas_data) {
+      setNodes(engagement.canvas_data.nodes || []);
+      setEdges(engagement.canvas_data.edges || []);
+    }
+    setCurrentEngagement(engagement);
+  };
+
+  const handleCreateEngagement = async (data: { title: string; clientName: string; industry: string }) => {
+    try {
+      const res = await fetch("/api/engagements", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: data.title,
+          client_name: data.clientName,
+          client_industry: data.industry || null,
+        }),
+      });
+
+      if (res.ok) {
+        const { engagement } = await res.json();
+        setEngagements((prev) => [engagement, ...prev]);
+        setCurrentEngagement(engagement);
+        setNodes([]);
+        setEdges([]);
+        setShowNewEngagementModal(false);
+      }
+    } catch (error) {
+      console.error("Failed to create engagement:", error);
+    }
   };
 
   return (
@@ -137,35 +207,45 @@ export default function AppPage() {
               </span>
             </div>
             <div className="space-y-1">
-              {engagements.map((engagement) => (
-                <button
-                  key={engagement.id}
-                  onClick={() => handleSelectEngagement(engagement)}
-                  className={`w-full rounded-lg p-2 text-left transition-colors ${
-                    currentEngagement?.id === engagement.id
-                      ? "bg-blue-50 text-blue-700"
-                      : "hover:bg-gray-50"
-                  }`}
-                >
-                  <div className="flex items-center gap-2">
-                    <FolderOpen className="h-4 w-4 text-gray-400" />
-                    <div className="flex-1 truncate">
-                      <p className="truncate text-sm font-medium">
-                        {engagement.title}
-                      </p>
-                      <p className="truncate text-xs text-gray-500">
-                        {engagement.client_name}
-                      </p>
+              {isLoading ? (
+                <div className="py-4 text-center text-sm text-gray-400">
+                  Loading...
+                </div>
+              ) : engagements.length === 0 ? (
+                <div className="py-4 text-center text-sm text-gray-400">
+                  No engagements yet
+                </div>
+              ) : (
+                engagements.map((engagement) => (
+                  <button
+                    key={engagement.id}
+                    onClick={() => handleSelectEngagement(engagement)}
+                    className={`w-full rounded-lg p-2 text-left transition-colors ${
+                      currentEngagement?.id === engagement.id
+                        ? "bg-blue-50 text-blue-700"
+                        : "hover:bg-gray-50"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <FolderOpen className="h-4 w-4 text-gray-400" />
+                      <div className="flex-1 truncate">
+                        <p className="truncate text-sm font-medium">
+                          {engagement.title}
+                        </p>
+                        <p className="truncate text-xs text-gray-500">
+                          {engagement.client_name}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                  <div className="mt-1 flex items-center gap-2">
-                    <StatusBadge status={engagement.status} />
-                    <span className="text-xs text-gray-400">
-                      {engagement.updated_at}
-                    </span>
-                  </div>
-                </button>
-              ))}
+                    <div className="mt-1 flex items-center gap-2">
+                      <StatusBadge status={engagement.status} />
+                      <span className="text-xs text-gray-400">
+                        {new Date(engagement.updated_at).toLocaleDateString()}
+                      </span>
+                    </div>
+                  </button>
+                ))
+              )}
             </div>
           </div>
         )}
@@ -200,6 +280,9 @@ export default function AppPage() {
                   {currentEngagement.title}
                 </h1>
                 <StatusBadge status={currentEngagement.status} />
+                {isSaving && (
+                  <span className="text-xs text-gray-400">Saving...</span>
+                )}
               </>
             ) : (
               <h1 className="text-lg font-semibold text-gray-500">
@@ -218,12 +301,28 @@ export default function AppPage() {
               <Bell className="h-5 w-5" />
             </button>
             {/* User Menu */}
-            <button className="flex items-center gap-2 rounded-lg p-2 hover:bg-gray-100">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100">
-                <User className="h-4 w-4 text-blue-600" />
-              </div>
-              <ChevronDown className="h-4 w-4 text-gray-400" />
-            </button>
+            <div className="relative" ref={userMenuRef}>
+              <button
+                onClick={() => setShowUserMenu(!showUserMenu)}
+                className="flex items-center gap-2 rounded-lg p-2 hover:bg-gray-100"
+              >
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100">
+                  <User className="h-4 w-4 text-blue-600" />
+                </div>
+                <ChevronDown className="h-4 w-4 text-gray-400" />
+              </button>
+              {showUserMenu && (
+                <div className="absolute right-0 top-full mt-1 w-48 rounded-lg border bg-white py-1 shadow-lg">
+                  <button
+                    onClick={handleSignOut}
+                    className="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    Sign out
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </header>
 
@@ -279,28 +378,7 @@ export default function AppPage() {
       {showNewEngagementModal && (
         <NewEngagementModal
           onClose={() => setShowNewEngagementModal(false)}
-          onCreate={(data) => {
-            const newEngagement = {
-              id: `new-${Date.now()}`,
-              user_id: "demo-user",
-              title: data.title,
-              client_name: data.clientName,
-              client_industry: data.industry,
-              description: null,
-              status: "discovery" as const,
-              canvas_data: { nodes: [], edges: [], viewport: { x: 0, y: 0, zoom: 1 } },
-              discovery_answers: {},
-              discovery_completed: false,
-              tags: [],
-              estimated_value: null,
-              estimated_duration_weeks: null,
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-              completed_at: null,
-            };
-            setCurrentEngagement(newEngagement);
-            setShowNewEngagementModal(false);
-          }}
+          onCreate={handleCreateEngagement}
         />
       )}
     </div>

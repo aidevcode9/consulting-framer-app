@@ -2,6 +2,71 @@
 
 ---
 
+## [2026-01-22] Phase 1 Completion: FR-103, FR-104, FR-702, FR-703, FR-704
+
+**Status:** ✅ Complete
+**Branch:** feat/auth-email-google
+
+**Files created:**
+- src/repositories/profile.repo.ts (new)
+- src/services/profile.service.ts (new)
+- src/app/api/profile/route.ts (new)
+- src/app/app/settings/page.tsx (new)
+- src/app/(auth)/reset-password/page.tsx (new)
+- src/app/(auth)/reset-password/confirm/page.tsx (new)
+- src/lib/validations/profile.ts (new)
+
+**Files modified:**
+- src/app/(auth)/actions.ts (added requestPasswordReset, updatePassword)
+- src/app/(auth)/login/page.tsx (fixed forgot password link)
+- src/app/auth/callback/route.ts (handle recovery type)
+- src/app/app/page.tsx (status selector, search/filter, archive)
+
+**What was implemented:**
+
+### FR-103: User Profile
+- Profile repository + service (CRUD for profiles table)
+- GET/PATCH /api/profile endpoints
+- Settings page at /app/settings
+- Edit full name, company, role
+
+### FR-104: Password Reset
+- Request reset via email (Supabase resetPasswordForEmail)
+- Reset confirmation page
+- Password update after clicking email link
+- Redirect to app after success
+
+### FR-702: Status Workflow
+- Clickable status dropdown in header
+- All 6 statuses: discovery, framing, scoping, active, completed, on_hold
+- Real-time update via PATCH API
+
+### FR-703: Search/Filter
+- Search by title or client name
+- Filter chips: All, Active, Discovery, Completed
+- Count shown in header
+- Client-side filtering for instant feedback
+
+### FR-704: Archive Engagements
+- "on_hold" status used as archive
+- Archive button on hover (per engagement)
+- "Show Archived" toggle with count
+- Restore button for archived items
+
+**Skeptic Reviews:** All ✅ Ship it
+
+**Verification:**
+- lint: ✅
+- typecheck: ✅
+- build: ✅
+
+**Notes:**
+- Phase 1 MVP is now complete!
+- All auth group (FR-100) P0s done: FR-101, FR-102, FR-103, FR-104
+- All engagement management P0s done: FR-701, FR-702, FR-703, FR-704
+
+---
+
 ## [2026-01-22] FR-701: Input Validation Fix
 
 **Status:** ✅ Complete

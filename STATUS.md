@@ -21,6 +21,11 @@ Last updated: 2026-01-22
 - ✅ **Database persistence** (engagements save to Supabase)
 - ✅ **Auto-save** (canvas saves every 5 seconds)
 - ✅ **Engagement list** (loads from database on login)
+- ✅ **User profile/settings** at `/app/settings`
+- ✅ **Password reset** via email
+- ✅ **Status workflow** (change status from header)
+- ✅ **Search/filter** (by title, client, status)
+- ✅ **Archive engagements** (hide/restore)
 
 **Not Working Yet:**
 - ❌ No real AI (discovery uses hardcoded questions)
@@ -31,10 +36,10 @@ Last updated: 2026-01-22
 
 ---
 
-## Current Phase: 1 — MVP Foundation
+## Current Phase: 1 → 2 (MVP Complete, Starting Billing)
 
-**Goal:** Canvas + 3 frameworks + auth + persistence
-**Target:** End of January 2026
+**Phase 1 Goal:** Canvas + 3 frameworks + auth + persistence ✅ **COMPLETE**
+**Phase 2 Goal:** Stripe billing + AI discovery
 
 ---
 
@@ -42,16 +47,16 @@ Last updated: 2026-01-22
 
 | Task | FR | Branch | Started | Notes |
 |------|-----|--------|---------|-------|
-| — | — | — | — | Ready for next task |
+| — | — | — | — | Phase 1 complete! Ready for Phase 2 |
 
 ## Next (Priority Order)
 
 | Task | FR | Depends On | Notes |
 |------|-----|------------|-------|
-| User profile page | FR-103 | ✅ Auth | Settings + account |
-| Password reset | FR-104 | ✅ Auth | Email link flow |
-| Status workflow | FR-702 | ✅ FR-701 | Draft → Active → Complete |
-| Search/filter | FR-703 | ✅ FR-701 | Filter by client, status |
+| Subscription tiers | FR-901 | ✅ Phase 1 | Free, Pro ($49), Team ($149) |
+| Stripe integration | FR-902 | ✅ Phase 1 | Checkout + webhooks |
+| Usage limits | FR-903 | FR-901 | Per-tier enforcement |
+| AI discovery | FR-402 | FR-903 | Claude follow-up questions |
 
 ## Blocked
 
@@ -63,6 +68,12 @@ Last updated: 2026-01-22
 
 | Task | FR | PR | Date |
 |------|-----|-----|------|
+| Archive engagements | FR-704 | — | 01-22 |
+| Search/filter | FR-703 | — | 01-22 |
+| Status workflow | FR-702 | — | 01-22 |
+| Password reset | FR-104 | — | 01-22 |
+| User profile page | FR-103 | — | 01-22 |
+| Input validation | FR-701 | — | 01-22 |
 | Database persistence | FR-201, FR-207 | — | 01-22 |
 | Engagement list | FR-701 | — | 01-22 |
 | Sign out button | FR-101 | — | 01-22 |
@@ -97,31 +108,32 @@ Last updated: 2026-01-22
 
 ## Phase 1 Checklist
 
-### Auth (FR-100)
+### Auth (FR-100) ✅ Complete
 - [x] FR-101: Email/password signup
 - [x] FR-102: Google OAuth
-- [ ] FR-103: User profile
-- [ ] FR-104: Password reset
+- [x] FR-103: User profile ✅
+- [x] FR-104: Password reset ✅
 
 ### Canvas (FR-200)
 - [x] FR-201: Create engagement ✅ **With DB persistence**
 - [x] FR-202: Drag-drop frameworks
 - [x] FR-203: Inline editing
-- [ ] FR-204: Connect blocks
+- [ ] FR-204: Connect blocks (P1, deferred)
 - [x] FR-205: Zoom/pan
 - [x] FR-206: Undo/redo
 - [x] FR-207: Auto-save to database ✅
 
-### Frameworks (FR-300)
+### Frameworks (FR-300) ✅ Complete
 - [x] FR-301: SWOT Analysis
 - [x] FR-302: Porter's Five Forces
 - [x] FR-303: McKinsey 7-S
 - [x] FR-310: Note block
 
-### Engagement Management (FR-700)
+### Engagement Management (FR-700) ✅ Complete
 - [x] FR-701: Engagement list ✅
-- [ ] FR-702: Status workflow
-- [ ] FR-703: Search/filter
+- [x] FR-702: Status workflow ✅
+- [x] FR-703: Search/filter ✅
+- [x] FR-704: Archive engagements ✅
 
 ---
 

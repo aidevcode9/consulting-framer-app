@@ -131,3 +131,69 @@ export async function signOut(): Promise<void> {
   await supabase.auth.signOut();
   redirect('/');
 }
+
+/**
+ * Request password reset email
+ * FR-104: Password reset
+ */
+export async function requestPasswordReset(formData: FormData): Promise<AuthResult> {
+  const email = formData.get('email') as string;
+
+  if (!email) {
+    return { error: 'Email is required' };
+  }
+
+  const supabase = await createServerSupabaseClient();
+  const origin = (await headers()).get('origin') || process.env.NEXT_PUBLIC_APP_URL;
+
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${origin}/auth/callback?type=recovery`,
+  });
+
+  if (error) {
+    console.error('[Auth] Password reset error:', error.message);
+    return { error: 'Failed to send reset email. Please try again.' };
+  }
+
+  return {
+    success: true,
+    message: 'Check your email for a password reset link',
+  };
+}
+
+/**
+ * Update password (after clicking reset link)
+ * FR-104: Password reset
+ */
+export async function updatePassword(formData: FormData): Promise<AuthResult> {
+  const password = formData.get('password') as string;
+  const confirmPassword = formData.get('confirmPassword') as string;
+
+  if (!password || !confirmPassword) {
+    return { error: 'Password is required' };
+  }
+
+  if (password.length < 8) {
+    return { error: 'Password must be at least 8 characters' };
+  }
+
+  if (password !== confirmPassword) {
+    return { error: 'Passwords do not match' };
+  }
+
+  const supabase = await createServerSupabaseClient();
+
+  const { error } = await supabase.auth.updateUser({
+    password,
+  });
+
+  if (error) {
+    console.error('[Auth] Update password error:', error.message);
+    return { error: 'Failed to update password. Please try again.' };
+  }
+
+  return {
+    success: true,
+    message: 'Password updated successfully',
+  };
+}

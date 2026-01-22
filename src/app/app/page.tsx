@@ -17,13 +17,16 @@ import {
   LayoutGrid,
   ClipboardList,
   LogOut,
+  Check,
+  Archive,
+  ArchiveRestore,
 } from "lucide-react";
 import { signOut } from "@/app/(auth)/actions";
 import { CanvasWithProvider } from "@/components/canvas/Canvas";
 import { DiscoveryPanel } from "@/components/discovery/DiscoveryPanel";
 import { useUIStore, useEngagementStore, useCanvasStore } from "@/lib/store";
 
-import type { Engagement } from "@/types";
+import type { Engagement, EngagementStatus } from "@/types";
 
 // Tab types for the right panel
 type RightPanelTab = "discovery" | "scope" | null;
@@ -39,8 +42,27 @@ export default function AppPage() {
   const [engagements, setEngagements] = useState<Engagement[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<EngagementStatus | "all">("all");
+  const [showArchived, setShowArchived] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Filter engagements based on search, status, and archive state
+  // "on_hold" status is treated as archived (FR-704)
+  const filteredEngagements = engagements.filter((e) => {
+    const matchesSearch =
+      searchQuery === "" ||
+      e.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      e.client_name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesStatus = statusFilter === "all" || e.status === statusFilter;
+    const isArchived = e.status === "on_hold";
+    const matchesArchive = showArchived || !isArchived;
+    return matchesSearch && matchesStatus && matchesArchive;
+  });
+
+  // Count archived engagements
+  const archivedCount = engagements.filter((e) => e.status === "on_hold").length;
 
   // Close user menu when clicking outside
   useEffect(() => {
@@ -155,6 +177,62 @@ export default function AppPage() {
     }
   };
 
+  // Update engagement status
+  const handleStatusChange = async (newStatus: EngagementStatus) => {
+    if (!currentEngagement) return;
+
+    try {
+      const res = await fetch(`/api/engagements/${currentEngagement.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        // Update current engagement
+        setCurrentEngagement(data.engagement);
+        // Update in engagements list
+        setEngagements((prev) =>
+          prev.map((e) =>
+            e.id === data.engagement.id ? data.engagement : e
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Failed to update status:", error);
+    }
+  };
+
+  // Archive/unarchive engagement (FR-704)
+  const handleArchive = async (engagement: Engagement) => {
+    const newStatus: EngagementStatus = engagement.status === "on_hold" ? "discovery" : "on_hold";
+
+    try {
+      const res = await fetch(`/api/engagements/${engagement.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        // Update in engagements list
+        setEngagements((prev) =>
+          prev.map((e) =>
+            e.id === data.engagement.id ? data.engagement : e
+          )
+        );
+        // If we archived the current engagement, deselect it
+        if (currentEngagement?.id === engagement.id && newStatus === "on_hold") {
+          setCurrentEngagement(null);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to archive engagement:", error);
+    }
+  };
+
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Left Sidebar */}
@@ -198,12 +276,63 @@ export default function AppPage() {
           </button>
         </div>
 
+        {/* Search and Filter (FR-703) */}
+        {sidebarOpen && (
+          <div className="border-b px-3 pb-3">
+            {/* Search Input */}
+            <div className="relative">
+              <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search engagements..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full rounded-lg border border-gray-200 bg-gray-50 py-1.5 pl-8 pr-3 text-sm placeholder-gray-400 focus:border-blue-300 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-300"
+              />
+            </div>
+            {/* Status Filter */}
+            <div className="mt-2 flex gap-1 overflow-x-auto">
+              <FilterChip
+                label="All"
+                active={statusFilter === "all"}
+                onClick={() => setStatusFilter("all")}
+              />
+              <FilterChip
+                label="Active"
+                active={statusFilter === "active"}
+                onClick={() => setStatusFilter("active")}
+              />
+              <FilterChip
+                label="Discovery"
+                active={statusFilter === "discovery"}
+                onClick={() => setStatusFilter("discovery")}
+              />
+              <FilterChip
+                label="Completed"
+                active={statusFilter === "completed"}
+                onClick={() => setStatusFilter("completed")}
+              />
+            </div>
+            {/* Show Archived Toggle (FR-704) */}
+            {archivedCount > 0 && (
+              <button
+                onClick={() => setShowArchived(!showArchived)}
+                className="mt-2 flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-700"
+              >
+                <Archive className="h-3 w-3" />
+                {showArchived ? "Hide" : "Show"} archived ({archivedCount})
+              </button>
+            )}
+          </div>
+        )}
+
         {/* Engagements List */}
         {sidebarOpen && (
           <div className="flex-1 overflow-y-auto p-3">
             <div className="mb-2 flex items-center justify-between">
               <span className="text-xs font-semibold uppercase text-gray-500">
-                Recent Engagements
+                {statusFilter === "all" ? "All" : statusConfig[statusFilter]?.label} Engagements
+                {filteredEngagements.length > 0 && ` (${filteredEngagements.length})`}
               </span>
             </div>
             <div className="space-y-1">
@@ -215,35 +344,58 @@ export default function AppPage() {
                 <div className="py-4 text-center text-sm text-gray-400">
                   No engagements yet
                 </div>
+              ) : filteredEngagements.length === 0 ? (
+                <div className="py-4 text-center text-sm text-gray-400">
+                  No matching engagements
+                </div>
               ) : (
-                engagements.map((engagement) => (
-                  <button
+                filteredEngagements.map((engagement) => (
+                  <div
                     key={engagement.id}
-                    onClick={() => handleSelectEngagement(engagement)}
-                    className={`w-full rounded-lg p-2 text-left transition-colors ${
+                    className={`group relative rounded-lg p-2 transition-colors ${
                       currentEngagement?.id === engagement.id
                         ? "bg-blue-50 text-blue-700"
                         : "hover:bg-gray-50"
                     }`}
                   >
-                    <div className="flex items-center gap-2">
-                      <FolderOpen className="h-4 w-4 text-gray-400" />
-                      <div className="flex-1 truncate">
-                        <p className="truncate text-sm font-medium">
-                          {engagement.title}
-                        </p>
-                        <p className="truncate text-xs text-gray-500">
-                          {engagement.client_name}
-                        </p>
+                    <button
+                      onClick={() => handleSelectEngagement(engagement)}
+                      className="w-full text-left"
+                    >
+                      <div className="flex items-center gap-2">
+                        <FolderOpen className="h-4 w-4 text-gray-400" />
+                        <div className="flex-1 truncate">
+                          <p className="truncate text-sm font-medium">
+                            {engagement.title}
+                          </p>
+                          <p className="truncate text-xs text-gray-500">
+                            {engagement.client_name}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                    <div className="mt-1 flex items-center gap-2">
-                      <StatusBadge status={engagement.status} />
-                      <span className="text-xs text-gray-400">
-                        {new Date(engagement.updated_at).toLocaleDateString()}
-                      </span>
-                    </div>
-                  </button>
+                      <div className="mt-1 flex items-center gap-2">
+                        <StatusBadge status={engagement.status} />
+                        <span className="text-xs text-gray-400">
+                          {new Date(engagement.updated_at).toLocaleDateString()}
+                        </span>
+                      </div>
+                    </button>
+                    {/* Archive Button (FR-704) */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleArchive(engagement);
+                      }}
+                      className="absolute right-2 top-2 hidden rounded p-1 text-gray-400 hover:bg-gray-200 hover:text-gray-600 group-hover:block"
+                      title={engagement.status === "on_hold" ? "Restore" : "Archive"}
+                    >
+                      {engagement.status === "on_hold" ? (
+                        <ArchiveRestore className="h-4 w-4" />
+                      ) : (
+                        <Archive className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
                 ))
               )}
             </div>
@@ -279,7 +431,10 @@ export default function AppPage() {
                 <h1 className="text-lg font-semibold text-gray-900">
                   {currentEngagement.title}
                 </h1>
-                <StatusBadge status={currentEngagement.status} />
+                <StatusSelector
+                  status={currentEngagement.status}
+                  onStatusChange={handleStatusChange}
+                />
                 {isSaving && (
                   <span className="text-xs text-gray-400">Saving...</span>
                 )}
@@ -313,6 +468,14 @@ export default function AppPage() {
               </button>
               {showUserMenu && (
                 <div className="absolute right-0 top-full mt-1 w-48 rounded-lg border bg-white py-1 shadow-lg">
+                  <Link
+                    href="/app/settings"
+                    className="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    <Settings className="h-4 w-4" />
+                    Settings
+                  </Link>
+                  <hr className="my-1 border-gray-100" />
                   <button
                     onClick={handleSignOut}
                     className="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -385,23 +548,118 @@ export default function AppPage() {
   );
 }
 
-// Status Badge Component
-function StatusBadge({ status }: { status: string }) {
-  const statusConfig: Record<string, { bg: string; text: string; label: string }> = {
-    discovery: { bg: "bg-amber-100", text: "text-amber-700", label: "Discovery" },
-    framing: { bg: "bg-blue-100", text: "text-blue-700", label: "Framing" },
-    scoping: { bg: "bg-purple-100", text: "text-purple-700", label: "Scoping" },
-    active: { bg: "bg-green-100", text: "text-green-700", label: "Active" },
-    completed: { bg: "bg-gray-100", text: "text-gray-700", label: "Completed" },
-    on_hold: { bg: "bg-red-100", text: "text-red-700", label: "On Hold" },
-  };
+// Status Configuration
+const statusConfig: Record<string, { bg: string; text: string; label: string }> = {
+  discovery: { bg: "bg-amber-100", text: "text-amber-700", label: "Discovery" },
+  framing: { bg: "bg-blue-100", text: "text-blue-700", label: "Framing" },
+  scoping: { bg: "bg-purple-100", text: "text-purple-700", label: "Scoping" },
+  active: { bg: "bg-green-100", text: "text-green-700", label: "Active" },
+  completed: { bg: "bg-gray-100", text: "text-gray-700", label: "Completed" },
+  on_hold: { bg: "bg-red-100", text: "text-red-700", label: "On Hold" },
+};
 
+const statusOrder: EngagementStatus[] = [
+  "discovery",
+  "framing",
+  "scoping",
+  "active",
+  "completed",
+  "on_hold",
+];
+
+// Status Selector Component (FR-702)
+function StatusSelector({
+  status,
+  onStatusChange,
+}: {
+  status: EngagementStatus;
+  onStatusChange: (status: EngagementStatus) => void;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (ref.current && !ref.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const config = statusConfig[status] || statusConfig.discovery;
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium transition-colors hover:ring-2 hover:ring-offset-1 ${config.bg} ${config.text}`}
+      >
+        {config.label}
+        <ChevronDown className="h-3 w-3" />
+      </button>
+      {isOpen && (
+        <div className="absolute left-0 top-full z-50 mt-1 w-40 rounded-lg border bg-white py-1 shadow-lg">
+          {statusOrder.map((s) => {
+            const cfg = statusConfig[s];
+            const isSelected = s === status;
+            return (
+              <button
+                key={s}
+                onClick={() => {
+                  onStatusChange(s);
+                  setIsOpen(false);
+                }}
+                className={`flex w-full items-center justify-between px-3 py-2 text-sm hover:bg-gray-50 ${
+                  isSelected ? "bg-gray-50" : ""
+                }`}
+              >
+                <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${cfg.bg} ${cfg.text}`}>
+                  {cfg.label}
+                </span>
+                {isSelected && <Check className="h-4 w-4 text-blue-600" />}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Status Badge Component (for sidebar list)
+function StatusBadge({ status }: { status: string }) {
   const config = statusConfig[status] || statusConfig.discovery;
 
   return (
     <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${config.bg} ${config.text}`}>
       {config.label}
     </span>
+  );
+}
+
+// Filter Chip Component (FR-703)
+function FilterChip({
+  label,
+  active,
+  onClick,
+}: {
+  label: string;
+  active: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${
+        active
+          ? "bg-blue-100 text-blue-700"
+          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+      }`}
+    >
+      {label}
+    </button>
   );
 }
 

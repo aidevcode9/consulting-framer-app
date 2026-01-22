@@ -1,7 +1,7 @@
 "use client";
 
 import { memo, useState } from "react";
-import { Handle, Position, type NodeProps } from "@xyflow/react";
+import { Handle, Position } from "@xyflow/react";
 import { Plus, Trash2, GripVertical } from "lucide-react";
 import { useCanvasStore } from "@/lib/store";
 import type { BaseNodeData, NodeItem } from "@/types";
@@ -24,11 +24,17 @@ interface SWOTData extends BaseNodeData {
   sections?: Record<string, NodeItem[]>;
 }
 
-export const SWOTNode = memo(function SWOTNode({ id, data, selected }: NodeProps<SWOTData>) {
+type SWOTNodeProps = {
+  id: string;
+  data: SWOTData;
+  selected?: boolean;
+};
+
+export const SWOTNode = memo(function SWOTNode({ id, data, selected }: SWOTNodeProps) {
   const [editingSection, setEditingSection] = useState<string | null>(null);
   const [newItemText, setNewItemText] = useState("");
 
-  const { addItemToNode, removeItemFromNode, updateNode } = useCanvasStore();
+  const { updateNode } = useCanvasStore();
 
   // Initialize sections if not present
   const sections = data.sections || {

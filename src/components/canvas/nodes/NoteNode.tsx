@@ -1,15 +1,20 @@
 "use client";
 
 import { memo, useState, useRef, useEffect } from "react";
-import { Handle, Position, type NodeProps } from "@xyflow/react";
+import { Handle, Position } from "@xyflow/react";
 import { Trash2, GripVertical, Edit2, Check, X } from "lucide-react";
 import { useCanvasStore } from "@/lib/store";
 import type { BaseNodeData } from "@/types";
 
 interface NoteData extends BaseNodeData {
   content?: string;
-  color?: string;
 }
+
+type NoteNodeProps = {
+  id: string;
+  data: NoteData;
+  selected?: boolean;
+};
 
 const NOTE_COLORS = [
   { name: "Yellow", value: "#fef3c7", border: "#fbbf24" },
@@ -23,7 +28,7 @@ export const NoteNode = memo(function NoteNode({
   id,
   data,
   selected,
-}: NodeProps<NoteData>) {
+}: NoteNodeProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(data.content || "");
   const [showColorPicker, setShowColorPicker] = useState(false);

@@ -9,8 +9,9 @@ import type {
   NodeItem,
   CanvasMode,
   DiscoveryAnswer,
-  FrameworkTemplate,
+  Profile,
 } from "@/types";
+import type { User } from "@supabase/supabase-js";
 import type { Viewport } from "@xyflow/react";
 
 // ============================================
@@ -400,5 +401,40 @@ export const useUIStore = create<UIState>()(
       setActiveTab: (activeTab) => set({ activeTab }),
     }),
     { name: "ui-store" }
+  )
+);
+
+// ============================================
+// AUTH STORE
+// ============================================
+
+interface AuthState {
+  user: User | null;
+  profile: Profile | null;
+  isLoading: boolean;
+  isInitialized: boolean;
+
+  setUser: (user: User | null) => void;
+  setProfile: (profile: Profile | null) => void;
+  setLoading: (loading: boolean) => void;
+  setInitialized: (initialized: boolean) => void;
+  clearAuth: () => void;
+}
+
+export const useAuthStore = create<AuthState>()(
+  devtools(
+    (set) => ({
+      user: null,
+      profile: null,
+      isLoading: true,
+      isInitialized: false,
+
+      setUser: (user) => set({ user }),
+      setProfile: (profile) => set({ profile }),
+      setLoading: (isLoading) => set({ isLoading }),
+      setInitialized: (isInitialized) => set({ isInitialized, isLoading: false }),
+      clearAuth: () => set({ user: null, profile: null, isLoading: false }),
+    }),
+    { name: "auth-store" }
   )
 );

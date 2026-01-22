@@ -41,8 +41,8 @@ export async function POST(req: NextRequest) {
 
     const client = new Anthropic({ apiKey });
 
-    const answersText = Object.entries(answers)
-      .map(([qId, answer]: [string, any]) => `Q: ${qId}\nA: ${answer.value}`)
+    const answersText = Object.entries(answers as Record<string, { value: string }>)
+      .map(([qId, answer]) => `Q: ${qId}\nA: ${answer.value}`)
       .join("\n\n");
 
     const prompt = `ENGAGEMENT CONTEXT:

@@ -8,12 +8,10 @@ import {
   MiniMap,
   Panel,
   useReactFlow,
-  type Node,
-  type Edge,
   type Connection,
   type NodeChange,
   type EdgeChange,
-  addEdge,
+  type NodeTypes,
   applyNodeChanges,
   applyEdgeChanges,
   BackgroundVariant,
@@ -35,7 +33,7 @@ const nodeTypes = {
   porter: PorterNode,
   mckinsey7s: McKinseyNode,
   note: NoteNode,
-};
+} as unknown as NodeTypes;
 
 // Edge styles
 const defaultEdgeOptions = {
@@ -62,11 +60,8 @@ export function Canvas({ onSave, readOnly = false }: CanvasProps) {
     setViewport,
     addNode,
     addEdge: addEdgeToStore,
-    mode,
-    setMode,
-    isDirty,
-    markDirty,
     saveToHistory,
+    isDirty,
   } = useCanvasStore();
 
   // Handle node changes (position, selection, etc.)

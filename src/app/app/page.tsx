@@ -6,8 +6,6 @@ import {
   Layers,
   PanelLeftClose,
   PanelLeft,
-  MessageSquare,
-  FileText,
   Settings,
   Plus,
   FolderOpen,
@@ -27,9 +25,9 @@ import { useUIStore, useEngagementStore, useCanvasStore } from "@/lib/store";
 type RightPanelTab = "discovery" | "scope" | null;
 
 export default function AppPage() {
-  const { sidebarOpen, setSidebarOpen, activeTab, setActiveTab } = useUIStore();
+  const { sidebarOpen, setSidebarOpen } = useUIStore();
   const { currentEngagement, setCurrentEngagement } = useEngagementStore();
-  const { isDirty, markSaved, getCanvasData } = useCanvasStore();
+  const { markSaved, getCanvasData } = useCanvasStore();
   
   const [rightPanelTab, setRightPanelTab] = useState<RightPanelTab>("discovery");
   const [showNewEngagementModal, setShowNewEngagementModal] = useState(false);
@@ -74,7 +72,7 @@ export default function AppPage() {
       client_name: engagement.client_name,
       client_industry: null,
       description: null,
-      status: engagement.status as any,
+      status: engagement.status as "discovery" | "framing" | "scoping",
       canvas_data: { nodes: [], edges: [], viewport: { x: 0, y: 0, zoom: 1 } },
       discovery_answers: {},
       discovery_completed: false,

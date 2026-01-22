@@ -1,7 +1,7 @@
 "use client";
 
 import { memo, useState } from "react";
-import { Handle, Position, type NodeProps } from "@xyflow/react";
+import { Handle, Position } from "@xyflow/react";
 import { Plus, Trash2, GripVertical } from "lucide-react";
 import { useCanvasStore } from "@/lib/store";
 import type { BaseNodeData, NodeItem } from "@/types";
@@ -56,11 +56,17 @@ interface PorterData extends BaseNodeData {
   forces?: Record<string, NodeItem[]>;
 }
 
+type PorterNodeProps = {
+  id: string;
+  data: PorterData;
+  selected?: boolean;
+};
+
 export const PorterNode = memo(function PorterNode({
   id,
   data,
   selected,
-}: NodeProps<PorterData>) {
+}: PorterNodeProps) {
   const [editingForce, setEditingForce] = useState<string | null>(null);
   const [newItemText, setNewItemText] = useState("");
 

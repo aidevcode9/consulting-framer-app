@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { EngagementService } from "@/services/engagement.service";
 import { handleApiError } from "@/lib/api-utils";
+import {
+  createEngagementSchema,
+  validateInput,
+} from "@/lib/validations/engagement";
 
 // GET /api/engagements - List user's engagements
 export async function GET() {
@@ -37,22 +41,10 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { title, client_name, client_industry, description } = body;
-
-    if (!title || !client_name) {
-      return NextResponse.json(
-        { error: "Title and client name are required" },
-        { status: 400 }
-      );
-    }
+    const input = validateInput(createEngagementSchema, body);
 
     const service = new EngagementService(supabase);
-    const engagement = await service.create(user.id, {
-      title,
-      client_name,
-      client_industry,
-      description,
-    });
+    const engagement = await service.create(user.id, input);
 
     return NextResponse.json({ engagement }, { status: 201 });
   } catch (error) {

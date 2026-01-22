@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { EngagementService } from "@/services/engagement.service";
 import { handleApiError } from "@/lib/api-utils";
+import {
+  uuidSchema,
+  updateEngagementSchema,
+  validateInput,
+} from "@/lib/validations/engagement";
 
 // GET /api/engagements/[id] - Get single engagement
 export async function GET(
@@ -10,6 +15,8 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
+    const validId = validateInput(uuidSchema, id);
+
     const supabase = await createServerSupabaseClient();
     const {
       data: { user },
@@ -20,7 +27,7 @@ export async function GET(
     }
 
     const service = new EngagementService(supabase);
-    const engagement = await service.getById(user.id, id);
+    const engagement = await service.getById(user.id, validId);
 
     return NextResponse.json({ engagement });
   } catch (error) {
@@ -35,6 +42,8 @@ export async function PATCH(
 ) {
   try {
     const { id } = await params;
+    const validId = validateInput(uuidSchema, id);
+
     const supabase = await createServerSupabaseClient();
     const {
       data: { user },
@@ -45,9 +54,10 @@ export async function PATCH(
     }
 
     const body = await request.json();
+    const input = validateInput(updateEngagementSchema, body);
 
     const service = new EngagementService(supabase);
-    const engagement = await service.update(user.id, id, body);
+    const engagement = await service.update(user.id, validId, input);
 
     return NextResponse.json({ engagement });
   } catch (error) {
@@ -62,6 +72,8 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
+    const validId = validateInput(uuidSchema, id);
+
     const supabase = await createServerSupabaseClient();
     const {
       data: { user },
@@ -72,7 +84,7 @@ export async function DELETE(
     }
 
     const service = new EngagementService(supabase);
-    await service.delete(user.id, id);
+    await service.delete(user.id, validId);
 
     return NextResponse.json({ success: true });
   } catch (error) {

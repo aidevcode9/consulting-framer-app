@@ -2,6 +2,45 @@
 
 ---
 
+## [2026-01-22] FR-701: Input Validation Fix
+
+**Status:** ✅ Complete
+**Branch:** feat/auth-email-google
+
+**Files created:**
+- src/lib/validations/engagement.ts (new)
+
+**Files modified:**
+- src/app/api/engagements/route.ts (added Zod validation)
+- src/app/api/engagements/[id]/route.ts (added Zod validation)
+- src/app/api/engagements/[id]/canvas/route.ts (added Zod validation)
+
+**What was implemented:**
+1. **Zod validation schemas:**
+   - `uuidSchema` - UUID format validation for route params
+   - `createEngagementSchema` - title, client_name required, optional fields
+   - `updateEngagementSchema` - all fields optional with constraints
+   - `canvasDataSchema` - validates nodes, edges, viewport structure
+   - `saveCanvasSchema` - wraps canvas_data for PATCH endpoint
+2. **validateInput helper** - Generic function that throws ValidationError on invalid input
+3. **Applied validation to all API routes** - UUID params and request bodies
+
+**Skeptic Review:** ✅ Ship it
+- All user inputs validated before processing
+- UUID params validated to prevent injection
+- Proper error propagation through service → API → client
+
+**Verification:**
+- lint: ✅
+- typecheck: ✅
+- build: ✅
+
+**Notes:**
+- Fixed type mismatch: Zod schemas now use `.optional()` (not `.nullable().optional()`) to match existing TypeScript types
+- ValidationError maps to 400 status via handleApiError
+
+---
+
 ## [2026-01-22] FR-201, FR-207, FR-701: Database Persistence
 
 **Status:** ✅ Complete

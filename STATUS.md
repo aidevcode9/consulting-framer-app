@@ -29,7 +29,7 @@ Last updated: 2026-01-22
 
 **Not Working Yet:**
 - ❌ No real AI (discovery uses hardcoded questions)
-- ❌ No Stripe/billing (tier limits not enforced)
+- ⚠️ Billing stub only (no real Stripe yet - `STRIPE_STUB_MODE=true`)
 - ❌ No SOW generation
 
 **To Demo:** Run `npm run dev` → visit `localhost:3000/app`
@@ -53,10 +53,15 @@ Last updated: 2026-01-22
 
 | Task | FR | Depends On | Notes |
 |------|-----|------------|-------|
-| Subscription tiers | FR-901 | ✅ Phase 1 | Free, Pro ($49), Team ($149) |
-| Stripe integration | FR-902 | ✅ Phase 1 | Checkout + webhooks |
-| Usage limits | FR-903 | FR-901 | Per-tier enforcement |
+| Usage limits | FR-903 | ✅ FR-901 | Per-tier enforcement |
 | AI discovery | FR-402 | FR-903 | Claude follow-up questions |
+| **Real Stripe** | FR-902 | End of project | See "Deferred" section |
+
+## Deferred (End of Project)
+
+| Task | FR | Notes |
+|------|-----|-------|
+| Real Stripe integration | FR-902 | Webhook as source of truth, signature verification, `subscriptions` table, remove direct tier updates |
 
 ## Blocked
 
@@ -68,6 +73,7 @@ Last updated: 2026-01-22
 
 | Task | FR | PR | Date |
 |------|-----|-----|------|
+| Billing stub (mock Stripe) | FR-901 | — | 01-22 |
 | Archive engagements | FR-704 | — | 01-22 |
 | Search/filter | FR-703 | — | 01-22 |
 | Status workflow | FR-702 | — | 01-22 |
@@ -140,12 +146,12 @@ Last updated: 2026-01-22
 ## Phase 2 Checklist
 
 ### Billing (FR-900)
-- [ ] FR-901: Subscription tiers defined
-- [ ] FR-902: Stripe Checkout integration
+- [x] FR-901: Subscription tiers defined ✅ **Stub mode**
+- [~] FR-902: Stripe Checkout integration ⚠️ **Stub only; real Stripe deferred**
 - [ ] FR-903: Usage limits enforcement
-- [ ] FR-904: Upgrade flow
-- [ ] FR-906: 14-day trial
-- [ ] FR-907: Billing portal
+- [x] FR-904: Upgrade flow ✅ **Stub mode**
+- [x] FR-906: 14-day trial ✅ **Stub mode**
+- [x] FR-907: Billing portal ✅ **Stub mode**
 
 ### AI Discovery (FR-400)
 - [x] FR-401: Discovery questionnaire *(mock)*
@@ -159,6 +165,7 @@ Last updated: 2026-01-22
 
 | Date | Decision | Rationale |
 |------|----------|-----------|
+| 01-22 | Stripe stub mode for development | Build billing UI without real credentials; defer real Stripe to end |
 | 01-22 | Thin routes, fat services pattern | Matches ARCHITECTURE.md; testable |
 | 01-22 | 5-second auto-save debounce | Balance between data safety and API load |
 | 01-21 | Server-side auth with @supabase/ssr | Secure cookies; works with SSR/RSC |

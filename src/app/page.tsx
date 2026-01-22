@@ -52,7 +52,7 @@ export default function LandingPage() {
               Sign In
             </Link>
             <Link
-              href="/app"
+              href="/signup"
               className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
             >
               Try Free
@@ -91,7 +91,7 @@ export default function LandingPage() {
             {/* CTA Buttons */}
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Link
-                href="/app"
+                href="/signup"
                 className="flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-3 text-lg font-medium text-white shadow-lg shadow-blue-500/25 hover:bg-blue-700"
               >
                 Start Free Trial
@@ -408,7 +408,7 @@ export default function LandingPage() {
                 "PDF export",
               ]}
               cta="Start Free"
-              href="/app"
+              href="/signup"
             />
             <PricingCard
               name="Professional"
@@ -424,7 +424,7 @@ export default function LandingPage() {
                 "Priority support",
               ]}
               cta="Start Trial"
-              href="/app"
+              href="/signup"
               featured
             />
             <PricingCard
@@ -459,7 +459,7 @@ export default function LandingPage() {
               with Consulting Framer. Start your free trial today.
             </p>
             <Link
-              href="/app"
+              href="/signup"
               className="inline-flex items-center gap-2 rounded-lg bg-white px-8 py-4 text-lg font-medium text-gray-900 hover:bg-gray-100"
             >
               Get Started Free

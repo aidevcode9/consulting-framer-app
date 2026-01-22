@@ -1,16 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { 
-  MessageCircle, 
-  Send, 
-  ChevronRight, 
+import {
+  ChevronRight,
   ChevronLeft,
   CheckCircle2,
   Sparkles,
   Loader2,
 } from "lucide-react";
-import { useDiscoveryStore, useEngagementStore } from "@/lib/store";
+import { useDiscoveryStore } from "@/lib/store";
 import type { DiscoveryQuestion, DiscoveryAnswer } from "@/types";
 
 // Mock questions for demo (in production, fetch from database)
@@ -21,6 +19,7 @@ const DISCOVERY_QUESTIONS: DiscoveryQuestion[] = [
     description: "Understanding the client's core business helps frame the engagement.",
     category: "business_context",
     question_type: "text",
+    options: null,
     sort_order: 1,
     is_required: true,
     ai_context: "Use this to understand industry-specific challenges.",
@@ -56,6 +55,7 @@ const DISCOVERY_QUESTIONS: DiscoveryQuestion[] = [
     description: "The core reason for this engagement.",
     category: "problem_definition",
     question_type: "text",
+    options: null,
     sort_order: 3,
     is_required: true,
     ai_context: "This is the central problem statement.",
@@ -70,6 +70,7 @@ const DISCOVERY_QUESTIONS: DiscoveryQuestion[] = [
     description: "Previous initiatives, solutions, or approaches.",
     category: "problem_definition",
     question_type: "text",
+    options: null,
     sort_order: 4,
     is_required: false,
     ai_context: "Understanding past attempts prevents repeating failures.",
@@ -84,6 +85,7 @@ const DISCOVERY_QUESTIONS: DiscoveryQuestion[] = [
     description: "Specific outcomes or metrics they want to achieve.",
     category: "success_criteria",
     question_type: "text",
+    options: null,
     sort_order: 5,
     is_required: true,
     ai_context: "Success criteria should be measurable.",
@@ -98,6 +100,7 @@ const DISCOVERY_QUESTIONS: DiscoveryQuestion[] = [
     description: "Weeks, months, or specific deadlines.",
     category: "constraints",
     question_type: "text",
+    options: null,
     sort_order: 6,
     is_required: true,
     ai_context: "Timeline affects scope significantly.",
@@ -146,8 +149,6 @@ export function DiscoveryPanel({ onComplete }: DiscoveryPanelProps) {
     setAIFollowUp,
     setProcessing,
   } = useDiscoveryStore();
-
-  const { currentEngagement } = useEngagementStore();
 
   const [inputValue, setInputValue] = useState("");
   const [followUpValue, setFollowUpValue] = useState("");
@@ -250,7 +251,7 @@ export function DiscoveryPanel({ onComplete }: DiscoveryPanelProps) {
           Discovery Complete!
         </h3>
         <p className="mb-6 text-gray-600">
-          You've answered all the discovery questions. The AI will now recommend
+          You&apos;ve answered all the discovery questions. The AI will now recommend
           frameworks based on your responses.
         </p>
         <button

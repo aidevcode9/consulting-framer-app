@@ -37,13 +37,12 @@ Last updated: 2026-01-20
 
 | Task | FR | Branch | Started | Notes |
 |------|-----|--------|---------|-------|
-| — | — | — | — | Ready to start Phase 1 |
+| Supabase Auth integration | FR-101, FR-102 | feat/auth-email-google | 01-21 | Email + Google OAuth |
 
 ## Next (Priority Order)
 
 | Task | FR | Depends On | Notes |
 |------|-----|------------|-------|
-| Supabase Auth integration | FR-101, FR-102 | — | Email + Google OAuth |
 | Protected routes middleware | FR-103 | Auth | Redirect unauthenticated users |
 | Save engagement to database | FR-201, FR-207 | Auth | Canvas data → Supabase |
 | Load engagements on login | FR-701 | Save | Dashboard list view |

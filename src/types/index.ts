@@ -184,6 +184,7 @@ export interface BaseNodeData {
   color: string;
   items: NodeItem[];
   description?: string;
+  [key: string]: unknown;
 }
 
 // Framework-specific node types

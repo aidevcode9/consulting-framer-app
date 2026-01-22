@@ -1,7 +1,7 @@
 "use client";
 
 import { memo, useState } from "react";
-import { Handle, Position, type NodeProps } from "@xyflow/react";
+import { Handle, Position } from "@xyflow/react";
 import { Plus, Trash2, GripVertical } from "lucide-react";
 import { useCanvasStore } from "@/lib/store";
 import type { BaseNodeData, NodeItem } from "@/types";
@@ -30,11 +30,17 @@ interface McKinseyData extends BaseNodeData {
   elements?: Record<string, NodeItem[]>;
 }
 
+type McKinseyNodeProps = {
+  id: string;
+  data: McKinseyData;
+  selected?: boolean;
+};
+
 export const McKinseyNode = memo(function McKinseyNode({
   id,
   data,
   selected,
-}: NodeProps<McKinseyData>) {
+}: McKinseyNodeProps) {
   const [editingElement, setEditingElement] = useState<string | null>(null);
   const [newItemText, setNewItemText] = useState("");
 

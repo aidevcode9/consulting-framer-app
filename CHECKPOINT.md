@@ -2,6 +2,55 @@
 
 ---
 
+## [2026-01-22] FR-509, FR-508: SOW Preview + Placeholder Detection
+
+**Status:** ✅ Complete
+**Branch:** feat/auth-email-google
+
+**Files created:**
+- src/components/sow/SOWPreviewModal.tsx (new) - Modal to preview generated SOW
+
+**Files modified:**
+- src/app/app/page.tsx - Added SOW preview modal, generate button, placeholder detection
+
+**What was implemented:**
+
+### FR-509: Preview Before Export
+- SOWPreviewModal component with full SOW display
+- Executive summary, objectives, deliverables, timeline, assumptions, risks sections
+- Professional styling with icons and color-coded badges
+- "Generate SOW" button in Scope panel with loading state
+- Integration with existing /api/sow/generate endpoint
+
+### FR-508: Placeholder Detection
+- Detects incomplete sections:
+  - Executive summary too short (< 50 chars)
+  - Less than 2 objectives
+  - Less than 2 deliverables
+  - No timeline phases
+  - No risks identified
+  - Less than 3 discovery questions answered
+  - No frameworks on canvas
+- Warning banner in preview modal
+- Lists all detected issues for user
+
+**Verification:**
+- lint: ✅
+- typecheck: ✅
+- build: ✅
+
+**Skeptic Review:** ✅ Ship it
+- All security checklists passed
+- Placeholder detection comprehensive
+
+**Commit:** pending
+
+**Notes:**
+- Export functionality (FR-503, FR-504) is next
+- Preview modal shows "Export" button with placeholder alert
+
+---
+
 ## [2026-01-22] FR-501: SOW Generation
 
 **Status:** ✅ Complete
@@ -47,7 +96,7 @@
 - All auth checklist items passed
 - All data integrity checklist items passed
 
-**Commit:** pending
+**Commit:** 96a2ad9
 
 **Notes:**
 - Phase 3 Deliverables has begun

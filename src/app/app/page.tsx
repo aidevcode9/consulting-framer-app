@@ -24,9 +24,10 @@ import {
 import { signOut } from "@/app/(auth)/actions";
 import { CanvasWithProvider } from "@/components/canvas/Canvas";
 import { DiscoveryPanel } from "@/components/discovery/DiscoveryPanel";
+import { SOWPreviewModal } from "@/components/sow/SOWPreviewModal";
 import { useUIStore, useEngagementStore, useCanvasStore } from "@/lib/store";
 
-import type { Engagement, EngagementStatus } from "@/types";
+import type { Engagement, EngagementStatus, GeneratedScope } from "@/types";
 
 // Tab types for the right panel
 type RightPanelTab = "discovery" | "scope" | null;
@@ -45,6 +46,10 @@ export default function AppPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<EngagementStatus | "all">("all");
   const [showArchived, setShowArchived] = useState(false);
+  const [showSOWPreview, setShowSOWPreview] = useState(false);
+  const [sowData, setSowData] = useState<GeneratedScope | null>(null);
+  const [isGeneratingSOW, setIsGeneratingSOW] = useState(false);
+  const [sowWarnings, setSowWarnings] = useState<string[]>([]);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -142,6 +147,79 @@ export default function AppPage() {
   const handleSignOut = async () => {
     await signOut();
   };
+
+  // Generate SOW (FR-509)
+  const generateSOW = useCallback(async () => {
+    if (!currentEngagement) return;
+
+    setIsGeneratingSOW(true);
+    setSowWarnings([]);
+
+    try {
+      const res = await fetch("/api/sow/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ engagementId: currentEngagement.id }),
+      });
+
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || "Failed to generate SOW");
+      }
+
+      const data = await res.json();
+      setSowData(data.sow);
+
+      // Detect incomplete sections (FR-508)
+      const warnings: string[] = [];
+      if (!data.sow.executive_summary || data.sow.executive_summary.length < 50) {
+        warnings.push("Executive summary is too short or missing");
+      }
+      if (!data.sow.objectives || data.sow.objectives.length < 2) {
+        warnings.push("Less than 2 objectives defined");
+      }
+      if (!data.sow.deliverables || data.sow.deliverables.length < 2) {
+        warnings.push("Less than 2 deliverables defined");
+      }
+      if (!data.sow.timeline || data.sow.timeline.length < 1) {
+        warnings.push("No timeline phases defined");
+      }
+      if (!data.sow.risks || data.sow.risks.length < 1) {
+        warnings.push("No risks identified");
+      }
+
+      // Check if discovery has enough content
+      const discoveryAnswers = currentEngagement.discovery_answers || {};
+      const answeredQuestions = Object.keys(discoveryAnswers).length;
+      if (answeredQuestions < 3) {
+        warnings.push("Only " + answeredQuestions + " discovery questions answered - consider completing more");
+      }
+
+      // Check if canvas has frameworks
+      const canvasNodes = currentEngagement.canvas_data?.nodes || [];
+      const frameworkNodes = canvasNodes.filter(
+        (n) => n.type === "swot" || n.type === "porter" || n.type === "mckinsey7s"
+      );
+      if (frameworkNodes.length === 0) {
+        warnings.push("No frameworks added to canvas - SOW may lack analytical depth");
+      }
+
+      setSowWarnings(warnings);
+      setShowSOWPreview(true);
+    } catch (error) {
+      console.error("Failed to generate SOW:", error);
+      alert(error instanceof Error ? error.message : "Failed to generate SOW");
+    } finally {
+      setIsGeneratingSOW(false);
+    }
+  }, [currentEngagement]);
+
+  // Handle SOW export (placeholder for FR-503/FR-504)
+  const handleSOWExport = useCallback(() => {
+    // TODO: Implement PDF/DOCX export in FR-503/FR-504
+    alert("Export functionality coming soon! (FR-503/FR-504)");
+    setShowSOWPreview(false);
+  }, []);
 
   const handleSelectEngagement = (engagement: Engagement) => {
     // Load canvas data from the engagement
@@ -529,7 +607,10 @@ export default function AppPage() {
                   />
                 )}
                 {rightPanelTab === "scope" && (
-                  <ScopePanel />
+                  <ScopePanel
+                    onGenerateSOW={generateSOW}
+                    isGenerating={isGeneratingSOW}
+                  />
                 )}
               </div>
             </aside>
@@ -542,6 +623,18 @@ export default function AppPage() {
         <NewEngagementModal
           onClose={() => setShowNewEngagementModal(false)}
           onCreate={handleCreateEngagement}
+        />
+      )}
+
+      {/* SOW Preview Modal (FR-509) */}
+      {showSOWPreview && sowData && currentEngagement && (
+        <SOWPreviewModal
+          open={showSOWPreview}
+          sowData={sowData}
+          engagement={currentEngagement}
+          onClose={() => setShowSOWPreview(false)}
+          onExport={handleSOWExport}
+          warnings={sowWarnings}
         />
       )}
     </div>
@@ -742,20 +835,53 @@ function EmptyState({ onCreateNew }: { onCreateNew: () => void }) {
   );
 }
 
-// Scope Panel Component
-function ScopePanel() {
+// Scope Panel Component (FR-509)
+function ScopePanel({
+  onGenerateSOW,
+  isGenerating,
+}: {
+  onGenerateSOW: () => void;
+  isGenerating: boolean;
+}) {
   return (
     <div className="flex h-full flex-col items-center justify-center p-6 text-center">
       <ClipboardList className="mb-4 h-12 w-12 text-gray-300" />
       <h3 className="mb-2 font-semibold text-gray-700">Scope Generation</h3>
       <p className="mb-4 text-sm text-gray-500">
-        Complete the discovery questions and add frameworks to your canvas to generate a scope.
+        Generate a Statement of Work based on your discovery answers and framework analysis.
       </p>
       <button
-        disabled
-        className="rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-400"
+        onClick={onGenerateSOW}
+        disabled={isGenerating}
+        className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+          isGenerating
+            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+            : "bg-blue-600 text-white hover:bg-blue-700"
+        }`}
       >
-        Generate SOW
+        {isGenerating ? (
+          <>
+            <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24">
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+                fill="none"
+              />
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              />
+            </svg>
+            Generating...
+          </>
+        ) : (
+          "Generate SOW"
+        )}
       </button>
     </div>
   );

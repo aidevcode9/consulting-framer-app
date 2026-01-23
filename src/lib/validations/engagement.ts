@@ -13,6 +13,14 @@ export const createEngagementSchema = z.object({
 
 export type CreateEngagementInput = z.infer<typeof createEngagementSchema>;
 
+// Discovery answer schema
+const discoveryAnswerSchema = z.object({
+  question_id: z.string(),
+  value: z.string(),
+  answered_at: z.string(),
+  follow_up_answer: z.string().optional(),
+});
+
 // Update engagement input (all fields optional)
 export const updateEngagementSchema = z.object({
   title: z.string().min(1).max(200).optional(),
@@ -23,6 +31,8 @@ export const updateEngagementSchema = z.object({
   tags: z.array(z.string().max(50)).max(20).optional(),
   estimated_value: z.number().positive().optional(),
   estimated_duration_weeks: z.number().int().positive().max(520).optional(),
+  discovery_answers: z.record(z.string(), discoveryAnswerSchema).optional(),
+  discovery_completed: z.boolean().optional(),
 });
 
 export type UpdateEngagementInput = z.infer<typeof updateEngagementSchema>;

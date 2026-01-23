@@ -2,6 +2,26 @@
 
 ---
 
+## [2026-01-22] Lesson Learned: Git Branching
+
+**Issue:** Used `feat/auth-email-google` branch for 15+ unrelated features beyond auth.
+
+**What went wrong:**
+- Branch accumulated: Auth → AI Discovery → SOW → Exports
+- Branch name became misleading
+- One giant PR instead of focused reviews
+- Harder to revert specific features if issues arise
+
+**Best practice:**
+1. One feature branch per feature (or tightly related set)
+2. Merge to main when complete
+3. Create new branch for next feature
+4. Small, focused PRs
+
+**Correction:** Creating PR for current branch, then fresh `feat/proposal-generation` for FR-502.
+
+---
+
 ## [2026-01-22] FR-503, FR-504: Export PDF + DOCX
 
 **Status:** ✅ Complete
@@ -48,7 +68,7 @@
 - No sensitive data exposure
 - Proper error handling
 
-**Commit:** pending
+**Commit:** d907c70
 
 **Notes:**
 - Phase 3 exports complete

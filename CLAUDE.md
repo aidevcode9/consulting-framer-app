@@ -44,6 +44,7 @@ The orchestrator (`/ws-orchestrate`) manages multi-FR sessions:
 - **Same phase only** — Unless explicitly approved
 - **P0 before P1** — Priorities matter
 - **Respect dependencies** — Auth before features that need auth
+- **Fresh branch per phase** — Merge to main between phases; name branch for current work
 
 ### Session Flow
 
@@ -229,6 +230,7 @@ npx inngest-cli dev   # Start Inngest dev server
 | **"use client" for interactivity** | Next.js 14 requirement | React hooks = client |
 | **Background jobs for > 10s tasks** | Vercel timeout | Inngest for SOW generation |
 | **Log to CHECKPOINT.md** | Track progress, enable handoff | After each FR |
+| **Fresh branch per phase** | Clean PRs, accurate names | Merge to main between phases |
 
 ---
 
@@ -358,6 +360,7 @@ export const generateSOW = inngest.createFunction(
 | Didn't log to CHECKPOINT.md | Always track progress for handoff |
 | Ran manual checks instead of `/ws-verify` | Always use `/ws-verify` skill before commit |
 | Skipped `/ws-skeptic` after FR | Run `/ws-skeptic` after EVERY FR - no exceptions |
+| Used same branch for unrelated features | Merge to main, create fresh branch per feature/phase |
 
 ---
 
@@ -375,6 +378,7 @@ export const generateSOW = inngest.createFunction(
 - Skipping typecheck because "it's just a quick fix"
 - AI calls without timeout handling
 - Not logging to CHECKPOINT.md
+- Adding unrelated features to existing branch (merge first, then new branch)
 
 ---
 

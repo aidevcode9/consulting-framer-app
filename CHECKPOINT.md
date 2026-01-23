@@ -2,6 +2,63 @@
 
 ---
 
+## [2026-01-22] FR-402, FR-405: AI Discovery + Framework Recommendations
+
+**Status:** ✅ Complete
+**Branch:** feat/auth-email-google
+
+**Files created:**
+- src/lib/ai/client.ts (new) - AI client with Anthropic/Gemini support, timeout, telemetry
+- src/lib/ai/prompts.ts (new) - System prompts for discovery, recommendations, summary
+- src/services/ai.service.ts (new) - AI service with usage tracking
+- src/app/api/ai/recommend-frameworks/route.ts (new) - POST /api/ai/recommend-frameworks
+
+**Files modified:**
+- src/app/api/ai/discovery/route.ts - Refactored to use AIService with auth + validation
+- .env - Added AI_PROVIDER, GEMINI_API_KEY config options
+- STATUS.md - Updated checklist
+
+**What was implemented:**
+
+### FR-402: AI Follow-up Questions
+- AI client abstraction supporting Anthropic (default) and Gemini 2.0 Flash
+- 30s timeout with graceful error handling
+- Request ID tracking for telemetry
+- Discovery prompts for generating follow-up questions
+- Usage limit enforcement before each AI call
+- Token usage tracked in ai_interactions table
+
+### FR-405: Framework Recommendations
+- POST /api/ai/recommend-frameworks endpoint
+- Prompts for analyzing discovery and suggesting frameworks
+- Returns confidence scores, reasoning, and focus areas
+- Mock response when no API key configured
+
+**AI Providers:**
+- Default: `AI_PROVIDER=anthropic` (Claude Sonnet)
+- Alternative: `AI_PROVIDER=gemini` (Gemini 2.0 Flash)
+
+**Telemetry logged:**
+- Request ID, provider, model
+- Input/output token counts
+- Latency in milliseconds
+- Prompt length, response length
+
+**Verification:**
+- lint: ✅
+- typecheck: ✅
+- build: ✅
+
+**Skeptic Review:** ✅ Ship it
+- Timeout handling: ✅
+- Usage limits checked: ✅
+- API keys server-side: ✅
+- Token tracking: ✅
+
+**Commit:** [pending]
+
+---
+
 ## [2026-01-22] FR-1101, FR-903: Logger Utility + Usage Limits
 
 **Status:** ✅ Complete
@@ -50,7 +107,7 @@
 - typecheck: ✅
 - build: ✅
 
-**Commit:** [pending]
+**Commit:** 08b57ce
 
 **Notes:**
 - Database migration adds subscription_tier, subscription_status, trial_ends_at, stripe_customer_id, stripe_subscription_id to profiles

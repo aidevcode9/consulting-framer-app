@@ -53,8 +53,8 @@ Last updated: 2026-01-22
 
 | Task | FR | Depends On | Notes |
 |------|-----|------------|-------|
-| AI discovery | FR-402 | ✅ FR-903 | Claude follow-up questions |
-| Framework recommendations | FR-405 | FR-402 | AI suggests frameworks |
+| Discovery summary | FR-404 | ✅ FR-402 | AI executive summary |
+| Auto-populate canvas | FR-406 | FR-405 | AI fills framework blocks |
 | **Real Stripe** | FR-902 | End of project | See "Deferred" section |
 
 ## Deferred (End of Project)
@@ -73,6 +73,8 @@ Last updated: 2026-01-22
 
 | Task | FR | PR | Date |
 |------|-----|-----|------|
+| AI follow-up questions | FR-402 | — | 01-22 |
+| Framework recommendations | FR-405 | — | 01-22 |
 | Usage limits enforcement | FR-903 | — | 01-22 |
 | Logger utility | FR-1101 | — | 01-22 |
 | Billing stub (mock Stripe) | FR-901 | — | 01-22 |
@@ -157,9 +159,9 @@ Last updated: 2026-01-22
 
 ### AI Discovery (FR-400)
 - [x] FR-401: Discovery questionnaire *(mock)*
-- [ ] FR-402: Claude follow-up questions
+- [x] FR-402: Claude follow-up questions ✅
 - [x] FR-403: Progress tracking
-- [ ] FR-405: Framework recommendations
+- [x] FR-405: Framework recommendations ✅
 
 ---
 

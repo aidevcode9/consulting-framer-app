@@ -55,7 +55,7 @@
 - API keys server-side: ✅
 - Token tracking: ✅
 
-**Commit:** [pending]
+**Commit:** b30d958
 
 ---
 

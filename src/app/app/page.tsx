@@ -36,7 +36,7 @@ type RightPanelTab = "discovery" | "scope" | null;
 export default function AppPage() {
   const { sidebarOpen, setSidebarOpen } = useUIStore();
   const { currentEngagement, setCurrentEngagement } = useEngagementStore();
-  const { markSaved, getCanvasData, setNodes, setEdges } = useCanvasStore();
+  const { markSaved, getCanvasData, loadCanvas } = useCanvasStore();
 
   const [rightPanelTab, setRightPanelTab] = useState<RightPanelTab>("discovery");
   const [showNewEngagementModal, setShowNewEngagementModal] = useState(false);
@@ -264,11 +264,8 @@ export default function AppPage() {
   }, []);
 
   const handleSelectEngagement = (engagement: Engagement) => {
-    // Load canvas data from the engagement
-    if (engagement.canvas_data) {
-      setNodes(engagement.canvas_data.nodes || []);
-      setEdges(engagement.canvas_data.edges || []);
-    }
+    // Load canvas data from the engagement (uses loadCanvas to avoid marking as dirty)
+    loadCanvas(engagement.canvas_data || { nodes: [], edges: [], viewport: { x: 0, y: 0, zoom: 1 } });
     setCurrentEngagement(engagement);
   };
 
@@ -288,8 +285,7 @@ export default function AppPage() {
         const { engagement } = await res.json();
         setEngagements((prev) => [engagement, ...prev]);
         setCurrentEngagement(engagement);
-        setNodes([]);
-        setEdges([]);
+        loadCanvas({ nodes: [], edges: [], viewport: { x: 0, y: 0, zoom: 1 } });
         setShowNewEngagementModal(false);
       }
     } catch (error) {

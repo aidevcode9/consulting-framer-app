@@ -18,7 +18,7 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 
-import { useCanvasStore } from "@/lib/store";
+import { useCanvasStore, useDiscoveryStore, useEngagementStore } from "@/lib/store";
 import { SWOTNode } from "./nodes/SWOTNode";
 import { PorterNode } from "./nodes/PorterNode";
 import { McKinseyNode } from "./nodes/McKinseyNode";
@@ -59,10 +59,14 @@ export function Canvas({ onSave, readOnly = false }: CanvasProps) {
     setEdges,
     setViewport,
     addNode,
+    updateNode,
     addEdge: addEdgeToStore,
     saveToHistory,
     isDirty,
   } = useCanvasStore();
+
+  const { isComplete: discoveryComplete, answers } = useDiscoveryStore();
+  const { currentEngagement } = useEngagementStore();
 
   // Handle node changes (position, selection, etc.)
   const onNodesChange = useCallback(
@@ -96,6 +100,54 @@ export function Canvas({ onSave, readOnly = false }: CanvasProps) {
     [addEdgeToStore, saveToHistory]
   );
 
+  // Auto-populate framework with AI content
+  const populateFramework = useCallback(
+    async (nodeId: string, frameworkType: string) => {
+      if (!currentEngagement || !discoveryComplete) return;
+
+      // Only populate strategy frameworks (not notes)
+      const supportedTypes = ["swot", "porter", "mckinsey7s"];
+      if (!supportedTypes.includes(frameworkType)) return;
+
+      try {
+        const response = await fetch("/api/ai/populate-canvas", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            engagementId: currentEngagement.id,
+            frameworkType,
+            discoveryAnswers: Object.entries(answers).map(([id, answer]) => ({
+              question: id,
+              answer: answer.value,
+            })),
+            context: {
+              clientName: currentEngagement.client_name,
+              industry: currentEngagement.client_industry || undefined,
+            },
+          }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          // Convert sections to items array
+          const items = Object.entries(data.sections || {}).flatMap(
+            ([category, points]) =>
+              (points as string[]).map((text) => ({
+                id: `${category}-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+                text,
+                category,
+                created_at: new Date().toISOString(),
+              }))
+          );
+          updateNode(nodeId, { items });
+        }
+      } catch (error) {
+        console.error("Failed to populate framework:", error);
+      }
+    },
+    [currentEngagement, discoveryComplete, answers, updateNode]
+  );
+
   // Handle dropping new nodes
   const onDrop = useCallback(
     (event: React.DragEvent) => {
@@ -109,16 +161,22 @@ export function Canvas({ onSave, readOnly = false }: CanvasProps) {
         y: event.clientY,
       });
 
+      const nodeId = `${type}-${Date.now()}`;
       const newNode: FrameworkNode = {
-        id: `${type}-${Date.now()}`,
+        id: nodeId,
         type: type as FrameworkNode["type"],
         position,
         data: getDefaultNodeData(type),
       };
 
       addNode(newNode);
+
+      // Auto-populate if discovery is complete
+      if (discoveryComplete && currentEngagement) {
+        populateFramework(nodeId, type);
+      }
     },
-    [screenToFlowPosition, addNode]
+    [screenToFlowPosition, addNode, discoveryComplete, currentEngagement, populateFramework]
   );
 
   const onDragOver = useCallback((event: React.DragEvent) => {

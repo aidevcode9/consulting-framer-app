@@ -49,12 +49,21 @@ export {
   type SOWEngagement,
 } from "./sow.prompt";
 
+// Proposal Generation (FR-502)
+export {
+  PROPOSAL_PROMPT_METADATA,
+  PROPOSAL_GENERATION_PROMPT,
+  buildProposalGenerationPrompt,
+  type ProposalEngagement,
+} from "./proposal.prompt";
+
 // Import metadata for getAllPromptMetadata function
 import { DISCOVERY_PROMPT_METADATA } from "./discovery.prompt";
 import { FRAMEWORK_PROMPT_METADATA } from "./framework.prompt";
 import { SUMMARY_PROMPT_METADATA } from "./summary.prompt";
 import { CANVAS_PROMPT_METADATA } from "./canvas.prompt";
 import { SOW_PROMPT_METADATA } from "./sow.prompt";
+import { PROPOSAL_PROMPT_METADATA } from "./proposal.prompt";
 
 /**
  * Get all prompt metadata for monitoring/debugging
@@ -66,5 +75,6 @@ export function getAllPromptMetadata() {
     summary: SUMMARY_PROMPT_METADATA,
     canvas: CANVAS_PROMPT_METADATA,
     sow: SOW_PROMPT_METADATA,
+    proposal: PROPOSAL_PROMPT_METADATA,
   };
 }

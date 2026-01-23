@@ -16,17 +16,19 @@ import {
   DISCOVERY_SUMMARY_PROMPT,
   CANVAS_POPULATE_PROMPT,
   SOW_GENERATION_PROMPT,
+  PROPOSAL_GENERATION_PROMPT,
   buildDiscoveryFollowUpPrompt,
   buildFrameworkRecommendationPrompt,
   buildDiscoverySummaryPrompt,
   buildCanvasPopulatePrompt,
   buildSOWGenerationPrompt,
+  buildProposalGenerationPrompt,
   type DiscoveryContext,
   type PopulateFrameworkType,
 } from "@/lib/ai/prompts";
 import { detectInjectionAttempt } from "@/lib/ai/sanitize";
 import { createLogger } from "@/lib/logger";
-import type { GeneratedScope, CanvasData, Engagement } from "@/types";
+import type { GeneratedScope, GeneratedProposal, CanvasData, Engagement } from "@/types";
 
 const log = createLogger("AIService");
 
@@ -448,5 +450,116 @@ export class AIService {
     }
 
     return result;
+  }
+
+  /**
+   * Generate client-facing proposal from engagement data
+   * FR-502: Generate Proposal
+   */
+  async generateProposal(
+    userId: string,
+    engagement: Engagement,
+    sowSummary?: string
+  ): Promise<GeneratedProposal> {
+    // Check usage limits - proposal generation uses same limit as SOW
+    await this.usageService.canPerformAction(userId, "sow_generation");
+
+    // Log potential injection attempts
+    if (detectInjectionAttempt(engagement.client_name) || detectInjectionAttempt(engagement.title)) {
+      log.warn("Potential prompt injection detected in proposal generation", {
+        userId,
+        engagementId: engagement.id,
+      });
+    }
+
+    log.info("Generating proposal", { userId, engagementId: engagement.id });
+
+    // Extract canvas insights from framework data
+    const canvasInsights = this.extractCanvasInsights(engagement.canvas_data);
+
+    // Convert discovery answers to array format
+    const discoveryAnswers = this.formatDiscoveryAnswers(engagement.discovery_answers);
+
+    const userPrompt = buildProposalGenerationPrompt(
+      {
+        title: engagement.title,
+        clientName: engagement.client_name,
+        industry: engagement.client_industry || undefined,
+        description: engagement.description || undefined,
+      },
+      discoveryAnswers,
+      canvasInsights,
+      sowSummary
+    );
+
+    const messages: AIMessage[] = [{ role: "user", content: userPrompt }];
+
+    const result = await generateCompletion(messages, {
+      systemPrompt: PROPOSAL_GENERATION_PROMPT,
+      maxTokens: 4096, // Proposal generation needs similar tokens to SOW
+      temperature: 0.5, // Slightly higher than SOW for more creative language
+      timeoutMs: 60000, // 60 second timeout
+    });
+
+    // Track usage with telemetry
+    await this.usageService.trackAIUsage(
+      userId,
+      engagement.id,
+      "scope_generate", // Using same type as SOW for now
+      {
+        engagementId: engagement.id,
+        clientName: engagement.client_name,
+        discoveryAnswersCount: discoveryAnswers.length,
+        type: "proposal",
+      },
+      { proposal: result.content, requestId: result.requestId },
+      {
+        tokensUsed: result.tokensUsed.input + result.tokensUsed.output,
+        modelUsed: result.model,
+        latencyMs: result.latencyMs,
+      }
+    );
+
+    // Parse JSON response
+    try {
+      const parsed = JSON.parse(result.content) as GeneratedProposal;
+
+      // Ensure all required fields exist with defaults
+      return {
+        executive_summary: parsed.executive_summary || "",
+        situation_analysis: parsed.situation_analysis || "",
+        proposed_approach: parsed.proposed_approach || "",
+        key_benefits: parsed.key_benefits || [],
+        methodology: parsed.methodology || [],
+        investment: parsed.investment || {
+          summary: "",
+          options: [],
+          terms: "",
+        },
+        next_steps: parsed.next_steps || [],
+        why_us: parsed.why_us || "",
+      };
+    } catch {
+      log.error("Failed to parse proposal JSON", {
+        userId,
+        engagementId: engagement.id,
+        content: result.content.slice(0, 500),
+      });
+      // Return empty proposal structure if parsing fails
+      return {
+        executive_summary: "Error generating proposal. Please try again.",
+        situation_analysis: "",
+        proposed_approach: "",
+        key_benefits: [],
+        methodology: [],
+        investment: {
+          summary: "",
+          options: [],
+          terms: "",
+        },
+        next_steps: [],
+        why_us: "",
+      };
+    }
   }
 }

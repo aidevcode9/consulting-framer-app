@@ -25,9 +25,10 @@ import { signOut } from "@/app/(auth)/actions";
 import { CanvasWithProvider } from "@/components/canvas/Canvas";
 import { DiscoveryPanel } from "@/components/discovery/DiscoveryPanel";
 import { SOWPreviewModal } from "@/components/sow/SOWPreviewModal";
+import { ProposalPreviewModal } from "@/components/proposal/ProposalPreviewModal";
 import { useUIStore, useEngagementStore, useCanvasStore } from "@/lib/store";
 
-import type { Engagement, EngagementStatus, GeneratedScope } from "@/types";
+import type { Engagement, EngagementStatus, GeneratedScope, GeneratedProposal } from "@/types";
 
 // Tab types for the right panel
 type RightPanelTab = "discovery" | "scope" | null;
@@ -50,6 +51,9 @@ export default function AppPage() {
   const [sowData, setSowData] = useState<GeneratedScope | null>(null);
   const [isGeneratingSOW, setIsGeneratingSOW] = useState(false);
   const [sowWarnings, setSowWarnings] = useState<string[]>([]);
+  const [showProposalPreview, setShowProposalPreview] = useState(false);
+  const [proposalData, setProposalData] = useState<GeneratedProposal | null>(null);
+  const [isGeneratingProposal, setIsGeneratingProposal] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -214,11 +218,49 @@ export default function AppPage() {
     }
   }, [currentEngagement]);
 
-  // Handle SOW export (placeholder for FR-503/FR-504)
+  // Handle SOW export
   const handleSOWExport = useCallback(() => {
-    // TODO: Implement PDF/DOCX export in FR-503/FR-504
-    alert("Export functionality coming soon! (FR-503/FR-504)");
     setShowSOWPreview(false);
+  }, []);
+
+  // Generate Proposal (FR-502)
+  const generateProposal = useCallback(async () => {
+    if (!currentEngagement) return;
+
+    setIsGeneratingProposal(true);
+
+    try {
+      // Optionally pass SOW summary for context if SOW was generated
+      const sowSummary = sowData?.executive_summary;
+
+      const res = await fetch("/api/proposal/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          engagementId: currentEngagement.id,
+          sowSummary,
+        }),
+      });
+
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || "Failed to generate proposal");
+      }
+
+      const data = await res.json();
+      setProposalData(data.proposal);
+      setShowProposalPreview(true);
+    } catch (error) {
+      console.error("Failed to generate proposal:", error);
+      alert(error instanceof Error ? error.message : "Failed to generate proposal");
+    } finally {
+      setIsGeneratingProposal(false);
+    }
+  }, [currentEngagement, sowData]);
+
+  // Handle Proposal export
+  const handleProposalExport = useCallback(() => {
+    setShowProposalPreview(false);
   }, []);
 
   const handleSelectEngagement = (engagement: Engagement) => {
@@ -609,7 +651,9 @@ export default function AppPage() {
                 {rightPanelTab === "scope" && (
                   <ScopePanel
                     onGenerateSOW={generateSOW}
-                    isGenerating={isGeneratingSOW}
+                    isGeneratingSOW={isGeneratingSOW}
+                    onGenerateProposal={generateProposal}
+                    isGeneratingProposal={isGeneratingProposal}
                   />
                 )}
               </div>
@@ -635,6 +679,17 @@ export default function AppPage() {
           onClose={() => setShowSOWPreview(false)}
           onExport={handleSOWExport}
           warnings={sowWarnings}
+        />
+      )}
+
+      {/* Proposal Preview Modal (FR-502) */}
+      {showProposalPreview && proposalData && currentEngagement && (
+        <ProposalPreviewModal
+          open={showProposalPreview}
+          proposalData={proposalData}
+          engagement={currentEngagement}
+          onClose={() => setShowProposalPreview(false)}
+          onExport={handleProposalExport}
         />
       )}
     </div>
@@ -835,54 +890,109 @@ function EmptyState({ onCreateNew }: { onCreateNew: () => void }) {
   );
 }
 
-// Scope Panel Component (FR-509)
+// Scope Panel Component (FR-509, FR-502)
 function ScopePanel({
   onGenerateSOW,
-  isGenerating,
+  isGeneratingSOW,
+  onGenerateProposal,
+  isGeneratingProposal,
 }: {
   onGenerateSOW: () => void;
-  isGenerating: boolean;
+  isGeneratingSOW: boolean;
+  onGenerateProposal: () => void;
+  isGeneratingProposal: boolean;
 }) {
+  const isGenerating = isGeneratingSOW || isGeneratingProposal;
+
   return (
     <div className="flex h-full flex-col items-center justify-center p-6 text-center">
       <ClipboardList className="mb-4 h-12 w-12 text-gray-300" />
-      <h3 className="mb-2 font-semibold text-gray-700">Scope Generation</h3>
-      <p className="mb-4 text-sm text-gray-500">
-        Generate a Statement of Work based on your discovery answers and framework analysis.
+      <h3 className="mb-2 font-semibold text-gray-700">Deliverables</h3>
+      <p className="mb-6 text-sm text-gray-500">
+        Generate professional documents based on your discovery answers and framework analysis.
       </p>
-      <button
-        onClick={onGenerateSOW}
-        disabled={isGenerating}
-        className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-          isGenerating
-            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-            : "bg-blue-600 text-white hover:bg-blue-700"
-        }`}
-      >
-        {isGenerating ? (
-          <>
-            <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24">
-              <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="4"
-                fill="none"
-              />
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              />
-            </svg>
-            Generating...
-          </>
-        ) : (
-          "Generate SOW"
-        )}
-      </button>
+
+      <div className="flex flex-col gap-3 w-full max-w-xs">
+        {/* Generate SOW Button */}
+        <button
+          onClick={onGenerateSOW}
+          disabled={isGenerating}
+          className={`flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors ${
+            isGenerating
+              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+              : "bg-blue-600 text-white hover:bg-blue-700"
+          }`}
+        >
+          {isGeneratingSOW ? (
+            <>
+              <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24">
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                  fill="none"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                />
+              </svg>
+              Generating SOW...
+            </>
+          ) : (
+            <>
+              <ClipboardList className="h-4 w-4" />
+              Generate SOW
+            </>
+          )}
+        </button>
+
+        {/* Generate Proposal Button */}
+        <button
+          onClick={onGenerateProposal}
+          disabled={isGenerating}
+          className={`flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors ${
+            isGenerating
+              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+              : "bg-purple-600 text-white hover:bg-purple-700"
+          }`}
+        >
+          {isGeneratingProposal ? (
+            <>
+              <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24">
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                  fill="none"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                />
+              </svg>
+              Generating Proposal...
+            </>
+          ) : (
+            <>
+              <Sparkles className="h-4 w-4" />
+              Generate Proposal
+            </>
+          )}
+        </button>
+      </div>
+
+      <p className="mt-4 text-xs text-gray-400">
+        SOW = Internal scope document • Proposal = Client-facing pitch
+      </p>
     </div>
   );
 }

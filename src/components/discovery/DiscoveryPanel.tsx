@@ -1,136 +1,23 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   ChevronRight,
   ChevronLeft,
   CheckCircle2,
   Sparkles,
   Loader2,
+  GitBranch,
+  LayoutTemplate,
 } from "lucide-react";
 import { useDiscoveryStore } from "@/lib/store";
-import type { DiscoveryQuestion, DiscoveryAnswer } from "@/types";
-
-// Mock questions for demo (in production, fetch from database)
-const DISCOVERY_QUESTIONS: DiscoveryQuestion[] = [
-  {
-    id: "business_context",
-    question: "What is the client's primary business or industry?",
-    description: "Understanding the client's core business helps frame the engagement.",
-    category: "business_context",
-    question_type: "text",
-    options: null,
-    sort_order: 1,
-    is_required: true,
-    ai_context: "Use this to understand industry-specific challenges.",
-    depends_on: null,
-    show_when: null,
-    follow_up_prompt: null,
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: "company_size",
-    question: "What is the approximate company size?",
-    description: "Employee count and revenue range helps scope the engagement.",
-    category: "business_context",
-    question_type: "select",
-    options: [
-      { value: "startup", label: "Startup (1-50 employees)" },
-      { value: "small", label: "Small (51-200 employees)" },
-      { value: "medium", label: "Medium (201-1000 employees)" },
-      { value: "large", label: "Large (1000+ employees)" },
-      { value: "enterprise", label: "Enterprise (10,000+ employees)" },
-    ],
-    sort_order: 2,
-    is_required: true,
-    ai_context: "Company size affects solution complexity.",
-    depends_on: null,
-    show_when: null,
-    follow_up_prompt: null,
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: "main_challenge",
-    question: "What is the primary challenge or opportunity the client wants to address?",
-    description: "The core reason for this engagement.",
-    category: "problem_definition",
-    question_type: "text",
-    options: null,
-    sort_order: 3,
-    is_required: true,
-    ai_context: "This is the central problem statement.",
-    depends_on: null,
-    show_when: null,
-    follow_up_prompt: null,
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: "previous_attempts",
-    question: "What has the client already tried to address this challenge?",
-    description: "Previous initiatives, solutions, or approaches.",
-    category: "problem_definition",
-    question_type: "text",
-    options: null,
-    sort_order: 4,
-    is_required: false,
-    ai_context: "Understanding past attempts prevents repeating failures.",
-    depends_on: null,
-    show_when: null,
-    follow_up_prompt: null,
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: "success_criteria",
-    question: "What does success look like for the client?",
-    description: "Specific outcomes or metrics they want to achieve.",
-    category: "success_criteria",
-    question_type: "text",
-    options: null,
-    sort_order: 5,
-    is_required: true,
-    ai_context: "Success criteria should be measurable.",
-    depends_on: null,
-    show_when: null,
-    follow_up_prompt: null,
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: "timeline",
-    question: "What is the expected timeline for this engagement?",
-    description: "Weeks, months, or specific deadlines.",
-    category: "constraints",
-    question_type: "text",
-    options: null,
-    sort_order: 6,
-    is_required: true,
-    ai_context: "Timeline affects scope significantly.",
-    depends_on: null,
-    show_when: null,
-    follow_up_prompt: null,
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: "budget_range",
-    question: "What is the approximate budget range?",
-    description: "Budget constraints help scope the engagement appropriately.",
-    category: "constraints",
-    question_type: "select",
-    options: [
-      { value: "under_25k", label: "Under $25,000" },
-      { value: "25k_50k", label: "$25,000 - $50,000" },
-      { value: "50k_100k", label: "$50,000 - $100,000" },
-      { value: "100k_250k", label: "$100,000 - $250,000" },
-      { value: "over_250k", label: "Over $250,000" },
-    ],
-    sort_order: 7,
-    is_required: false,
-    ai_context: "Budget determines solution sophistication.",
-    depends_on: null,
-    show_when: null,
-    follow_up_prompt: null,
-    created_at: new Date().toISOString(),
-  },
-];
+import { getQuestionsForTemplate, getTemplateById } from "@/lib/discovery/templates";
+import {
+  filterVisibleQuestions,
+  calculateProgress,
+} from "@/lib/discovery/branching";
+import { TemplateSelector } from "./TemplateSelector";
+import type { DiscoveryAnswer } from "@/types";
 
 interface DiscoveryPanelProps {
   onComplete?: () => void;
@@ -143,19 +30,51 @@ export function DiscoveryPanel({ onComplete }: DiscoveryPanelProps) {
     isComplete,
     aiFollowUp,
     isProcessing,
+    selectedTemplateId,
     setAnswer,
     setCurrentQuestionIndex,
     setComplete,
     setAIFollowUp,
     setProcessing,
+    setSelectedTemplate,
   } = useDiscoveryStore();
 
   const [inputValue, setInputValue] = useState("");
   const [followUpValue, setFollowUpValue] = useState("");
 
-  const questions = DISCOVERY_QUESTIONS;
-  const currentQuestion = questions[currentQuestionIndex];
-  const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
+  // FR-408: Get questions based on selected template
+  const allQuestions = useMemo(
+    () => getQuestionsForTemplate(selectedTemplateId || "general"),
+    [selectedTemplateId]
+  );
+
+  // Get selected template info for display
+  const selectedTemplate = useMemo(
+    () => (selectedTemplateId ? getTemplateById(selectedTemplateId) : null),
+    [selectedTemplateId]
+  );
+
+  // FR-407: Filter questions based on branching conditions
+  const visibleQuestions = useMemo(
+    () => filterVisibleQuestions(allQuestions, answers),
+    [allQuestions, answers]
+  );
+
+  // Find current question in visible list
+  const currentVisibleIndex = useMemo(() => {
+    const currentQuestion = allQuestions[currentQuestionIndex];
+    if (!currentQuestion) return 0;
+    const idx = visibleQuestions.findIndex((q) => q.id === currentQuestion.id);
+    return idx >= 0 ? idx : 0;
+  }, [allQuestions, currentQuestionIndex, visibleQuestions]);
+
+  const currentQuestion = visibleQuestions[currentVisibleIndex];
+
+  // Calculate progress based on visible questions only
+  const progressInfo = useMemo(
+    () => calculateProgress(allQuestions, currentQuestionIndex, answers),
+    [allQuestions, currentQuestionIndex, answers]
+  );
 
   // Get existing answer for current question
   useEffect(() => {
@@ -169,7 +88,25 @@ export function DiscoveryPanel({ onComplete }: DiscoveryPanelProps) {
     }
   }, [currentQuestion, answers]);
 
+  // Ensure we're on a visible question when answers change
+  useEffect(() => {
+    if (!currentQuestion && visibleQuestions.length > 0) {
+      // Current question is not visible, find the first visible question
+      const firstVisible = visibleQuestions[0];
+      const newIndex = allQuestions.findIndex((q) => q.id === firstVisible.id);
+      if (newIndex >= 0) {
+        setCurrentQuestionIndex(newIndex);
+      }
+    }
+  }, [currentQuestion, visibleQuestions, allQuestions, setCurrentQuestionIndex]);
+
+  const handleTemplateSelect = (templateId: string) => {
+    setSelectedTemplate(templateId);
+    setCurrentQuestionIndex(0);
+  };
+
   const handleSubmit = async () => {
+    if (!currentQuestion) return;
     if (!inputValue.trim() && currentQuestion.is_required) return;
 
     // Save answer
@@ -188,7 +125,7 @@ export function DiscoveryPanel({ onComplete }: DiscoveryPanelProps) {
         // const result = await generateDiscoveryFollowUp({...});
         // For demo, simulate AI response
         await new Promise((resolve) => setTimeout(resolve, 1000));
-        
+
         // Simulate AI deciding if follow-up is needed
         const needsFollowUp = Math.random() > 0.6;
         if (needsFollowUp) {
@@ -210,7 +147,7 @@ export function DiscoveryPanel({ onComplete }: DiscoveryPanelProps) {
   };
 
   const handleFollowUpSubmit = () => {
-    if (!followUpValue.trim()) return;
+    if (!followUpValue.trim() || !currentQuestion) return;
 
     // Update answer with follow-up
     const existingAnswer = answers[currentQuestion.id];
@@ -228,8 +165,15 @@ export function DiscoveryPanel({ onComplete }: DiscoveryPanelProps) {
   };
 
   const moveToNext = () => {
-    if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
+    // After saving an answer, recalculate visible questions
+    // The next visible question might be different due to branching
+    const updatedVisibleQuestions = filterVisibleQuestions(allQuestions, answers);
+    const nextVisibleIndex = currentVisibleIndex + 1;
+
+    if (nextVisibleIndex < updatedVisibleQuestions.length) {
+      const nextQuestion = updatedVisibleQuestions[nextVisibleIndex];
+      const newIndex = allQuestions.findIndex((q) => q.id === nextQuestion.id);
+      setCurrentQuestionIndex(newIndex);
       setInputValue("");
     } else {
       setComplete(true);
@@ -238,10 +182,17 @@ export function DiscoveryPanel({ onComplete }: DiscoveryPanelProps) {
   };
 
   const moveToPrevious = () => {
-    if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex(currentQuestionIndex - 1);
+    if (currentVisibleIndex > 0) {
+      const prevQuestion = visibleQuestions[currentVisibleIndex - 1];
+      const newIndex = allQuestions.findIndex((q) => q.id === prevQuestion.id);
+      setCurrentQuestionIndex(newIndex);
     }
   };
+
+  // FR-408: Show template selector if no template selected
+  if (!selectedTemplateId) {
+    return <TemplateSelector onSelect={handleTemplateSelect} />;
+  }
 
   if (isComplete) {
     return (
@@ -267,36 +218,64 @@ export function DiscoveryPanel({ onComplete }: DiscoveryPanelProps) {
     );
   }
 
+  if (!currentQuestion) {
+    return (
+      <div className="flex h-full items-center justify-center p-8">
+        <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+      </div>
+    );
+  }
+
+  // Check if this is a conditional question (has branching)
+  const isConditionalQuestion = !!currentQuestion.show_when;
+
   return (
     <div className="flex h-full flex-col">
-      {/* Progress bar */}
+      {/* Template indicator + Progress bar */}
       <div className="px-6 pt-4">
+        {/* Template badge */}
+        {selectedTemplate && (
+          <div className="mb-3 flex items-center justify-between">
+            <button
+              onClick={() => setSelectedTemplate(null)}
+              className="flex items-center gap-2 rounded-full bg-purple-50 px-3 py-1 text-xs font-medium text-purple-700 hover:bg-purple-100"
+            >
+              <LayoutTemplate className="h-3 w-3" />
+              {selectedTemplate.name}
+              <span className="text-purple-400">×</span>
+            </button>
+          </div>
+        )}
         <div className="mb-2 flex items-center justify-between text-sm">
           <span className="text-gray-500">
-            Question {currentQuestionIndex + 1} of {questions.length}
+            Question {progressInfo.current} of {progressInfo.total}
           </span>
           <span className="font-medium text-blue-600">
-            {Math.round(progress)}% complete
+            {progressInfo.percentage}% complete
           </span>
         </div>
         <div className="h-2 overflow-hidden rounded-full bg-gray-200">
           <div
             className="h-full rounded-full bg-blue-600 transition-all duration-300"
-            style={{ width: `${progress}%` }}
+            style={{ width: `${progressInfo.percentage}%` }}
           />
         </div>
       </div>
 
       {/* Question */}
       <div className="flex-1 overflow-y-auto p-6">
-        <div className="mb-4">
+        <div className="mb-4 flex items-center gap-2">
           <span
-            className={`inline-block rounded-full px-3 py-1 text-xs font-medium ${
-              getCategoryColor(currentQuestion.category)
-            }`}
+            className={`inline-block rounded-full px-3 py-1 text-xs font-medium ${getCategoryColor(currentQuestion.category)}`}
           >
             {formatCategory(currentQuestion.category)}
           </span>
+          {isConditionalQuestion && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-violet-100 px-2 py-0.5 text-xs font-medium text-violet-700">
+              <GitBranch className="h-3 w-3" />
+              Follow-up
+            </span>
+          )}
         </div>
 
         <h3 className="mb-2 text-lg font-semibold text-gray-800">
@@ -385,7 +364,7 @@ export function DiscoveryPanel({ onComplete }: DiscoveryPanelProps) {
         <div className="flex items-center justify-between">
           <button
             onClick={moveToPrevious}
-            disabled={currentQuestionIndex === 0 || isProcessing}
+            disabled={currentVisibleIndex === 0 || isProcessing}
             className="flex items-center gap-1 rounded-md px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-200 disabled:opacity-50"
           >
             <ChevronLeft className="h-4 w-4" />
@@ -406,7 +385,7 @@ export function DiscoveryPanel({ onComplete }: DiscoveryPanelProps) {
                 <Loader2 className="h-4 w-4 animate-spin" />
                 Processing...
               </>
-            ) : currentQuestionIndex === questions.length - 1 ? (
+            ) : currentVisibleIndex === visibleQuestions.length - 1 ? (
               <>
                 <CheckCircle2 className="h-4 w-4" />
                 Complete

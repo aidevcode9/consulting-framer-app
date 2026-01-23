@@ -15,7 +15,8 @@ Last updated: 2026-01-22 (evening)
 - ✅ Workspace UI at `/app`
 - ✅ Canvas with drag-drop, zoom, pan, undo/redo
 - ✅ 3 framework nodes: SWOT, Porter, McKinsey
-- ✅ Discovery panel UI (mock questions)
+- ✅ **Discovery panel with branching** (FR-407)
+- ✅ **Industry templates** (FR-408: Tech, Healthcare, Retail, Finance, Manufacturing)
 - ✅ Framework panel (drag-drop to canvas)
 - ✅ **AI follow-up questions** (FR-402, needs API key)
 - ✅ **Framework recommendations** (FR-405, needs API key)
@@ -59,8 +60,7 @@ Last updated: 2026-01-22 (evening)
 
 | Task | FR | Depends On | Notes |
 |------|-----|------------|-------|
-| Question branching | FR-407 | ✅ FR-402 | Conditional follow-up questions (P1) |
-| Discovery templates | FR-408 | — | Industry-specific question sets (P1) |
+| **Phase 3: SOW generation** | FR-501 | ✅ Phase 2 | Deliverables phase |
 | **Real Stripe** | FR-902 | End of project | See "Deferred" section |
 
 ## Deferred (End of Project)
@@ -79,6 +79,8 @@ Last updated: 2026-01-22 (evening)
 
 | Task | FR | PR | Date |
 |------|-----|-----|------|
+| Question branching | FR-407 | — | 01-22 |
+| Discovery templates | FR-408 | — | 01-22 |
 | Discovery summary | FR-404 | 7053a75 | 01-22 |
 | Canvas auto-populate | FR-406 | 7053a75 | 01-22 |
 | Prompt injection defense | Security | e37fbd9 | 01-22 |
@@ -166,13 +168,15 @@ Last updated: 2026-01-22 (evening)
 - [x] FR-906: 14-day trial ✅ **Stub mode**
 - [x] FR-907: Billing portal ✅ **Stub mode**
 
-### AI Discovery (FR-400) ✅ All P0s Complete
+### AI Discovery (FR-400) ✅ All P0s + P1s Complete
 - [x] FR-401: Discovery questionnaire *(mock)*
 - [x] FR-402: Claude follow-up questions ✅
 - [x] FR-403: Progress tracking
 - [x] FR-404: Discovery summary ✅
 - [x] FR-405: Framework recommendations ✅
-- [x] FR-406: Auto-populate canvas ✅ (P1)
+- [x] FR-406: Auto-populate canvas ✅
+- [x] FR-407: Question branching ✅ (P1)
+- [x] FR-408: Discovery templates ✅ (P1)
 
 ---
 

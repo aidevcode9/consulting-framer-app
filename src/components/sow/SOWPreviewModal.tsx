@@ -3,12 +3,16 @@
 /**
  * SOW Preview Modal
  * FR-509: Preview before export
+ * FR-503: Export PDF
+ * FR-504: Export DOCX
  *
  * Displays generated Statement of Work with all sections
  * before user approves for export.
  */
 
-import { X, FileText, Target, CheckSquare, Calendar, AlertTriangle, Lightbulb } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { X, FileText, Target, CheckSquare, Calendar, AlertTriangle, Lightbulb, Download, ChevronDown } from "lucide-react";
+import { exportSOWToPDF, exportSOWToDOCX } from "@/lib/export";
 import type { GeneratedScope, Engagement } from "@/types";
 
 interface SOWPreviewModalProps {
@@ -28,6 +32,49 @@ export function SOWPreviewModal({
   onExport,
   warnings = [],
 }: SOWPreviewModalProps) {
+  const [showExportMenu, setShowExportMenu] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+  const exportMenuRef = useRef<HTMLDivElement>(null);
+
+  // Close export menu when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (exportMenuRef.current && !exportMenuRef.current.contains(event.target as Node)) {
+        setShowExportMenu(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleExportPDF = async () => {
+    setIsExporting(true);
+    setShowExportMenu(false);
+    try {
+      exportSOWToPDF({ sowData, engagement });
+      onExport();
+    } catch (error) {
+      console.error("Failed to export PDF:", error);
+      alert("Failed to export PDF. Please try again.");
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleExportDOCX = async () => {
+    setIsExporting(true);
+    setShowExportMenu(false);
+    try {
+      await exportSOWToDOCX({ sowData, engagement });
+      onExport();
+    } catch (error) {
+      console.error("Failed to export DOCX:", error);
+      alert("Failed to export DOCX. Please try again.");
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   if (!open) return null;
 
   const getLikelihoodColor = (likelihood: "high" | "medium" | "low") => {
@@ -298,12 +345,66 @@ export function SOWPreviewModal({
             >
               Cancel
             </button>
-            <button
-              onClick={onExport}
-              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-            >
-              Approve & Export
-            </button>
+
+            {/* Export Dropdown */}
+            <div className="relative" ref={exportMenuRef}>
+              <button
+                onClick={() => setShowExportMenu(!showExportMenu)}
+                disabled={isExporting}
+                className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors ${
+                  isExporting
+                    ? "bg-blue-400 cursor-not-allowed"
+                    : "bg-blue-600 hover:bg-blue-700"
+                }`}
+              >
+                {isExporting ? (
+                  <>
+                    <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24">
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                        fill="none"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      />
+                    </svg>
+                    Exporting...
+                  </>
+                ) : (
+                  <>
+                    <Download className="h-4 w-4" />
+                    Export
+                    <ChevronDown className="h-4 w-4" />
+                  </>
+                )}
+              </button>
+
+              {showExportMenu && !isExporting && (
+                <div className="absolute right-0 bottom-full mb-2 w-48 rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
+                  <button
+                    onClick={handleExportPDF}
+                    className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    <FileText className="h-4 w-4 text-red-600" />
+                    Export as PDF
+                  </button>
+                  <button
+                    onClick={handleExportDOCX}
+                    className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    <FileText className="h-4 w-4 text-blue-600" />
+                    Export as DOCX
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

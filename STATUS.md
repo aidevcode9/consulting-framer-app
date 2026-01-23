@@ -35,6 +35,8 @@ Last updated: 2026-01-22 (evening)
 - ✅ **Archive engagements** (hide/restore)
 - ✅ **SOW generation** (FR-501, needs API key)
 - ✅ **SOW preview** (FR-509, with placeholder detection)
+- ✅ **Export PDF** (FR-503, from SOW preview)
+- ✅ **Export DOCX** (FR-504, from SOW preview)
 
 **Not Working Yet:**
 - ⚠️ AI requires API key (set `ANTHROPIC_API_KEY` or `GEMINI_API_KEY`)
@@ -56,14 +58,12 @@ Last updated: 2026-01-22 (evening)
 
 | Task | FR | Branch | Started | Notes |
 |------|-----|--------|---------|-------|
-| Export PDF | FR-503 | feat/auth-email-google | — | After preview UI |
-| Export DOCX | FR-504 | — | — | After FR-503 |
+| Generate Proposal | FR-502 | feat/auth-email-google | — | Last Phase 3 P0 |
 
 ## Next (Priority Order)
 
 | Task | FR | Depends On | Notes |
 |------|-----|------------|-------|
-| **Generate Proposal** | FR-502 | FR-509 | After exports |
 | **Real Stripe** | FR-902 | End of project | See "Deferred" section |
 
 ## Deferred (End of Project)
@@ -82,6 +82,8 @@ Last updated: 2026-01-22 (evening)
 
 | Task | FR | PR | Date |
 |------|-----|-----|------|
+| Export PDF | FR-503 | — | 01-22 |
+| Export DOCX | FR-504 | — | 01-22 |
 | SOW preview | FR-509 | — | 01-22 |
 | Placeholder detection | FR-508 | — | 01-22 |
 | SOW generation | FR-501 | — | 01-22 |
@@ -191,8 +193,8 @@ Last updated: 2026-01-22 (evening)
 ### Deliverables (FR-500)
 - [x] FR-501: Generate SOW ✅
 - [ ] FR-502: Generate proposal (P0)
-- [ ] FR-503: Export PDF (P0)
-- [ ] FR-504: Export DOCX (P0)
+- [x] FR-503: Export PDF ✅
+- [x] FR-504: Export DOCX ✅
 - [x] FR-508: Placeholder detection ✅
 - [x] FR-509: Preview before export ✅
 

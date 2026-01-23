@@ -2,6 +2,60 @@
 
 ---
 
+## [2026-01-22] FR-503, FR-504: Export PDF + DOCX
+
+**Status:** ✅ Complete
+**Branch:** feat/auth-email-google
+
+**Files created:**
+- src/lib/export/pdf.ts (new) - PDF export using jsPDF
+- src/lib/export/docx.ts (new) - DOCX export using docx library
+- src/lib/export/index.ts (new) - Export utilities index
+
+**Files modified:**
+- src/components/sow/SOWPreviewModal.tsx - Added export dropdown with PDF/DOCX options
+- package.json - Added docx and file-saver dependencies
+
+**What was implemented:**
+
+### FR-503: Export PDF
+- Professional PDF generation using jsPDF (already installed)
+- Full SOW sections: executive summary, objectives, deliverables, timeline, assumptions, risks
+- Color-coded risk badges (high/medium/low)
+- Proper pagination with page breaks
+- Header with engagement info, footer with page numbers
+- Download as `SOW_ClientName_YYYY-MM-DD.pdf`
+
+### FR-504: Export DOCX
+- Word document generation using docx library
+- Styled headings, tables for timeline
+- Professional formatting matching PDF output
+- Download as `SOW_ClientName_YYYY-MM-DD.docx`
+
+### Export UI
+- Dropdown menu in SOW preview footer
+- Loading state during export
+- Error handling with user alerts
+- Click-outside to close dropdown
+
+**Verification:**
+- lint: ✅
+- typecheck: ✅
+- build: ✅
+
+**Skeptic Review:** ✅ Ship it
+- Client-side export, no API calls needed
+- No sensitive data exposure
+- Proper error handling
+
+**Commit:** pending
+
+**Notes:**
+- Phase 3 exports complete
+- FR-502 (Generate Proposal) is the remaining P0
+
+---
+
 ## [2026-01-22] FR-509, FR-508: SOW Preview + Placeholder Detection
 
 **Status:** ✅ Complete
@@ -43,7 +97,7 @@
 - All security checklists passed
 - Placeholder detection comprehensive
 
-**Commit:** pending
+**Commit:** 38f49d1
 
 **Notes:**
 - Export functionality (FR-503, FR-504) is next

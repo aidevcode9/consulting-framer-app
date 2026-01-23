@@ -2,6 +2,36 @@
 
 ---
 
+## [2026-01-22] Security: Prompt Injection Defense
+
+**Status:** ✅ Complete
+**Branch:** feat/auth-email-google
+
+**Files created:**
+- src/lib/ai/sanitize.ts (new) - Input sanitization for AI prompts
+
+**Files modified:**
+- src/lib/ai/prompts.ts - Apply sanitization to all user inputs
+- src/services/ai.service.ts - Add injection detection logging
+
+**What was implemented:**
+- Pattern detection for common injection attempts (role hijacking, instruction overrides, system prompt extraction)
+- Input length limits: short (200), medium (1000), long (5000) chars
+- Neutralization wraps suspicious patterns as `[user said: ...]`
+- Delimiter escaping for code blocks and special sequences
+- Warning logs when potential injection attempts detected
+
+**Verification:**
+- lint: ✅
+- typecheck: ✅
+- build: ✅
+
+**Skeptic Review:** ✅ Ship it (prompt injection now defended)
+
+**Commit:** e37fbd9
+
+---
+
 ## [2026-01-22] FR-402, FR-405: AI Discovery + Framework Recommendations
 
 **Status:** ✅ Complete

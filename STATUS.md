@@ -1,6 +1,6 @@
 # STATUS.md — Consulting Framer
 
-Last updated: 2026-01-22
+Last updated: 2026-01-22 (evening)
 
 ---
 
@@ -15,8 +15,12 @@ Last updated: 2026-01-22
 - ✅ Workspace UI at `/app`
 - ✅ Canvas with drag-drop, zoom, pan, undo/redo
 - ✅ 3 framework nodes: SWOT, Porter, McKinsey
-- ✅ Discovery panel UI (mock questions, no AI)
+- ✅ Discovery panel UI (mock questions)
 - ✅ Framework panel (drag-drop to canvas)
+- ✅ **AI follow-up questions** (FR-402, needs API key)
+- ✅ **Framework recommendations** (FR-405, needs API key)
+- ✅ **Usage limits enforcement** (tier-based limits)
+- ✅ **Prompt injection defense** (input sanitization)
 - ✅ Note block
 - ✅ **Database persistence** (engagements save to Supabase)
 - ✅ **Auto-save** (canvas saves every 5 seconds)
@@ -28,9 +32,10 @@ Last updated: 2026-01-22
 - ✅ **Archive engagements** (hide/restore)
 
 **Not Working Yet:**
-- ❌ No real AI (discovery uses hardcoded questions)
+- ⚠️ AI requires API key (set `ANTHROPIC_API_KEY` or `GEMINI_API_KEY`)
 - ⚠️ Billing stub only (no real Stripe yet - `STRIPE_STUB_MODE=true`)
 - ❌ No SOW generation
+- ❌ Discovery summary (FR-404)
 
 **To Demo:** Run `npm run dev` → visit `localhost:3000/app`
 
@@ -73,8 +78,9 @@ Last updated: 2026-01-22
 
 | Task | FR | PR | Date |
 |------|-----|-----|------|
-| AI follow-up questions | FR-402 | — | 01-22 |
-| Framework recommendations | FR-405 | — | 01-22 |
+| Prompt injection defense | Security | e37fbd9 | 01-22 |
+| AI follow-up questions | FR-402 | b30d958 | 01-22 |
+| Framework recommendations | FR-405 | b30d958 | 01-22 |
 | Usage limits enforcement | FR-903 | — | 01-22 |
 | Logger utility | FR-1101 | — | 01-22 |
 | Billing stub (mock Stripe) | FR-901 | — | 01-22 |

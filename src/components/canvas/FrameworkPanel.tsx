@@ -1,16 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { 
-  ChevronDown, 
-  ChevronRight, 
-  Grid3X3, 
-  Network, 
+import {
+  ChevronDown,
+  ChevronRight,
+  Grid3X3,
+  Network,
   Layers,
   StickyNote,
   Sparkles,
+  Loader2,
+  CheckCircle2,
 } from "lucide-react";
-import { useUIStore } from "@/lib/store";
+import { useUIStore, useDiscoveryStore } from "@/lib/store";
 
 interface FrameworkItem {
   type: string;
@@ -54,9 +56,54 @@ const OTHER_NODES = [
   },
 ];
 
+interface Recommendation {
+  framework: "swot" | "porter" | "mckinsey7s" | "bmc";
+  confidence: number;
+  reasoning: string;
+  focusAreas: string[];
+}
+
 export function FrameworkPanel() {
   const { frameworkPanelOpen, setFrameworkPanelOpen } = useUIStore();
+  const { isComplete: discoveryComplete, answers } = useDiscoveryStore();
   const [expandedSection, setExpandedSection] = useState<string | null>("frameworks");
+  const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
+  const [isLoadingRecs, setIsLoadingRecs] = useState(false);
+  const [recsError, setRecsError] = useState<string | null>(null);
+
+  const answeredCount = Object.keys(answers).length;
+
+  const handleGetRecommendations = async () => {
+    setIsLoadingRecs(true);
+    setRecsError(null);
+    try {
+      const response = await fetch("/api/ai/recommend-frameworks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          discoveryAnswers: Object.entries(answers).map(([id, answer]) => ({
+            question: id,
+            answer: answer.value,
+          })),
+          context: {
+            clientName: "Client", // TODO: Get from engagement
+          },
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to get recommendations");
+      }
+
+      const data = await response.json();
+      setRecommendations(data.recommendations || []);
+    } catch (error) {
+      console.error("Recommendations error:", error);
+      setRecsError("Could not get recommendations. Try again.");
+    } finally {
+      setIsLoadingRecs(false);
+    }
+  };
 
   const onDragStart = (event: React.DragEvent, nodeType: string) => {
     event.dataTransfer.setData("application/reactflow", nodeType);
@@ -102,6 +149,16 @@ export function FrameworkPanel() {
               <span className="text-sm font-medium text-gray-700">
                 AI Recommended
               </span>
+              {discoveryComplete && recommendations.length === 0 && (
+                <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs text-blue-700">
+                  Ready
+                </span>
+              )}
+              {recommendations.length > 0 && (
+                <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs text-green-700">
+                  {recommendations.length}
+                </span>
+              )}
             </div>
             {expandedSection === "ai" ? (
               <ChevronDown className="h-4 w-4 text-gray-400" />
@@ -110,11 +167,87 @@ export function FrameworkPanel() {
             )}
           </button>
           {expandedSection === "ai" && (
-            <div className="ml-6 mt-1 rounded-md border border-amber-200 bg-amber-50 p-3">
-              <p className="text-xs text-amber-700">
-                Complete the Discovery questionnaire to get AI-powered framework
-                recommendations based on your engagement context.
-              </p>
+            <div className="ml-2 mt-1">
+              {!discoveryComplete && answeredCount === 0 ? (
+                // No discovery started
+                <div className="rounded-md border border-amber-200 bg-amber-50 p-3">
+                  <p className="text-xs text-amber-700">
+                    Complete the Discovery questionnaire to get AI-powered framework
+                    recommendations based on your engagement context.
+                  </p>
+                </div>
+              ) : !discoveryComplete && answeredCount > 0 ? (
+                // Discovery in progress
+                <div className="rounded-md border border-blue-200 bg-blue-50 p-3">
+                  <p className="text-xs text-blue-700">
+                    Discovery in progress ({answeredCount} answers). Complete all questions to get recommendations.
+                  </p>
+                </div>
+              ) : recommendations.length === 0 ? (
+                // Discovery complete, no recommendations yet
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 rounded-md border border-green-200 bg-green-50 p-2">
+                    <CheckCircle2 className="h-4 w-4 text-green-600" />
+                    <p className="text-xs text-green-700">Discovery complete!</p>
+                  </div>
+                  <button
+                    onClick={handleGetRecommendations}
+                    disabled={isLoadingRecs}
+                    className="flex w-full items-center justify-center gap-2 rounded-md bg-amber-500 px-3 py-2 text-sm font-medium text-white hover:bg-amber-600 disabled:opacity-50"
+                  >
+                    {isLoadingRecs ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Analyzing...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="h-4 w-4" />
+                        Get AI Recommendations
+                      </>
+                    )}
+                  </button>
+                  {recsError && (
+                    <p className="text-xs text-red-600">{recsError}</p>
+                  )}
+                </div>
+              ) : (
+                // Show recommendations
+                <div className="space-y-2">
+                  {recommendations.map((rec) => {
+                    const framework = FRAMEWORKS.find((f) => f.type === rec.framework);
+                    if (!framework) return null;
+                    return (
+                      <div
+                        key={rec.framework}
+                        draggable
+                        onDragStart={(e) => onDragStart(e, rec.framework)}
+                        className="cursor-grab rounded-md border border-amber-200 bg-amber-50 p-2 hover:border-amber-300 active:cursor-grabbing"
+                      >
+                        <div className="flex items-center gap-2">
+                          <framework.icon
+                            className="h-4 w-4"
+                            style={{ color: framework.color }}
+                          />
+                          <span className="text-sm font-medium text-gray-800">
+                            {framework.name}
+                          </span>
+                          <span className="ml-auto text-xs text-amber-600">
+                            {Math.round(rec.confidence * 100)}%
+                          </span>
+                        </div>
+                        <p className="mt-1 text-xs text-gray-600">{rec.reasoning}</p>
+                      </div>
+                    );
+                  })}
+                  <button
+                    onClick={() => setRecommendations([])}
+                    className="w-full text-xs text-gray-500 hover:text-gray-700"
+                  >
+                    Clear recommendations
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>

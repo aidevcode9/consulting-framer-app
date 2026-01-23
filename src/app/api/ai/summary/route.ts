@@ -47,16 +47,15 @@ export async function POST(req: NextRequest) {
 
     const { engagementId, discoveryAnswers, context } = parsed.data;
 
-    // Check if API key is configured
+    // Require API key
     const hasApiKey =
       process.env.ANTHROPIC_API_KEY || process.env.GEMINI_API_KEY;
 
     if (!hasApiKey) {
-      // Return mock response when no API key configured
-      return NextResponse.json({
-        summary: `Executive Summary for ${context.clientName}\n\nBased on the discovery process, the client is seeking consulting support to address key business challenges. The engagement will focus on understanding current operations, identifying improvement opportunities, and developing actionable recommendations.\n\nKey areas of focus include strategic planning, operational efficiency, and stakeholder alignment. The recommended approach involves structured analysis using established frameworks followed by collaborative solution development.`,
-        message: "AI not configured - using mock response",
-      });
+      return NextResponse.json(
+        { error: "AI service not configured. Set ANTHROPIC_API_KEY or GEMINI_API_KEY." },
+        { status: 503 }
+      );
     }
 
     const aiService = new AIService(supabase);

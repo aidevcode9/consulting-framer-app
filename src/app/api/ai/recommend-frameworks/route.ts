@@ -48,30 +48,15 @@ export async function POST(req: NextRequest) {
 
     const { engagementId, discoveryAnswers, context } = parsed.data;
 
-    // Check if API key is configured
+    // Require API key
     const hasApiKey =
       process.env.ANTHROPIC_API_KEY || process.env.GEMINI_API_KEY;
 
     if (!hasApiKey) {
-      // Return mock response when no API key configured
-      return NextResponse.json({
-        recommendations: [
-          {
-            framework: "swot",
-            confidence: 0.85,
-            reasoning: "SWOT analysis provides a good starting point for understanding the competitive position.",
-            focusAreas: ["Market opportunities", "Internal capabilities"],
-          },
-          {
-            framework: "porter",
-            confidence: 0.7,
-            reasoning: "Understanding industry dynamics will help inform strategic decisions.",
-            focusAreas: ["Competitive rivalry", "Buyer power"],
-          },
-        ],
-        summary: "Based on the discovery information, we recommend starting with a SWOT analysis to establish baseline understanding, followed by Porter's Five Forces for industry analysis.",
-        message: "AI not configured - using mock response",
-      });
+      return NextResponse.json(
+        { error: "AI service not configured. Set ANTHROPIC_API_KEY or GEMINI_API_KEY." },
+        { status: 503 }
+      );
     }
 
     const aiService = new AIService(supabase);

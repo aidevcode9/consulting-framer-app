@@ -330,6 +330,7 @@ interface DiscoveryState {
   isComplete: boolean;
   aiFollowUp: string | null;
   isProcessing: boolean;
+  selectedTemplateId: string | null; // FR-408: Discovery templates
 
   setAnswer: (questionId: string, answer: DiscoveryAnswer) => void;
   setCurrentQuestionIndex: (index: number) => void;
@@ -337,6 +338,7 @@ interface DiscoveryState {
   setAIFollowUp: (followUp: string | null) => void;
   setProcessing: (processing: boolean) => void;
   loadAnswers: (answers: Record<string, DiscoveryAnswer>) => void;
+  setSelectedTemplate: (templateId: string | null) => void; // FR-408
   reset: () => void;
 }
 
@@ -348,6 +350,7 @@ export const useDiscoveryStore = create<DiscoveryState>()(
       isComplete: false,
       aiFollowUp: null,
       isProcessing: false,
+      selectedTemplateId: null,
 
       setAnswer: (questionId, answer) =>
         set((state) => ({
@@ -358,6 +361,7 @@ export const useDiscoveryStore = create<DiscoveryState>()(
       setAIFollowUp: (aiFollowUp) => set({ aiFollowUp }),
       setProcessing: (isProcessing) => set({ isProcessing }),
       loadAnswers: (answers) => set({ answers }),
+      setSelectedTemplate: (selectedTemplateId) => set({ selectedTemplateId }),
       reset: () =>
         set({
           answers: {},
@@ -365,6 +369,7 @@ export const useDiscoveryStore = create<DiscoveryState>()(
           isComplete: false,
           aiFollowUp: null,
           isProcessing: false,
+          selectedTemplateId: null,
         }),
     }),
     { name: "discovery-store" }

@@ -2,10 +2,18 @@
 // These match the database schema and provide type safety throughout the app
 
 import type { Node, Edge, Viewport } from "@xyflow/react";
+import type { SubscriptionTier } from "@/lib/stripe/config";
 
 // ============================================
 // DATABASE TYPES
 // ============================================
+
+export type SubscriptionStatus =
+  | "active"
+  | "trialing"
+  | "past_due"
+  | "canceled"
+  | "incomplete";
 
 export interface Profile {
   id: string;
@@ -15,6 +23,9 @@ export interface Profile {
   company: string | null;
   role: string;
   settings: Record<string, unknown>;
+  subscription_tier: SubscriptionTier;
+  subscription_status: SubscriptionStatus;
+  trial_ends_at: string | null;
   created_at: string;
   updated_at: string;
 }

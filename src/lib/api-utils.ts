@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { AppError } from './errors';
+import { AppError, UsageLimitError } from './errors';
 
 /**
  * Maps error codes to HTTP status codes
@@ -19,6 +19,11 @@ const ERROR_STATUS_MAP: Record<string, number> = {
  */
 export function handleApiError(error: unknown): NextResponse {
   console.error('[API Error]', error);
+
+  // Handle usage limit errors with 429 status
+  if (error instanceof UsageLimitError) {
+    return NextResponse.json(error.toJSON(), { status: 429 });
+  }
 
   if (error instanceof AppError) {
     const status = ERROR_STATUS_MAP[error.code] || 500;

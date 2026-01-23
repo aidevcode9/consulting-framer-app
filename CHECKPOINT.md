@@ -2,6 +2,68 @@
 
 ---
 
+## [2026-01-22] FR-502: Generate Proposal
+
+**Status:** ✅ Complete
+**Branch:** feat/proposal-generation
+
+**Files created:**
+- src/lib/ai/prompts/proposal.prompt.ts (new) - Proposal generation prompt
+- src/app/api/proposal/generate/route.ts (new) - POST /api/proposal/generate endpoint
+- src/components/proposal/ProposalPreviewModal.tsx (new) - Modal to preview generated proposals
+- src/lib/export/proposal-pdf.ts (new) - PDF export for proposals
+- src/lib/export/proposal-docx.ts (new) - DOCX export for proposals
+
+**Files modified:**
+- src/types/index.ts - Added GeneratedProposal, ProposalPhase, ProposalInvestment, ProposalOption types
+- src/lib/ai/prompts/index.ts - Added proposal prompt exports
+- src/services/ai.service.ts - Added generateProposal method
+- src/lib/export/index.ts - Added proposal export functions
+- src/app/app/page.tsx - Added Generate Proposal button and ProposalPreviewModal
+
+**What was implemented:**
+
+### FR-502: Generate Proposal
+- POST /api/proposal/generate endpoint
+- Client-facing proposal generation (distinct from internal SOW)
+- Generates structured proposal with:
+  - Executive summary (persuasive, value-focused)
+  - Situation analysis (client understanding)
+  - Proposed approach (methodology overview)
+  - Key benefits (4-6 business outcomes)
+  - Methodology phases with outcomes
+  - Investment options with pricing
+  - Next steps (actionable)
+  - Why us section
+- Mock proposal when no API key configured
+- 60 second timeout for long-running generations
+- Export to PDF and DOCX
+
+**Security:**
+- Usage limits checked BEFORE AI call (sow_generation action)
+- Prompt injection defense with sanitizeForPrompt()
+- Auth check + engagement ownership verification
+- Input validation with Zod schema
+
+**Verification:**
+- lint: ✅
+- typecheck: ✅
+- build: ✅
+
+**Skeptic Review:** ✅ Ship it
+- All AI checklist items passed
+- All auth checklist items passed
+- All data integrity checklist items passed
+
+**Commit:** [pending]
+
+**Notes:**
+- Phase 3 Deliverables is now COMPLETE!
+- All P0s done: FR-501, FR-502, FR-503, FR-504, FR-508, FR-509
+- Proposal is client-facing pitch; SOW is internal scope document
+
+---
+
 ## [2026-01-22] Lesson Learned: Git Branching
 
 **Issue:** Used `feat/auth-email-google` branch for 15+ unrelated features beyond auth.

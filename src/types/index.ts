@@ -309,6 +309,41 @@ export interface PricingLineItem {
 }
 
 // ============================================
+// PROPOSAL TYPES (FR-502)
+// ============================================
+
+export interface GeneratedProposal {
+  executive_summary: string;
+  situation_analysis: string;
+  proposed_approach: string;
+  key_benefits: string[];
+  methodology: ProposalPhase[];
+  investment: ProposalInvestment;
+  next_steps: string[];
+  why_us: string;
+}
+
+export interface ProposalPhase {
+  phase: string;
+  description: string;
+  duration: string;
+  outcomes: string[];
+}
+
+export interface ProposalInvestment {
+  summary: string;
+  options: ProposalOption[];
+  terms: string;
+}
+
+export interface ProposalOption {
+  name: string;
+  description: string;
+  price_range: string;
+  includes: string[];
+}
+
+// ============================================
 // UI TYPES
 // ============================================
 

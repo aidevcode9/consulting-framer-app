@@ -37,6 +37,8 @@ Last updated: 2026-01-22 (evening)
 - ✅ **SOW preview** (FR-509, with placeholder detection)
 - ✅ **Export PDF** (FR-503, from SOW preview)
 - ✅ **Export DOCX** (FR-504, from SOW preview)
+- ✅ **Generate Proposal** (FR-502, needs API key)
+- ✅ **Proposal export** (PDF/DOCX)
 
 **Not Working Yet:**
 - ⚠️ AI requires API key (set `ANTHROPIC_API_KEY` or `GEMINI_API_KEY`)
@@ -46,11 +48,11 @@ Last updated: 2026-01-22 (evening)
 
 ---
 
-## Current Phase: 3 (Deliverables)
+## Current Phase: 3 (Deliverables) ✅ COMPLETE
 
 **Phase 1 Goal:** Canvas + 3 frameworks + auth + persistence ✅ **COMPLETE**
 **Phase 2 Goal:** Stripe billing + AI discovery ✅ **COMPLETE**
-**Phase 3 Goal:** SOW generation + exports
+**Phase 3 Goal:** SOW generation + exports ✅ **COMPLETE**
 
 ---
 
@@ -58,7 +60,7 @@ Last updated: 2026-01-22 (evening)
 
 | Task | FR | Branch | Started | Notes |
 |------|-----|--------|---------|-------|
-| Generate Proposal | FR-502 | feat/auth-email-google | — | Last Phase 3 P0 |
+| — | — | — | — | Phase 3 complete! |
 
 ## Next (Priority Order)
 
@@ -82,6 +84,7 @@ Last updated: 2026-01-22 (evening)
 
 | Task | FR | PR | Date |
 |------|-----|-----|------|
+| Generate Proposal | FR-502 | — | 01-22 |
 | Export PDF | FR-503 | — | 01-22 |
 | Export DOCX | FR-504 | — | 01-22 |
 | SOW preview | FR-509 | — | 01-22 |
@@ -188,11 +191,11 @@ Last updated: 2026-01-22 (evening)
 
 ---
 
-## Phase 3 Checklist
+## Phase 3 Checklist ✅ COMPLETE
 
 ### Deliverables (FR-500)
 - [x] FR-501: Generate SOW ✅
-- [ ] FR-502: Generate proposal (P0)
+- [x] FR-502: Generate proposal ✅
 - [x] FR-503: Export PDF ✅
 - [x] FR-504: Export DOCX ✅
 - [x] FR-508: Placeholder detection ✅

@@ -2,7 +2,11 @@
  * AI Prompts for Consulting Framer
  * FR-402: AI follow-up questions
  * FR-405: Framework recommendations
+ *
+ * All user inputs are sanitized to defend against prompt injection.
  */
+
+import { sanitizeForPrompt } from "./sanitize";
 
 /**
  * System prompt for discovery follow-up questions
@@ -34,20 +38,30 @@ export function buildDiscoveryFollowUpPrompt(
     previousAnswers?: Array<{ question: string; answer: string }>;
   }
 ): string {
-  let prompt = `Client: ${context.clientName}`;
-  if (context.industry) {
-    prompt += `\nIndustry: ${context.industry}`;
+  // Sanitize all user inputs
+  const safeClientName = sanitizeForPrompt(context.clientName, "short");
+  const safeIndustry = context.industry
+    ? sanitizeForPrompt(context.industry, "short")
+    : null;
+  const safeQuestion = sanitizeForPrompt(question, "medium");
+  const safeAnswer = sanitizeForPrompt(answer, "medium");
+
+  let prompt = `Client: ${safeClientName}`;
+  if (safeIndustry) {
+    prompt += `\nIndustry: ${safeIndustry}`;
   }
 
   if (context.previousAnswers && context.previousAnswers.length > 0) {
     prompt += `\n\nPrevious discovery answers:`;
     for (const qa of context.previousAnswers.slice(-3)) {
-      prompt += `\nQ: ${qa.question}\nA: ${qa.answer}`;
+      const safeQ = sanitizeForPrompt(qa.question, "medium");
+      const safeA = sanitizeForPrompt(qa.answer, "medium");
+      prompt += `\nQ: ${safeQ}\nA: ${safeA}`;
     }
   }
 
-  prompt += `\n\nCurrent question: ${question}`;
-  prompt += `\nClient's answer: ${answer}`;
+  prompt += `\n\nCurrent question: ${safeQuestion}`;
+  prompt += `\nClient's answer: ${safeAnswer}`;
   prompt += `\n\nGenerate a follow-up question to clarify or expand on this answer, or respond with "NO_FOLLOWUP" if the answer is complete.`;
 
   return prompt;
@@ -94,17 +108,28 @@ export function buildFrameworkRecommendationPrompt(
     challenge?: string;
   }
 ): string {
-  let prompt = `Client: ${context.clientName}`;
-  if (context.industry) {
-    prompt += `\nIndustry: ${context.industry}`;
+  // Sanitize all user inputs
+  const safeClientName = sanitizeForPrompt(context.clientName, "short");
+  const safeIndustry = context.industry
+    ? sanitizeForPrompt(context.industry, "short")
+    : null;
+  const safeChallenge = context.challenge
+    ? sanitizeForPrompt(context.challenge, "medium")
+    : null;
+
+  let prompt = `Client: ${safeClientName}`;
+  if (safeIndustry) {
+    prompt += `\nIndustry: ${safeIndustry}`;
   }
-  if (context.challenge) {
-    prompt += `\nPrimary Challenge: ${context.challenge}`;
+  if (safeChallenge) {
+    prompt += `\nPrimary Challenge: ${safeChallenge}`;
   }
 
   prompt += `\n\nDiscovery Answers:`;
   for (const qa of discoveryAnswers) {
-    prompt += `\n\nQ: ${qa.question}\nA: ${qa.answer}`;
+    const safeQ = sanitizeForPrompt(qa.question, "medium");
+    const safeA = sanitizeForPrompt(qa.answer, "medium");
+    prompt += `\n\nQ: ${safeQ}\nA: ${safeA}`;
   }
 
   prompt += `\n\nBased on this information, recommend the most appropriate consulting frameworks. Return your response as JSON.`;
@@ -137,14 +162,22 @@ export function buildDiscoverySummaryPrompt(
     industry?: string;
   }
 ): string {
-  let prompt = `Client: ${context.clientName}`;
-  if (context.industry) {
-    prompt += `\nIndustry: ${context.industry}`;
+  // Sanitize all user inputs
+  const safeClientName = sanitizeForPrompt(context.clientName, "short");
+  const safeIndustry = context.industry
+    ? sanitizeForPrompt(context.industry, "short")
+    : null;
+
+  let prompt = `Client: ${safeClientName}`;
+  if (safeIndustry) {
+    prompt += `\nIndustry: ${safeIndustry}`;
   }
 
   prompt += `\n\nDiscovery Answers:`;
   for (const qa of discoveryAnswers) {
-    prompt += `\n\nQ: ${qa.question}\nA: ${qa.answer}`;
+    const safeQ = sanitizeForPrompt(qa.question, "medium");
+    const safeA = sanitizeForPrompt(qa.answer, "medium");
+    prompt += `\n\nQ: ${safeQ}\nA: ${safeA}`;
   }
 
   prompt += `\n\nGenerate a concise executive summary of this discovery information.`;

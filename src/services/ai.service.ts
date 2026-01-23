@@ -17,6 +17,7 @@ import {
   buildFrameworkRecommendationPrompt,
   buildDiscoverySummaryPrompt,
 } from "@/lib/ai/prompts";
+import { detectInjectionAttempt } from "@/lib/ai/sanitize";
 import { createLogger } from "@/lib/logger";
 
 const log = createLogger("AIService");
@@ -59,6 +60,15 @@ export class AIService {
   ): Promise<string | null> {
     // Check usage limits
     await this.usageService.canPerformAction(userId, "ai_query");
+
+    // Log potential injection attempts (inputs are sanitized in prompts.ts)
+    if (detectInjectionAttempt(answer) || detectInjectionAttempt(context.clientName)) {
+      log.warn("Potential prompt injection detected", {
+        userId,
+        engagementId,
+        field: detectInjectionAttempt(answer) ? "answer" : "clientName",
+      });
+    }
 
     log.info("Generating follow-up question", { userId, engagementId });
 
@@ -105,6 +115,18 @@ export class AIService {
   ): Promise<FrameworkRecommendationResult> {
     // Check usage limits
     await this.usageService.canPerformAction(userId, "ai_query");
+
+    // Log potential injection attempts (inputs are sanitized in prompts.ts)
+    const suspiciousAnswers = discoveryAnswers.filter((qa) =>
+      detectInjectionAttempt(qa.answer)
+    );
+    if (suspiciousAnswers.length > 0 || detectInjectionAttempt(context.clientName)) {
+      log.warn("Potential prompt injection detected", {
+        userId,
+        engagementId,
+        suspiciousCount: suspiciousAnswers.length,
+      });
+    }
 
     log.info("Generating framework recommendations", { userId, engagementId });
 
@@ -165,6 +187,18 @@ export class AIService {
   ): Promise<string> {
     // Check usage limits
     await this.usageService.canPerformAction(userId, "ai_query");
+
+    // Log potential injection attempts (inputs are sanitized in prompts.ts)
+    const suspiciousAnswers = discoveryAnswers.filter((qa) =>
+      detectInjectionAttempt(qa.answer)
+    );
+    if (suspiciousAnswers.length > 0 || detectInjectionAttempt(context.clientName)) {
+      log.warn("Potential prompt injection detected", {
+        userId,
+        engagementId,
+        suspiciousCount: suspiciousAnswers.length,
+      });
+    }
 
     log.info("Generating discovery summary", { userId, engagementId });
 

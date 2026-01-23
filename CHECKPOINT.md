@@ -2,6 +2,63 @@
 
 ---
 
+## [2026-01-22] FR-1101, FR-903: Logger Utility + Usage Limits
+
+**Status:** ✅ Complete
+**Branch:** feat/auth-email-google
+
+**Files created:**
+- src/lib/logger.ts (new) - Logger utility with module prefixes
+- src/repositories/usage.repo.ts (new) - Usage counts from database
+- src/services/usage.service.ts (new) - Usage limit checks and tracking
+- src/app/api/usage/route.ts (new) - GET /api/usage endpoint
+- supabase/migrations/001_add_subscription_fields.sql (new) - Adds subscription fields to profiles
+
+**Files modified:**
+- src/lib/errors.ts (updated UsageLimitError signature)
+- src/lib/api-utils.ts (handle UsageLimitError with 429 status)
+- src/services/engagement.service.ts (added usage limit check on create)
+- STATUS.md (moved FR-1101, FR-903 to Shipped)
+- REQUIREMENTS.md (added FR-1100 Infrastructure section)
+
+**What was implemented:**
+
+### FR-1101: Logger Utility
+- `createLogger(module)` returns logger with debug, info, warn, error methods
+- Consistent prefixes like `[Auth]`, `[Billing]`, `[Canvas]`
+- Dev mode: all levels; Prod mode: warn and error only
+- Pre-configured loggers exported: `loggers.auth`, `loggers.billing`, etc.
+
+### FR-903: Usage Limits Enforcement
+- UsageRepository: Counts engagements, AI queries (this month), SOW generations
+- UsageService.canPerformAction(): Checks limits before allowing actions
+- UsageService.getUsageInfo(): Returns tier, counts, limits, remaining, percentUsed
+- GET /api/usage: Returns usage summary for authenticated user
+- EngagementService.create() now checks usage limit before creating
+- UsageLimitError returns 429 with upgrade flag
+
+**Tier Limits:**
+| Tier | Engagements | AI Queries/Mo | SOW Generations |
+|------|-------------|---------------|-----------------|
+| Free | 2 | 10 | 0 |
+| Trial | 999 | 100 | 5 |
+| Pro | 999 | 500 | 999 |
+| Team | 999 | 2000 | 999 |
+
+**Verification:**
+- lint: ✅
+- typecheck: ✅
+- build: ✅
+
+**Commit:** [pending]
+
+**Notes:**
+- Database migration adds subscription_tier, subscription_status, trial_ends_at, stripe_customer_id, stripe_subscription_id to profiles
+- Usage checks integrated into engagement creation
+- Ready for AI service integration (FR-402) to check ai_query limits
+
+---
+
 ## [2026-01-22] Phase 1 Completion: FR-103, FR-104, FR-702, FR-703, FR-704
 
 **Status:** ✅ Complete

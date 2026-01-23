@@ -1,6 +1,8 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 import { EngagementRepository } from "@/repositories/engagement.repo";
+import { UsageService } from "@/services/usage.service";
 import { NotFoundError, ForbiddenError } from "@/lib/errors";
+import { createLogger } from "@/lib/logger";
 import type {
   Engagement,
   CreateEngagementInput,
@@ -8,11 +10,15 @@ import type {
   CanvasData,
 } from "@/types";
 
+const log = createLogger("EngagementService");
+
 export class EngagementService {
   private repo: EngagementRepository;
+  private usageService: UsageService;
 
   constructor(private supabase: SupabaseClient) {
     this.repo = new EngagementRepository(supabase);
+    this.usageService = new UsageService(supabase);
   }
 
   async list(userId: string): Promise<Engagement[]> {
@@ -38,7 +44,10 @@ export class EngagementService {
     userId: string,
     input: CreateEngagementInput
   ): Promise<Engagement> {
-    // Could add usage limit checks here in the future
+    // Check usage limits before creating
+    await this.usageService.canPerformAction(userId, "create_engagement");
+    log.info("Creating engagement", { userId, title: input.title });
+
     return this.repo.create(userId, input);
   }
 

@@ -215,6 +215,16 @@ Consultants waste **7+ hours per engagement** on administrative work:
 
 ---
 
+### FR-1100: Infrastructure & Developer Experience
+
+| ID | Requirement | Acceptance Criteria | Priority |
+|----|-------------|---------------------|----------|
+| FR-1101 | Logger utility | Consistent prefixes `[Module]`; dev/prod modes; timestamp option | P2 |
+| FR-1102 | Error tracking | Client-side error capture; optional Sentry integration | P2 |
+| FR-1103 | Feature flags | Simple flags for gradual rollout | P2 |
+
+---
+
 ## Non-Functional Requirements
 
 ### NFR-100: Performance

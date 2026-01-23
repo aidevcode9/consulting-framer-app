@@ -51,8 +51,8 @@ export class ValidationError extends AppError {
 }
 
 export class UsageLimitError extends AppError {
-  constructor(limit: string) {
-    super('USAGE_LIMIT_EXCEEDED', `${limit} limit reached`, { upgrade: true });
+  constructor(code: string, message: string, details?: Record<string, unknown>) {
+    super(code, message, { ...details, upgrade: true });
     this.name = 'UsageLimitError';
   }
 }

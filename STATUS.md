@@ -53,8 +53,8 @@ Last updated: 2026-01-22
 
 | Task | FR | Depends On | Notes |
 |------|-----|------------|-------|
-| Usage limits | FR-903 | ✅ FR-901 | Per-tier enforcement |
-| AI discovery | FR-402 | FR-903 | Claude follow-up questions |
+| AI discovery | FR-402 | ✅ FR-903 | Claude follow-up questions |
+| Framework recommendations | FR-405 | FR-402 | AI suggests frameworks |
 | **Real Stripe** | FR-902 | End of project | See "Deferred" section |
 
 ## Deferred (End of Project)
@@ -73,6 +73,8 @@ Last updated: 2026-01-22
 
 | Task | FR | PR | Date |
 |------|-----|-----|------|
+| Usage limits enforcement | FR-903 | — | 01-22 |
+| Logger utility | FR-1101 | — | 01-22 |
 | Billing stub (mock Stripe) | FR-901 | — | 01-22 |
 | Archive engagements | FR-704 | — | 01-22 |
 | Search/filter | FR-703 | — | 01-22 |
@@ -148,7 +150,7 @@ Last updated: 2026-01-22
 ### Billing (FR-900)
 - [x] FR-901: Subscription tiers defined ✅ **Stub mode**
 - [~] FR-902: Stripe Checkout integration ⚠️ **Stub only; real Stripe deferred**
-- [ ] FR-903: Usage limits enforcement
+- [x] FR-903: Usage limits enforcement ✅
 - [x] FR-904: Upgrade flow ✅ **Stub mode**
 - [x] FR-906: 14-day trial ✅ **Stub mode**
 - [x] FR-907: Billing portal ✅ **Stub mode**

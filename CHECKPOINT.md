@@ -2,6 +2,47 @@
 
 ---
 
+## [2026-01-22] FR-404, FR-406: Discovery Summary + Canvas Auto-populate
+
+**Status:** ✅ Complete
+**Branch:** feat/auth-email-google
+
+**Files created:**
+- src/app/api/ai/summary/route.ts (new) - POST /api/ai/summary endpoint
+- src/app/api/ai/populate-canvas/route.ts (new) - POST /api/ai/populate-canvas endpoint
+
+**Files modified:**
+- src/lib/ai/prompts.ts - Added CANVAS_POPULATE_PROMPT and buildCanvasPopulatePrompt
+- src/services/ai.service.ts - Added generateCanvasContent method
+
+**What was implemented:**
+
+### FR-404: Discovery Summary
+- POST /api/ai/summary endpoint
+- Generates executive summary from discovery answers
+- Uses existing DISCOVERY_SUMMARY_PROMPT
+
+### FR-406: Canvas Auto-populate
+- POST /api/ai/populate-canvas endpoint
+- Generates structured content for SWOT, Porter, McKinsey 7S frameworks
+- Returns sections with 3-5 items per section
+- Mock responses when no API key configured
+
+**Verification:**
+- lint: ✅
+- typecheck: ✅
+- build: ✅
+
+**Skeptic Review:** ✅ Ship it
+
+**Commit:** 7053a75
+
+**Notes:**
+- All Phase 2 AI Discovery P0s are now complete
+- FR-406 is P1 but was quick to implement alongside FR-404
+
+---
+
 ## [2026-01-22] Security: Prompt Injection Defense
 
 **Status:** ✅ Complete

@@ -19,6 +19,8 @@ Last updated: 2026-01-22 (evening)
 - ✅ Framework panel (drag-drop to canvas)
 - ✅ **AI follow-up questions** (FR-402, needs API key)
 - ✅ **Framework recommendations** (FR-405, needs API key)
+- ✅ **Discovery summary** (FR-404, needs API key)
+- ✅ **Canvas auto-populate** (FR-406, needs API key)
 - ✅ **Usage limits enforcement** (tier-based limits)
 - ✅ **Prompt injection defense** (input sanitization)
 - ✅ Note block
@@ -35,7 +37,6 @@ Last updated: 2026-01-22 (evening)
 - ⚠️ AI requires API key (set `ANTHROPIC_API_KEY` or `GEMINI_API_KEY`)
 - ⚠️ Billing stub only (no real Stripe yet - `STRIPE_STUB_MODE=true`)
 - ❌ No SOW generation
-- ❌ Discovery summary (FR-404)
 
 **To Demo:** Run `npm run dev` → visit `localhost:3000/app`
 
@@ -58,8 +59,8 @@ Last updated: 2026-01-22 (evening)
 
 | Task | FR | Depends On | Notes |
 |------|-----|------------|-------|
-| Discovery summary | FR-404 | ✅ FR-402 | AI executive summary |
-| Auto-populate canvas | FR-406 | FR-405 | AI fills framework blocks |
+| Question branching | FR-407 | ✅ FR-402 | Conditional follow-up questions (P1) |
+| Discovery templates | FR-408 | — | Industry-specific question sets (P1) |
 | **Real Stripe** | FR-902 | End of project | See "Deferred" section |
 
 ## Deferred (End of Project)
@@ -78,6 +79,8 @@ Last updated: 2026-01-22 (evening)
 
 | Task | FR | PR | Date |
 |------|-----|-----|------|
+| Discovery summary | FR-404 | 7053a75 | 01-22 |
+| Canvas auto-populate | FR-406 | 7053a75 | 01-22 |
 | Prompt injection defense | Security | e37fbd9 | 01-22 |
 | AI follow-up questions | FR-402 | b30d958 | 01-22 |
 | Framework recommendations | FR-405 | b30d958 | 01-22 |
@@ -163,11 +166,13 @@ Last updated: 2026-01-22 (evening)
 - [x] FR-906: 14-day trial ✅ **Stub mode**
 - [x] FR-907: Billing portal ✅ **Stub mode**
 
-### AI Discovery (FR-400)
+### AI Discovery (FR-400) ✅ All P0s Complete
 - [x] FR-401: Discovery questionnaire *(mock)*
 - [x] FR-402: Claude follow-up questions ✅
 - [x] FR-403: Progress tracking
+- [x] FR-404: Discovery summary ✅
 - [x] FR-405: Framework recommendations ✅
+- [x] FR-406: Auto-populate canvas ✅ (P1)
 
 ---
 

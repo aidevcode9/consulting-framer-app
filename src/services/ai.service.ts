@@ -13,9 +13,11 @@ import {
   DISCOVERY_SYSTEM_PROMPT,
   FRAMEWORK_RECOMMENDATION_PROMPT,
   DISCOVERY_SUMMARY_PROMPT,
+  CANVAS_POPULATE_PROMPT,
   buildDiscoveryFollowUpPrompt,
   buildFrameworkRecommendationPrompt,
   buildDiscoverySummaryPrompt,
+  buildCanvasPopulatePrompt,
 } from "@/lib/ai/prompts";
 import { detectInjectionAttempt } from "@/lib/ai/sanitize";
 import { createLogger } from "@/lib/logger";
@@ -38,6 +40,12 @@ export interface FrameworkRecommendation {
 export interface FrameworkRecommendationResult {
   recommendations: FrameworkRecommendation[];
   summary: string;
+}
+
+export type PopulateFrameworkType = "swot" | "porter" | "mckinsey7s";
+
+export interface CanvasPopulateResult {
+  sections: Record<string, string[]>;
 }
 
 export class AIService {
@@ -226,5 +234,77 @@ export class AIService {
     );
 
     return result.content.trim();
+  }
+
+  /**
+   * Generate content to populate a framework on the canvas
+   * FR-406: Auto-populate canvas
+   */
+  async generateCanvasContent(
+    userId: string,
+    engagementId: string,
+    frameworkType: PopulateFrameworkType,
+    discoveryAnswers: Array<{ question: string; answer: string }>,
+    context: { clientName: string; industry?: string }
+  ): Promise<CanvasPopulateResult> {
+    // Check usage limits
+    await this.usageService.canPerformAction(userId, "ai_query");
+
+    // Log potential injection attempts (inputs are sanitized in prompts.ts)
+    const suspiciousAnswers = discoveryAnswers.filter((qa) =>
+      detectInjectionAttempt(qa.answer)
+    );
+    if (suspiciousAnswers.length > 0 || detectInjectionAttempt(context.clientName)) {
+      log.warn("Potential prompt injection detected", {
+        userId,
+        engagementId,
+        suspiciousCount: suspiciousAnswers.length,
+      });
+    }
+
+    log.info("Generating canvas content", { userId, engagementId, frameworkType });
+
+    const userPrompt = buildCanvasPopulatePrompt(
+      frameworkType,
+      discoveryAnswers,
+      context
+    );
+    const messages: AIMessage[] = [{ role: "user", content: userPrompt }];
+
+    const result = await generateCompletion(messages, {
+      systemPrompt: CANVAS_POPULATE_PROMPT,
+      maxTokens: 1024,
+      temperature: 0.6,
+    });
+
+    // Track usage with telemetry
+    await this.usageService.trackAIUsage(
+      userId,
+      engagementId,
+      "canvas_populate",
+      { frameworkType, discoveryAnswers, context },
+      { content: result.content, requestId: result.requestId },
+      {
+        tokensUsed: result.tokensUsed.input + result.tokensUsed.output,
+        modelUsed: result.model,
+        latencyMs: result.latencyMs,
+      }
+    );
+
+    // Parse JSON response
+    try {
+      const parsed = JSON.parse(result.content);
+      return {
+        sections: parsed.sections || {},
+      };
+    } catch {
+      log.warn("Failed to parse canvas populate JSON", {
+        content: result.content,
+      });
+      // Return empty sections if parsing fails
+      return {
+        sections: {},
+      };
+    }
   }
 }

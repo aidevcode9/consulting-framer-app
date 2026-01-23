@@ -184,3 +184,73 @@ export function buildDiscoverySummaryPrompt(
 
   return prompt;
 }
+
+/**
+ * System prompt for canvas population
+ * FR-406: Auto-populate canvas from discovery
+ */
+export const CANVAS_POPULATE_PROMPT = `You are an expert management consultant. Based on the discovery information provided, generate content to populate a consulting framework.
+
+Guidelines:
+- Generate 3-5 items per section
+- Each item should be a concise, actionable insight (1-2 sentences)
+- Items should be specific to the client's situation
+- Prioritize the most impactful insights
+- Use professional consulting language
+
+Framework-specific guidance:
+- SWOT: Internal (Strengths, Weaknesses) and External (Opportunities, Threats)
+- Porter: Analyze each of the 5 competitive forces
+- McKinsey 7S: Cover Strategy, Structure, Systems, Shared Values, Style, Staff, Skills
+
+Response format (JSON):
+{
+  "sections": {
+    "sectionId": ["item 1", "item 2", "item 3"]
+  }
+}
+
+For SWOT, use section IDs: strengths, weaknesses, opportunities, threats
+For Porter, use section IDs: rivalry, suppliers, buyers, substitutes, entrants
+For McKinsey 7S, use section IDs: strategy, structure, systems, shared_values, style, staff, skills`;
+
+/**
+ * Build user message for canvas population
+ */
+export function buildCanvasPopulatePrompt(
+  frameworkType: "swot" | "porter" | "mckinsey7s",
+  discoveryAnswers: Array<{ question: string; answer: string }>,
+  context: {
+    clientName: string;
+    industry?: string;
+  }
+): string {
+  // Sanitize all user inputs
+  const safeClientName = sanitizeForPrompt(context.clientName, "short");
+  const safeIndustry = context.industry
+    ? sanitizeForPrompt(context.industry, "short")
+    : null;
+
+  const frameworkNames: Record<string, string> = {
+    swot: "SWOT Analysis",
+    porter: "Porter's Five Forces",
+    mckinsey7s: "McKinsey 7-S Framework",
+  };
+
+  let prompt = `Framework: ${frameworkNames[frameworkType]}`;
+  prompt += `\nClient: ${safeClientName}`;
+  if (safeIndustry) {
+    prompt += `\nIndustry: ${safeIndustry}`;
+  }
+
+  prompt += `\n\nDiscovery Answers:`;
+  for (const qa of discoveryAnswers) {
+    const safeQ = sanitizeForPrompt(qa.question, "medium");
+    const safeA = sanitizeForPrompt(qa.answer, "medium");
+    prompt += `\n\nQ: ${safeQ}\nA: ${safeA}`;
+  }
+
+  prompt += `\n\nBased on this information, generate content for the ${frameworkNames[frameworkType]}. Return your response as JSON with a "sections" object.`;
+
+  return prompt;
+}

@@ -33,20 +33,21 @@ Last updated: 2026-01-22 (evening)
 - ✅ **Status workflow** (change status from header)
 - ✅ **Search/filter** (by title, client, status)
 - ✅ **Archive engagements** (hide/restore)
+- ✅ **SOW generation** (FR-501, needs API key)
 
 **Not Working Yet:**
 - ⚠️ AI requires API key (set `ANTHROPIC_API_KEY` or `GEMINI_API_KEY`)
 - ⚠️ Billing stub only (no real Stripe yet - `STRIPE_STUB_MODE=true`)
-- ❌ No SOW generation
 
 **To Demo:** Run `npm run dev` → visit `localhost:3000/app`
 
 ---
 
-## Current Phase: 1 → 2 (MVP Complete, Starting Billing)
+## Current Phase: 3 (Deliverables)
 
 **Phase 1 Goal:** Canvas + 3 frameworks + auth + persistence ✅ **COMPLETE**
-**Phase 2 Goal:** Stripe billing + AI discovery
+**Phase 2 Goal:** Stripe billing + AI discovery ✅ **COMPLETE**
+**Phase 3 Goal:** SOW generation + exports
 
 ---
 
@@ -54,13 +55,15 @@ Last updated: 2026-01-22 (evening)
 
 | Task | FR | Branch | Started | Notes |
 |------|-----|--------|---------|-------|
-| — | — | — | — | Phase 1 complete! Ready for Phase 2 |
+| SOW preview | FR-509 | feat/auth-email-google | 01-22 | Preview before export |
+| Placeholder detection | FR-508 | — | — | Next after FR-509 |
 
 ## Next (Priority Order)
 
 | Task | FR | Depends On | Notes |
 |------|-----|------------|-------|
-| **Phase 3: SOW generation** | FR-501 | ✅ Phase 2 | Deliverables phase |
+| **Export PDF** | FR-503 | FR-509 | After preview UI |
+| **Export DOCX** | FR-504 | FR-509 | After preview UI |
 | **Real Stripe** | FR-902 | End of project | See "Deferred" section |
 
 ## Deferred (End of Project)
@@ -79,6 +82,7 @@ Last updated: 2026-01-22 (evening)
 
 | Task | FR | PR | Date |
 |------|-----|-----|------|
+| SOW generation | FR-501 | — | 01-22 |
 | Question branching | FR-407 | — | 01-22 |
 | Discovery templates | FR-408 | — | 01-22 |
 | Discovery summary | FR-404 | 7053a75 | 01-22 |
@@ -177,6 +181,18 @@ Last updated: 2026-01-22 (evening)
 - [x] FR-406: Auto-populate canvas ✅
 - [x] FR-407: Question branching ✅ (P1)
 - [x] FR-408: Discovery templates ✅ (P1)
+
+---
+
+## Phase 3 Checklist
+
+### Deliverables (FR-500)
+- [x] FR-501: Generate SOW ✅
+- [ ] FR-502: Generate proposal (P0)
+- [ ] FR-503: Export PDF (P0)
+- [ ] FR-504: Export DOCX (P0)
+- [ ] FR-508: Placeholder detection (P0)
+- [ ] FR-509: Preview before export (P0)
 
 ---
 

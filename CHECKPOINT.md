@@ -2,6 +2,59 @@
 
 ---
 
+## [2026-01-22] FR-501: SOW Generation
+
+**Status:** ✅ Complete
+**Branch:** feat/auth-email-google
+
+**Files created:**
+- src/app/api/sow/generate/route.ts (new) - POST /api/sow/generate endpoint
+
+**Files modified:**
+- src/lib/ai/prompts.ts - Added SOW_GENERATION_PROMPT and buildSOWGenerationPrompt
+- src/services/ai.service.ts - Added generateSOW method with canvas insights extraction
+
+**What was implemented:**
+
+### FR-501: Generate SOW
+- POST /api/sow/generate endpoint
+- Takes engagementId, fetches engagement with canvas_data and discovery_answers
+- Extracts framework insights from canvas nodes (SWOT, Porter, McKinsey)
+- Formats discovery answers for prompt context
+- Generates comprehensive SOW with:
+  - Executive summary
+  - Objectives (3-5)
+  - Deliverables with acceptance criteria (3-6)
+  - Timeline with phases (2-4)
+  - Assumptions (3-5)
+  - Risks with mitigations (2-4)
+- Mock SOW returned when no API key configured
+- 60 second timeout for long-running generations
+
+**Security:**
+- Usage limits checked BEFORE AI call (sow_generation action)
+- Prompt injection defense with sanitizeForPrompt()
+- Auth check + engagement ownership verification
+- Input validation with Zod schema
+
+**Verification:**
+- lint: ✅
+- typecheck: ✅
+- build: ✅
+
+**Skeptic Review:** ✅ Ship it
+- All AI checklist items passed
+- All auth checklist items passed
+- All data integrity checklist items passed
+
+**Commit:** pending
+
+**Notes:**
+- Phase 3 Deliverables has begun
+- FR-509 (Preview) and FR-508 (Placeholder detection) are next
+
+---
+
 ## [2026-01-22] FR-404, FR-406: Discovery Summary + Canvas Auto-populate
 
 **Status:** ✅ Complete

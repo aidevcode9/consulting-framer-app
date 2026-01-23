@@ -2,6 +2,7 @@
  * AI Service
  * FR-402: AI follow-up questions
  * FR-405: Framework recommendations
+ * FR-501: SOW generation
  *
  * Handles AI interactions with usage tracking and limit enforcement
  */
@@ -14,21 +15,23 @@ import {
   FRAMEWORK_RECOMMENDATION_PROMPT,
   DISCOVERY_SUMMARY_PROMPT,
   CANVAS_POPULATE_PROMPT,
+  SOW_GENERATION_PROMPT,
   buildDiscoveryFollowUpPrompt,
   buildFrameworkRecommendationPrompt,
   buildDiscoverySummaryPrompt,
   buildCanvasPopulatePrompt,
+  buildSOWGenerationPrompt,
+  type DiscoveryContext,
+  type PopulateFrameworkType,
 } from "@/lib/ai/prompts";
 import { detectInjectionAttempt } from "@/lib/ai/sanitize";
 import { createLogger } from "@/lib/logger";
+import type { GeneratedScope, CanvasData, Engagement } from "@/types";
 
 const log = createLogger("AIService");
 
-export interface DiscoveryContext {
-  clientName: string;
-  industry?: string;
-  previousAnswers?: Array<{ question: string; answer: string }>;
-}
+// Re-export for backwards compatibility
+export type { DiscoveryContext };
 
 export interface FrameworkRecommendation {
   framework: "swot" | "porter" | "mckinsey7s" | "bmc";
@@ -42,7 +45,8 @@ export interface FrameworkRecommendationResult {
   summary: string;
 }
 
-export type PopulateFrameworkType = "swot" | "porter" | "mckinsey7s";
+// Re-export PopulateFrameworkType for backwards compatibility
+export type { PopulateFrameworkType };
 
 export interface CanvasPopulateResult {
   sections: Record<string, string[]>;
@@ -306,5 +310,143 @@ export class AIService {
         sections: {},
       };
     }
+  }
+
+  /**
+   * Generate Statement of Work from engagement data
+   * FR-501: Generate SOW
+   */
+  async generateSOW(
+    userId: string,
+    engagement: Engagement
+  ): Promise<GeneratedScope> {
+    // Check usage limits - SOW generation is a separate limit
+    await this.usageService.canPerformAction(userId, "sow_generation");
+
+    // Log potential injection attempts
+    if (detectInjectionAttempt(engagement.client_name) || detectInjectionAttempt(engagement.title)) {
+      log.warn("Potential prompt injection detected in SOW generation", {
+        userId,
+        engagementId: engagement.id,
+      });
+    }
+
+    log.info("Generating SOW", { userId, engagementId: engagement.id });
+
+    // Extract canvas insights from framework data
+    const canvasInsights = this.extractCanvasInsights(engagement.canvas_data);
+
+    // Convert discovery answers to array format
+    const discoveryAnswers = this.formatDiscoveryAnswers(engagement.discovery_answers);
+
+    const userPrompt = buildSOWGenerationPrompt(
+      {
+        title: engagement.title,
+        clientName: engagement.client_name,
+        industry: engagement.client_industry || undefined,
+        description: engagement.description || undefined,
+      },
+      discoveryAnswers,
+      canvasInsights
+    );
+
+    const messages: AIMessage[] = [{ role: "user", content: userPrompt }];
+
+    const result = await generateCompletion(messages, {
+      systemPrompt: SOW_GENERATION_PROMPT,
+      maxTokens: 4096, // SOW generation needs more tokens
+      temperature: 0.4, // Lower temperature for more consistent output
+      timeoutMs: 60000, // 60 second timeout for SOW generation
+    });
+
+    // Track usage with telemetry
+    await this.usageService.trackAIUsage(
+      userId,
+      engagement.id,
+      "scope_generate",
+      {
+        engagementId: engagement.id,
+        clientName: engagement.client_name,
+        discoveryAnswersCount: discoveryAnswers.length,
+      },
+      { sow: result.content, requestId: result.requestId },
+      {
+        tokensUsed: result.tokensUsed.input + result.tokensUsed.output,
+        modelUsed: result.model,
+        latencyMs: result.latencyMs,
+      }
+    );
+
+    // Parse JSON response
+    try {
+      const parsed = JSON.parse(result.content) as GeneratedScope;
+
+      // Ensure all required fields exist with defaults
+      return {
+        executive_summary: parsed.executive_summary || "",
+        objectives: parsed.objectives || [],
+        deliverables: parsed.deliverables || [],
+        timeline: parsed.timeline || [],
+        assumptions: parsed.assumptions || [],
+        risks: parsed.risks || [],
+        pricing: parsed.pricing,
+      };
+    } catch {
+      log.error("Failed to parse SOW JSON", {
+        userId,
+        engagementId: engagement.id,
+        content: result.content.slice(0, 500),
+      });
+      // Return empty SOW structure if parsing fails
+      return {
+        executive_summary: "Error generating SOW. Please try again.",
+        objectives: [],
+        deliverables: [],
+        timeline: [],
+        assumptions: [],
+        risks: [],
+      };
+    }
+  }
+
+  /**
+   * Extract insights from canvas data for SOW generation
+   */
+  private extractCanvasInsights(canvasData: CanvasData): string {
+    const insights: string[] = [];
+
+    for (const node of canvasData.nodes) {
+      if (node.data.items && node.data.items.length > 0) {
+        const itemTexts = node.data.items.map((item) => `  - ${item.text}`).join("\n");
+        insights.push(`${node.data.label || node.type}:\n${itemTexts}`);
+      }
+    }
+
+    return insights.length > 0
+      ? insights.join("\n\n")
+      : "No framework analysis completed yet";
+  }
+
+  /**
+   * Format discovery answers for prompt
+   */
+  private formatDiscoveryAnswers(
+    answers: Record<string, unknown>
+  ): Array<{ question: string; answer: string }> {
+    const result: Array<{ question: string; answer: string }> = [];
+
+    for (const [questionId, answerData] of Object.entries(answers)) {
+      if (answerData && typeof answerData === "object") {
+        const answer = answerData as { value?: unknown; question_id?: string };
+        if (answer.value !== undefined) {
+          result.push({
+            question: questionId,
+            answer: String(answer.value),
+          });
+        }
+      }
+    }
+
+    return result;
   }
 }

@@ -12,7 +12,7 @@ import {
   Loader2,
   CheckCircle2,
 } from "lucide-react";
-import { useUIStore, useDiscoveryStore } from "@/lib/store";
+import { useUIStore, useDiscoveryStore, useEngagementStore } from "@/lib/store";
 
 interface FrameworkItem {
   type: string;
@@ -66,6 +66,7 @@ interface Recommendation {
 export function FrameworkPanel() {
   const { frameworkPanelOpen, setFrameworkPanelOpen } = useUIStore();
   const { isComplete: discoveryComplete, answers } = useDiscoveryStore();
+  const { currentEngagement } = useEngagementStore();
   const [expandedSection, setExpandedSection] = useState<string | null>("frameworks");
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
   const [isLoadingRecs, setIsLoadingRecs] = useState(false);
@@ -74,6 +75,11 @@ export function FrameworkPanel() {
   const answeredCount = Object.keys(answers).length;
 
   const handleGetRecommendations = async () => {
+    if (!currentEngagement) {
+      setRecsError("No engagement selected");
+      return;
+    }
+
     setIsLoadingRecs(true);
     setRecsError(null);
     try {
@@ -81,12 +87,14 @@ export function FrameworkPanel() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          engagementId: currentEngagement.id,
           discoveryAnswers: Object.entries(answers).map(([id, answer]) => ({
             question: id,
             answer: answer.value,
           })),
           context: {
-            clientName: "Client", // TODO: Get from engagement
+            clientName: currentEngagement.client_name,
+            industry: currentEngagement.client_industry || undefined,
           },
         }),
       });

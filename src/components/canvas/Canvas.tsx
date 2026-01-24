@@ -50,10 +50,15 @@ interface CanvasProps {
 }
 
 // Cache for AI-generated framework content to avoid redundant API calls
+interface FrameworkCacheData {
+  sections: Record<string, string[]>;
+  strategic_insights?: unknown; // FR-454: Cache strategic insights too
+}
+
 interface CacheEntry {
   engagementId: string;
   answersHash: string;
-  frameworks: Record<string, Record<string, string[]>>;
+  frameworks: Record<string, FrameworkCacheData>;
 }
 
 export function Canvas({ onSave, readOnly = false }: CanvasProps) {
@@ -166,9 +171,14 @@ export function Canvas({ onSave, readOnly = false }: CanvasProps) {
         cache.answersHash === answersHash &&
         cache.frameworks[frameworkType]
       ) {
-        console.log("Using cached framework content:", { frameworkType });
-        const sections = convertSectionsToNodeItems(cache.frameworks[frameworkType]);
-        updateNode(nodeId, { sections });
+        const cachedData = cache.frameworks[frameworkType];
+        const sections = convertSectionsToNodeItems(cachedData.sections);
+        // FR-454: Include cached strategic insights
+        const nodeUpdate: Record<string, unknown> = { sections };
+        if (cachedData.strategic_insights) {
+          nodeUpdate.strategic_insights = cachedData.strategic_insights;
+        }
+        updateNode(nodeId, nodeUpdate);
         return;
       }
 
@@ -197,7 +207,7 @@ export function Canvas({ onSave, readOnly = false }: CanvasProps) {
           console.log("Populate response:", apiData);
           const rawSections = apiData.sections || {};
 
-          // Store in cache
+          // Store in cache (FR-454: include strategic_insights)
           if (!frameworkCacheRef.current ||
               frameworkCacheRef.current.engagementId !== currentEngagement.id ||
               frameworkCacheRef.current.answersHash !== answersHash) {
@@ -208,12 +218,20 @@ export function Canvas({ onSave, readOnly = false }: CanvasProps) {
               frameworks: {},
             };
           }
-          frameworkCacheRef.current.frameworks[frameworkType] = rawSections;
-          console.log("Cached framework content:", { frameworkType });
+          frameworkCacheRef.current.frameworks[frameworkType] = {
+            sections: rawSections,
+            strategic_insights: apiData.strategic_insights,
+          };
 
           const sections = convertSectionsToNodeItems(rawSections);
           console.log("Updating node with sections:", sections);
-          updateNode(nodeId, { sections });
+
+          // FR-454: Include strategic insights from AI response
+          const nodeUpdate: Record<string, unknown> = { sections };
+          if (apiData.strategic_insights) {
+            nodeUpdate.strategic_insights = apiData.strategic_insights;
+          }
+          updateNode(nodeId, nodeUpdate);
         } else {
           console.error("Populate API error:", response.status, await response.text());
         }

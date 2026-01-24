@@ -4,7 +4,8 @@ import { memo, useState } from "react";
 import { Handle, Position } from "@xyflow/react";
 import { Plus, Trash2, GripVertical } from "lucide-react";
 import { useCanvasStore } from "@/lib/store";
-import type { BaseNodeData, NodeItem } from "@/types";
+import { StrategicInsightsPanel } from "../StrategicInsightsPanel";
+import type { BaseNodeData, NodeItem, PorterStrategicInsights } from "@/types";
 
 interface PorterForce {
   id: "rivalry" | "suppliers" | "buyers" | "substitutes" | "entrants";
@@ -54,6 +55,7 @@ const PORTER_FORCES: PorterForce[] = [
 
 interface PorterData extends BaseNodeData {
   forces?: Record<string, NodeItem[]>;
+  strategic_insights?: PorterStrategicInsights;
 }
 
 type PorterNodeProps = {
@@ -237,6 +239,12 @@ export const PorterNode = memo(function PorterNode({
             onCancel={() => setEditingForce(null)}
           />
         </div>
+
+        {/* FR-454: Strategic Insights Panel */}
+        <StrategicInsightsPanel
+          frameworkType="porter"
+          insights={data.strategic_insights}
+        />
       </div>
 
       {/* Connection handles */}

@@ -31,7 +31,18 @@ import {
 import { detectInjectionAttempt } from "@/lib/ai/sanitize";
 import { stripMarkdownCodeBlocks } from "@/lib/ai/utils";
 import { createLogger } from "@/lib/logger";
-import type { GeneratedScope, GeneratedProposal, CanvasData, Engagement } from "@/types";
+import type {
+  GeneratedScope,
+  GeneratedProposal,
+  CanvasData,
+  Engagement,
+  FrameworkStrategicInsights,
+  PorterStrategicInsights,
+  McKinseyStrategicInsights,
+  SWOTStrategicInsights,
+  BMCStrategicInsights,
+  EvidenceQuality,
+} from "@/types";
 
 const log = createLogger("AIService");
 
@@ -55,6 +66,7 @@ export type { PopulateFrameworkType };
 
 export interface CanvasPopulateResult {
   sections: Record<string, string[]>;
+  strategic_insights?: FrameworkStrategicInsights;
 }
 
 export class AIService {
@@ -324,8 +336,13 @@ export class AIService {
     try {
       const cleanedContent = stripMarkdownCodeBlocks(result.content);
       const parsed = JSON.parse(cleanedContent);
+
+      // FR-454: Extract strategic insights based on framework type
+      const strategicInsights = this.extractStrategicInsights(frameworkType, parsed);
+
       return {
         sections: parsed.sections || {},
+        strategic_insights: strategicInsights,
       };
     } catch {
       log.warn("Failed to parse canvas populate JSON", {
@@ -338,6 +355,61 @@ export class AIService {
         sections: {},
       };
     }
+  }
+
+  /**
+   * Extract strategic insights from AI response based on framework type
+   * FR-454: Strategic implications
+   */
+  private extractStrategicInsights(
+    frameworkType: PopulateFrameworkType,
+    parsed: Record<string, unknown>
+  ): FrameworkStrategicInsights | undefined {
+    const evidenceQuality = parsed.evidence_quality as EvidenceQuality | undefined;
+    const strategicImplications = (parsed.strategic_implications as string) || "";
+
+    switch (frameworkType) {
+      case "porter":
+        if (parsed.intensity_ratings || strategicImplications) {
+          return {
+            intensity_ratings: parsed.intensity_ratings,
+            strategic_implications: strategicImplications,
+            evidence_quality: evidenceQuality,
+          } as PorterStrategicInsights;
+        }
+        break;
+      case "mckinsey7s":
+        if (parsed.element_health || parsed.alignment_issues || strategicImplications) {
+          return {
+            element_health: parsed.element_health,
+            alignment_issues: (parsed.alignment_issues as string[]) || [],
+            strategic_implications: strategicImplications,
+            evidence_quality: evidenceQuality,
+          } as McKinseyStrategicInsights;
+        }
+        break;
+      case "swot":
+        if (parsed.factor_priority || parsed.tows_strategies || strategicImplications) {
+          return {
+            factor_priority: parsed.factor_priority,
+            tows_strategies: parsed.tows_strategies,
+            strategic_implications: strategicImplications,
+            evidence_quality: evidenceQuality,
+          } as SWOTStrategicInsights;
+        }
+        break;
+      case "bmc":
+        if (parsed.value_proposition_fit || parsed.coherence_issues || strategicImplications) {
+          return {
+            value_proposition_fit: parsed.value_proposition_fit,
+            coherence_issues: (parsed.coherence_issues as string[]) || [],
+            strategic_implications: strategicImplications,
+            evidence_quality: evidenceQuality,
+          } as BMCStrategicInsights;
+        }
+        break;
+    }
+    return undefined;
   }
 
   /**

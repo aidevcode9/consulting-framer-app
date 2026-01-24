@@ -4,7 +4,8 @@ import { memo, useState } from "react";
 import { Handle, Position } from "@xyflow/react";
 import { Plus, Trash2, GripVertical } from "lucide-react";
 import { useCanvasStore } from "@/lib/store";
-import type { BaseNodeData, NodeItem } from "@/types";
+import { StrategicInsightsPanel } from "../StrategicInsightsPanel";
+import type { BaseNodeData, NodeItem, BMCStrategicInsights } from "@/types";
 
 interface BMCSection {
   id: string;
@@ -27,6 +28,7 @@ const BMC_SECTIONS: BMCSection[] = [
 
 interface BMCData extends BaseNodeData {
   sections?: Record<string, NodeItem[]>;
+  strategic_insights?: BMCStrategicInsights;
 }
 
 type BMCNodeProps = {
@@ -177,6 +179,14 @@ export const BMCNode = memo(function BMCNode({ id, data, selected }: BMCNodeProp
             </div>
           </div>
         ))}
+      </div>
+
+      {/* FR-454: Strategic Insights Panel */}
+      <div className="px-4 pb-2">
+        <StrategicInsightsPanel
+          frameworkType="bmc"
+          insights={data.strategic_insights}
+        />
       </div>
 
       {/* Connection handles */}

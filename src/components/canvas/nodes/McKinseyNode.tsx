@@ -1,7 +1,7 @@
 "use client";
 
 import { memo, useState } from "react";
-import { Handle, Position } from "@xyflow/react";
+import { Handle, Position, NodeResizer } from "@xyflow/react";
 import { Plus, Trash2, GripVertical } from "lucide-react";
 import { useCanvasStore } from "@/lib/store";
 import { StrategicInsightsPanel } from "../StrategicInsightsPanel";
@@ -89,8 +89,15 @@ export const McKinseyNode = memo(function McKinseyNode({
       className={`rounded-lg bg-white shadow-lg transition-shadow ${
         selected ? "ring-2 ring-indigo-500 shadow-xl" : ""
       }`}
-      style={{ width: 650 }}
+      style={{ minWidth: 550, minHeight: 450, width: "100%", height: "100%" }}
     >
+      <NodeResizer
+        minWidth={550}
+        minHeight={450}
+        isVisible={selected}
+        lineClassName="!border-indigo-400"
+        handleClassName="!w-2 !h-2 !bg-indigo-500 !border-indigo-500"
+      />
       {/* Header */}
       <div className="flex items-center justify-between rounded-t-lg bg-gradient-to-r from-indigo-600 to-purple-600 px-4 py-3">
         <div className="flex items-center gap-2">

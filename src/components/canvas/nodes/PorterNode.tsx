@@ -1,7 +1,7 @@
 "use client";
 
 import { memo, useState } from "react";
-import { Handle, Position } from "@xyflow/react";
+import { Handle, Position, NodeResizer } from "@xyflow/react";
 import { Plus, Trash2, GripVertical } from "lucide-react";
 import { useCanvasStore } from "@/lib/store";
 import { StrategicInsightsPanel } from "../StrategicInsightsPanel";
@@ -113,8 +113,15 @@ export const PorterNode = memo(function PorterNode({
       className={`rounded-lg bg-white shadow-lg transition-shadow ${
         selected ? "ring-2 ring-purple-500 shadow-xl" : ""
       }`}
-      style={{ width: 600 }}
+      style={{ minWidth: 500, minHeight: 400, width: "100%", height: "100%" }}
     >
+      <NodeResizer
+        minWidth={500}
+        minHeight={400}
+        isVisible={selected}
+        lineClassName="!border-purple-400"
+        handleClassName="!w-2 !h-2 !bg-purple-500 !border-purple-500"
+      />
       {/* Header */}
       <div className="flex items-center justify-between rounded-t-lg bg-gradient-to-r from-purple-600 to-fuchsia-600 px-4 py-3">
         <div className="flex items-center gap-2">

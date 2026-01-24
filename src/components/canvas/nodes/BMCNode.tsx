@@ -1,7 +1,7 @@
 "use client";
 
 import { memo, useState } from "react";
-import { Handle, Position } from "@xyflow/react";
+import { Handle, Position, NodeResizer } from "@xyflow/react";
 import { Plus, Trash2, GripVertical } from "lucide-react";
 import { useCanvasStore } from "@/lib/store";
 import { StrategicInsightsPanel } from "../StrategicInsightsPanel";
@@ -83,8 +83,15 @@ export const BMCNode = memo(function BMCNode({ id, data, selected }: BMCNodeProp
       className={`rounded-lg bg-white shadow-lg transition-shadow ${
         selected ? "ring-2 ring-emerald-500 shadow-xl" : ""
       }`}
-      style={{ minWidth: 800 }}
+      style={{ minWidth: 700, minHeight: 500, width: "100%", height: "100%" }}
     >
+      <NodeResizer
+        minWidth={700}
+        minHeight={500}
+        isVisible={selected}
+        lineClassName="!border-emerald-400"
+        handleClassName="!w-2 !h-2 !bg-emerald-500 !border-emerald-500"
+      />
       {/* Header */}
       <div className="flex items-center justify-between rounded-t-lg bg-gradient-to-r from-emerald-600 to-teal-600 px-4 py-3">
         <div className="flex items-center gap-2">

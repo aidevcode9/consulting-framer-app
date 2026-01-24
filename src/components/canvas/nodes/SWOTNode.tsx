@@ -1,7 +1,7 @@
 "use client";
 
 import { memo, useState } from "react";
-import { Handle, Position } from "@xyflow/react";
+import { Handle, Position, NodeResizer } from "@xyflow/react";
 import { Plus, Trash2, GripVertical } from "lucide-react";
 import { useCanvasStore } from "@/lib/store";
 import { StrategicInsightsPanel } from "../StrategicInsightsPanel";
@@ -73,8 +73,15 @@ export const SWOTNode = memo(function SWOTNode({ id, data, selected }: SWOTNodeP
       className={`rounded-lg bg-white shadow-lg transition-shadow ${
         selected ? "ring-2 ring-blue-500 shadow-xl" : ""
       }`}
-      style={{ minWidth: 500 }}
+      style={{ minWidth: 500, minHeight: 350, width: "100%", height: "100%" }}
     >
+      <NodeResizer
+        minWidth={500}
+        minHeight={350}
+        isVisible={selected}
+        lineClassName="!border-blue-400"
+        handleClassName="!w-2 !h-2 !bg-blue-500 !border-blue-500"
+      />
       {/* Header */}
       <div className="flex items-center justify-between rounded-t-lg bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-3">
         <div className="flex items-center gap-2">

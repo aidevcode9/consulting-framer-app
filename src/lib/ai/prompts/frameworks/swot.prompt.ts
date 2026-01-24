@@ -17,11 +17,12 @@ import type { PromptMetadata } from "../types";
 
 export const SWOT_PROMPT_METADATA: PromptMetadata = {
   id: "framework-swot",
-  version: "2.0.0",
+  version: "2.1.0",
   description:
-    "SWOT Analysis with TOWS matrix and strategic options generation",
-  lastUpdated: "2026-01-23",
+    "SWOT Analysis with TOWS matrix, industry context, and strategic options generation",
+  lastUpdated: "2026-01-24",
   changelog: [
+    "2.1.0 (2026-01-24): Added industry context requirements (FR-453)",
     "2.0.0 (2026-01-23): Enhanced with TOWS matrix, strategic options, sources",
     "1.0.0 (2026-01-22): Initial version (generic canvas populate)",
   ],
@@ -96,6 +97,21 @@ Combine factors to generate four types of strategic options:
 - ST Strategies (Strengths + Threats): Use strengths to minimize threats
 - WT Strategies (Weaknesses + Threats): Minimize weaknesses and avoid threats
 
+INDUSTRY CONTEXT (FR-453):
+When analyzing SWOT factors, you MUST:
+- Ground each observation in industry-specific evidence from the discovery information
+- Consider typical strengths, weaknesses, opportunities, and threats for the client's industry vertical
+- Distinguish between generic observations (apply to any industry) and industry-specific insights
+- Reference specific competitors, market dynamics, or regulatory factors mentioned in discovery
+- Calibrate factor significance against industry norms
+
+Industry-specific SWOT considerations by vertical:
+- Technology/SaaS: IP/patents, technical talent, platform scalability, cybersecurity threats
+- Professional Services: Client relationships, expertise depth, talent pipeline, fee pressure
+- Healthcare: Regulatory compliance, clinical outcomes, reimbursement dynamics, litigation risk
+- Manufacturing: Supply chain, operational efficiency, automation, commodity price volatility
+- Retail/E-commerce: Brand recognition, customer experience, omnichannel, margin compression
+
 GUIDELINES:
 - For each quadrant, provide 3-5 specific, evidence-based observations
 - Internal factors should be within the organization's control
@@ -103,6 +119,7 @@ GUIDELINES:
 - Each observation should be actionable and specific to the client
 - Generate at least one strategic option for each TOWS quadrant
 - Use professional consulting language
+- Flag whether each observation is industry-specific or generic
 
 RESPONSE FORMAT (JSON):
 {
@@ -123,6 +140,11 @@ RESPONSE FORMAT (JSON):
     "wo": "WO Strategy: Address [weakness] to pursue [opportunity]",
     "st": "ST Strategy: Leverage [strength] to mitigate [threat]",
     "wt": "WT Strategy: Minimize [weakness] to avoid [threat]"
+  },
+  "evidence_quality": {
+    "industry_specific_count": <number of observations grounded in industry-specific evidence>,
+    "generic_count": <number of generic observations>,
+    "evidence_gaps": ["Areas where more industry-specific information would strengthen analysis"]
   },
   "strategic_implications": "2-3 sentences on strategic positioning and priority actions"
 }
@@ -155,7 +177,7 @@ export function buildSWOTPrompt(
     prompt += `\n\nQ: ${safeQ}\nA: ${safeA}`;
   }
 
-  prompt += `\n\nApply SWOT Analysis methodology to assess internal strengths/weaknesses and external opportunities/threats. Include TOWS matrix strategic options. Return your analysis as JSON.`;
+  prompt += `\n\nApply SWOT Analysis methodology to assess internal strengths/weaknesses and external opportunities/threats. Ground your observations in industry-specific evidence from the discovery information. Include TOWS matrix strategic options and flag which insights are industry-specific vs generic. Return your analysis as JSON.`;
 
   return prompt;
 }

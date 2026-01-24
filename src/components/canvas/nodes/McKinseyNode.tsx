@@ -4,7 +4,8 @@ import { memo, useState } from "react";
 import { Handle, Position } from "@xyflow/react";
 import { Plus, Trash2, GripVertical } from "lucide-react";
 import { useCanvasStore } from "@/lib/store";
-import type { BaseNodeData, NodeItem } from "@/types";
+import { StrategicInsightsPanel } from "../StrategicInsightsPanel";
+import type { BaseNodeData, NodeItem, McKinseyStrategicInsights } from "@/types";
 
 interface McKinseyElement {
   id: string;
@@ -28,6 +29,7 @@ const MCKINSEY_ELEMENTS: McKinseyElement[] = [
 
 interface McKinseyData extends BaseNodeData {
   elements?: Record<string, NodeItem[]>;
+  strategic_insights?: McKinseyStrategicInsights;
 }
 
 type McKinseyNodeProps = {
@@ -200,6 +202,12 @@ export const McKinseyNode = memo(function McKinseyNode({
               />
             ))}
         </div>
+
+        {/* FR-454: Strategic Insights Panel */}
+        <StrategicInsightsPanel
+          frameworkType="mckinsey7s"
+          insights={data.strategic_insights}
+        />
       </div>
 
       {/* Connection handles */}

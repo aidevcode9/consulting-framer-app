@@ -14,11 +14,12 @@ import type { PromptMetadata } from "../types";
 
 export const PORTER_PROMPT_METADATA: PromptMetadata = {
   id: "framework-porter",
-  version: "2.0.0",
+  version: "2.1.0",
   description:
-    "Porter's Five Forces analysis with intensity ratings and strategic implications",
-  lastUpdated: "2026-01-23",
+    "Porter's Five Forces analysis with intensity ratings, industry context, and strategic implications",
+  lastUpdated: "2026-01-24",
   changelog: [
+    "2.1.0 (2026-01-24): Added industry context requirements (FR-453)",
     "2.0.0 (2026-01-23): Enhanced with Porter methodology, intensity ratings, sources",
     "1.0.0 (2026-01-22): Initial version (generic canvas populate)",
   ],
@@ -92,12 +93,28 @@ Porter's Five Forces analyzes the competitive intensity and attractiveness of an
    - Number of substitute products
    Intensity Rating: HIGH (many alternatives) / MEDIUM / LOW (few alternatives)
 
+INDUSTRY CONTEXT (FR-453):
+When analyzing competitive forces, you MUST:
+- Ground each observation in industry-specific evidence from the discovery information
+- Consider typical competitive intensity patterns for the client's industry vertical
+- Distinguish between generic observations (apply to any industry) and industry-specific insights
+- Reference specific competitors, suppliers, or market dynamics mentioned in discovery
+- If industry is provided, calibrate intensity ratings against industry norms
+
+Industry-specific considerations by vertical:
+- Technology/SaaS: Rapid innovation cycles, network effects, low marginal costs
+- Professional Services: Relationship-driven, reputation barriers, talent competition
+- Healthcare: Regulatory barriers, payer complexity, compliance requirements
+- Manufacturing: Capital intensity, supply chain dependencies, economies of scale
+- Retail/E-commerce: Channel competition, customer acquisition costs, logistics
+
 GUIDELINES:
 - For each force, provide 3-5 specific observations based on the discovery information
 - Assign an intensity rating (HIGH/MEDIUM/LOW) for each force
 - Ground observations in evidence from the discovery, not assumptions
 - Use professional consulting language
 - Focus on actionable insights that inform strategic decisions
+- Flag whether each observation is industry-specific or generic
 
 RESPONSE FORMAT (JSON):
 {
@@ -114,6 +131,11 @@ RESPONSE FORMAT (JSON):
     "suppliers": "HIGH" | "MEDIUM" | "LOW",
     "buyers": "HIGH" | "MEDIUM" | "LOW",
     "substitutes": "HIGH" | "MEDIUM" | "LOW"
+  },
+  "evidence_quality": {
+    "industry_specific_count": <number of observations grounded in industry-specific evidence>,
+    "generic_count": <number of generic observations>,
+    "evidence_gaps": ["Areas where more industry-specific information would strengthen analysis"]
   },
   "strategic_implications": "2-3 sentences on overall industry attractiveness and strategic position"
 }
@@ -146,7 +168,7 @@ export function buildPorterPrompt(
     prompt += `\n\nQ: ${safeQ}\nA: ${safeA}`;
   }
 
-  prompt += `\n\nApply Porter's Five Forces methodology to analyze the competitive landscape. Return your analysis as JSON.`;
+  prompt += `\n\nApply Porter's Five Forces methodology to analyze the competitive landscape. Ground your observations in industry-specific evidence from the discovery information. Flag which insights are industry-specific vs generic. Return your analysis as JSON.`;
 
   return prompt;
 }

@@ -36,15 +36,25 @@ export {
   type SWOTContext,
 } from "./swot.prompt";
 
+// Business Model Canvas
+export {
+  BMC_PROMPT_METADATA,
+  BMC_SYSTEM_PROMPT,
+  BMC_SOURCE,
+  buildBMCPrompt,
+  type BMCContext,
+} from "./bmc.prompt";
+
 // Import for aggregation
 import { PORTER_PROMPT_METADATA, PORTER_SYSTEM_PROMPT, buildPorterPrompt } from "./porter.prompt";
 import { MCKINSEY_PROMPT_METADATA, MCKINSEY_SYSTEM_PROMPT, buildMcKinseyPrompt } from "./mckinsey.prompt";
 import { SWOT_PROMPT_METADATA, SWOT_SYSTEM_PROMPT, buildSWOTPrompt } from "./swot.prompt";
+import { BMC_PROMPT_METADATA, BMC_SYSTEM_PROMPT, buildBMCPrompt } from "./bmc.prompt";
 
 /**
  * Supported framework types for enhanced prompts
  */
-export type EnhancedFrameworkType = "swot" | "porter" | "mckinsey7s";
+export type EnhancedFrameworkType = "swot" | "porter" | "mckinsey7s" | "bmc";
 
 /**
  * Framework prompt configuration
@@ -77,6 +87,11 @@ const FRAMEWORK_PROMPTS: Record<EnhancedFrameworkType, FrameworkPromptConfig> = 
     systemPrompt: SWOT_SYSTEM_PROMPT,
     buildUserPrompt: buildSWOTPrompt,
   },
+  bmc: {
+    metadata: BMC_PROMPT_METADATA,
+    systemPrompt: BMC_SYSTEM_PROMPT,
+    buildUserPrompt: buildBMCPrompt,
+  },
 };
 
 /**
@@ -107,5 +122,6 @@ export function getAllFrameworkPromptMetadata(): Record<string, PromptMetadata> 
     porter: PORTER_PROMPT_METADATA,
     mckinsey7s: MCKINSEY_PROMPT_METADATA,
     swot: SWOT_PROMPT_METADATA,
+    bmc: BMC_PROMPT_METADATA,
   };
 }

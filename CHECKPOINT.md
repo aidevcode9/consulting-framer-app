@@ -2,6 +2,177 @@
 
 ---
 
+## [2026-01-24] FR-454: Strategic Implications UI
+
+**Status:** ✅ Complete
+**Branch:** feat/proposal-generation
+
+**Files created:**
+- src/components/canvas/StrategicInsightsPanel.tsx (new) - Collapsible panel for strategic insights
+
+**Files modified:**
+- src/types/index.ts - Added strategic insights types (PorterStrategicInsights, McKinseyStrategicInsights, SWOTStrategicInsights, BMCStrategicInsights, EvidenceQuality)
+- src/services/ai.service.ts - Updated CanvasPopulateResult to include strategic_insights; added extractStrategicInsights()
+- src/components/canvas/Canvas.tsx - Pass strategic_insights through to nodes
+- src/components/canvas/nodes/PorterNode.tsx - Added StrategicInsightsPanel
+- src/components/canvas/nodes/SWOTNode.tsx - Added StrategicInsightsPanel
+- src/components/canvas/nodes/McKinseyNode.tsx - Added StrategicInsightsPanel
+- src/components/canvas/nodes/BMCNode.tsx - Added StrategicInsightsPanel
+
+**What was implemented:**
+
+### Strategic Insights Types
+New TypeScript types for framework-specific AI metadata:
+- `PorterStrategicInsights` - intensity_ratings per force
+- `McKinseyStrategicInsights` - element_health per element, alignment_issues
+- `SWOTStrategicInsights` - factor_priority, tows_strategies
+- `BMCStrategicInsights` - value_proposition_fit, coherence_issues
+- `EvidenceQuality` - industry_specific_count, generic_count, evidence_gaps
+
+### AIService Updates
+- `CanvasPopulateResult` now includes optional `strategic_insights`
+- New `extractStrategicInsights()` method parses AI response metadata
+- Metadata extraction based on framework type
+
+### Canvas Integration
+- Canvas passes `strategic_insights` from API response to node data
+- Each framework node receives insights alongside sections
+
+### StrategicInsightsPanel Component
+Collapsible panel showing:
+- **Porter:** Force intensity ratings (HIGH/MEDIUM/LOW badges)
+- **McKinsey:** Element health ratings, alignment issues
+- **SWOT:** Factor priorities, TOWS strategies (SO/WO/ST/WT)
+- **BMC:** Value proposition fit ratings, coherence issues
+- **All:** Strategic implications summary, evidence quality metrics
+
+### UI Features
+- Collapsed by default to save space
+- Color-coded rating badges (green=strong, yellow=moderate, red=weak)
+- Evidence quality shows industry-specific vs generic observation ratio
+- Evidence gaps highlighted with warning icon
+
+**Verification:**
+- lint: ✅
+- typecheck: ✅
+- build: ✅
+
+**Skeptic Review:** ✅ Pass (after fix)
+- HIGH issue fixed: Cache now includes strategic_insights
+- Updated `CacheEntry` interface with `FrameworkCacheData` type
+- Cache retrieval and storage both handle strategic_insights
+
+**Notes:**
+- Panel only shows when strategic_insights data is available
+- Backwards compatible - old nodes without insights work fine
+- Completes FR-450 Framework Intelligence group
+
+---
+
+## [2026-01-24] FR-453: Industry Context for Framework Prompts
+
+**Status:** ✅ Complete
+**Branch:** feat/proposal-generation
+
+**Files modified:**
+- src/lib/ai/prompts/frameworks/porter.prompt.ts (v2.0.0 → v2.1.0)
+- src/lib/ai/prompts/frameworks/mckinsey.prompt.ts (v2.0.0 → v2.1.0)
+- src/lib/ai/prompts/frameworks/swot.prompt.ts (v2.0.0 → v2.1.0)
+- src/lib/ai/prompts/frameworks/bmc.prompt.ts (v2.0.0 → v2.1.0)
+
+**What was implemented:**
+
+### Industry Context Requirements
+Each framework prompt now includes:
+
+1. **INDUSTRY CONTEXT section** with:
+   - Instructions to ground observations in industry-specific evidence
+   - Guidance on typical patterns by industry vertical (Tech/SaaS, Professional Services, Healthcare, Manufacturing, Retail/E-commerce, Financial Services)
+   - Direction to distinguish generic vs industry-specific observations
+   - Calibration guidance against industry norms
+
+2. **Evidence Quality tracking** in JSON output:
+   ```json
+   "evidence_quality": {
+     "industry_specific_count": <number>,
+     "generic_count": <number>,
+     "evidence_gaps": ["Areas needing more industry context"]
+   }
+   ```
+
+3. **Updated user prompts** to request:
+   - Industry-specific evidence grounding
+   - Flagging of generic vs industry-specific insights
+
+### Framework-Specific Industry Considerations
+
+**Porter's Five Forces (v2.1.0)**
+- Industry-specific competitive intensity patterns
+- Vertical-specific force considerations (network effects, regulatory barriers, etc.)
+
+**McKinsey 7-S (v2.1.0)**
+- Organizational patterns by vertical (agile structures, compliance culture, etc.)
+- Industry-calibrated element health assessments
+
+**SWOT Analysis (v2.1.0)**
+- Industry-typical strengths/weaknesses/opportunities/threats
+- Vertical-specific factors (IP, supply chain, regulatory, etc.)
+
+**Business Model Canvas (v2.1.0)**
+- Business model patterns by vertical (freemium, utilization, etc.)
+- Industry-calibrated value proposition fit
+
+**Verification:**
+- lint: ✅
+- typecheck: ✅
+- build: ✅
+
+**Notes:**
+- FR-454 (Strategic Implications UI) is next
+- Evidence quality tracking enables future UI for showing industry-specific vs generic ratio
+
+---
+
+## [2026-01-24] FR-451: BMC Prompt Enhancement
+
+**Status:** ✅ Complete
+**Branch:** feat/proposal-generation
+
+**Files created:**
+- src/lib/ai/prompts/frameworks/bmc.prompt.ts (new) - Business Model Canvas v2.0.0
+
+**Files modified:**
+- src/lib/ai/prompts/frameworks/index.ts - Added BMC to FRAMEWORK_PROMPTS registry
+- src/lib/ai/prompts/index.ts - Added BMC exports
+
+**What was implemented:**
+
+### Business Model Canvas Prompt (Osterwalder 2010)
+
+**9 Building Blocks organized by area:**
+- **Infrastructure (How):** Key Partners, Key Activities, Key Resources
+- **Offering (What):** Value Propositions
+- **Customers (Who):** Customer Relationships, Channels, Customer Segments
+- **Finances (How Much):** Cost Structure, Revenue Streams
+
+**Value Proposition Fit Analysis:**
+- segment_vp_fit: STRONG | MODERATE | WEAK
+- vp_channel_fit: STRONG | MODERATE | WEAK
+- relationship_revenue_fit: STRONG | MODERATE | WEAK
+
+**Coherence Issue Detection:**
+- Identifies gaps/misalignments between blocks
+- Strategic implications for business model viability
+
+**Verification:**
+- lint: ✅
+- typecheck: ✅
+- build: ✅
+
+**Source:** Osterwalder, A. & Pigneur, Y. (2010). Business Model Generation. Wiley.
+
+---
+
 ## [2026-01-23] FR-451, FR-452: Framework Intelligence Prompts
 
 **Status:** ✅ Complete

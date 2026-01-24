@@ -344,6 +344,101 @@ export interface ProposalOption {
 }
 
 // ============================================
+// STRATEGIC INSIGHTS TYPES (FR-454)
+// ============================================
+
+/** Rating level for force intensity or element health */
+export type RatingLevel = "HIGH" | "MEDIUM" | "LOW" | "STRONG" | "MODERATE" | "WEAK";
+
+/** Porter's Five Forces intensity ratings */
+export interface PorterIntensityRatings {
+  rivalry: RatingLevel;
+  entrants: RatingLevel;
+  suppliers: RatingLevel;
+  buyers: RatingLevel;
+  substitutes: RatingLevel;
+}
+
+/** McKinsey 7-S element health ratings */
+export interface McKinseyElementHealth {
+  strategy: RatingLevel;
+  structure: RatingLevel;
+  systems: RatingLevel;
+  shared_values: RatingLevel;
+  style: RatingLevel;
+  staff: RatingLevel;
+  skills: RatingLevel;
+}
+
+/** SWOT factor priorities */
+export interface SWOTFactorPriority {
+  strengths: string[];
+  weaknesses: string[];
+  opportunities: string[];
+  threats: string[];
+}
+
+/** SWOT TOWS strategies */
+export interface TOWSStrategies {
+  so: string;
+  wo: string;
+  st: string;
+  wt: string;
+}
+
+/** BMC value proposition fit ratings */
+export interface BMCValuePropositionFit {
+  segment_vp_fit: RatingLevel;
+  vp_channel_fit: RatingLevel;
+  relationship_revenue_fit: RatingLevel;
+}
+
+/** Evidence quality tracking (FR-453) */
+export interface EvidenceQuality {
+  industry_specific_count: number;
+  generic_count: number;
+  evidence_gaps: string[];
+}
+
+/** Strategic insights for Porter's Five Forces */
+export interface PorterStrategicInsights {
+  intensity_ratings: PorterIntensityRatings;
+  strategic_implications: string;
+  evidence_quality?: EvidenceQuality;
+}
+
+/** Strategic insights for McKinsey 7-S */
+export interface McKinseyStrategicInsights {
+  element_health: McKinseyElementHealth;
+  alignment_issues: string[];
+  strategic_implications: string;
+  evidence_quality?: EvidenceQuality;
+}
+
+/** Strategic insights for SWOT */
+export interface SWOTStrategicInsights {
+  factor_priority: SWOTFactorPriority;
+  tows_strategies: TOWSStrategies;
+  strategic_implications: string;
+  evidence_quality?: EvidenceQuality;
+}
+
+/** Strategic insights for BMC */
+export interface BMCStrategicInsights {
+  value_proposition_fit: BMCValuePropositionFit;
+  coherence_issues: string[];
+  strategic_implications: string;
+  evidence_quality?: EvidenceQuality;
+}
+
+/** Union type for all framework strategic insights */
+export type FrameworkStrategicInsights =
+  | PorterStrategicInsights
+  | McKinseyStrategicInsights
+  | SWOTStrategicInsights
+  | BMCStrategicInsights;
+
+// ============================================
 // UI TYPES
 // ============================================
 

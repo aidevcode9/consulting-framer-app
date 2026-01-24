@@ -4,7 +4,8 @@ import { memo, useState } from "react";
 import { Handle, Position } from "@xyflow/react";
 import { Plus, Trash2, GripVertical } from "lucide-react";
 import { useCanvasStore } from "@/lib/store";
-import type { BaseNodeData, NodeItem } from "@/types";
+import { StrategicInsightsPanel } from "../StrategicInsightsPanel";
+import type { BaseNodeData, NodeItem, SWOTStrategicInsights } from "@/types";
 
 interface SWOTSection {
   id: "strengths" | "weaknesses" | "opportunities" | "threats";
@@ -22,6 +23,7 @@ const SWOT_SECTIONS: SWOTSection[] = [
 
 interface SWOTData extends BaseNodeData {
   sections?: Record<string, NodeItem[]>;
+  strategic_insights?: SWOTStrategicInsights;
 }
 
 type SWOTNodeProps = {
@@ -159,6 +161,14 @@ export const SWOTNode = memo(function SWOTNode({ id, data, selected }: SWOTNodeP
             </div>
           </div>
         ))}
+      </div>
+
+      {/* FR-454: Strategic Insights Panel */}
+      <div className="px-4 pb-2">
+        <StrategicInsightsPanel
+          frameworkType="swot"
+          insights={data.strategic_insights}
+        />
       </div>
 
       {/* Connection handles */}

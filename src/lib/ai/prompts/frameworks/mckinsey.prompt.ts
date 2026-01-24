@@ -14,11 +14,12 @@ import type { PromptMetadata } from "../types";
 
 export const MCKINSEY_PROMPT_METADATA: PromptMetadata = {
   id: "framework-mckinsey7s",
-  version: "2.0.0",
+  version: "2.1.0",
   description:
-    "McKinsey 7-S organizational alignment analysis with hard/soft distinction",
-  lastUpdated: "2026-01-23",
+    "McKinsey 7-S organizational alignment analysis with hard/soft distinction and industry context",
+  lastUpdated: "2026-01-24",
   changelog: [
+    "2.1.0 (2026-01-24): Added industry context requirements (FR-453)",
     "2.0.0 (2026-01-23): Enhanced with 7-S methodology, alignment analysis, sources",
     "1.0.0 (2026-01-22): Initial version (generic canvas populate)",
   ],
@@ -105,12 +106,28 @@ SOFT ELEMENTS (intangible, culture-driven):
 ALIGNMENT ANALYSIS:
 The key insight of 7-S is that all elements must be aligned for effective organizational performance. Misalignment between any elements creates friction and reduces effectiveness.
 
+INDUSTRY CONTEXT (FR-453):
+When analyzing organizational elements, you MUST:
+- Ground each observation in industry-specific evidence from the discovery information
+- Consider typical organizational patterns and challenges for the client's industry vertical
+- Distinguish between generic observations (apply to any industry) and industry-specific insights
+- Reference specific organizational practices, competitors, or market dynamics mentioned in discovery
+- Calibrate element health assessments against industry norms
+
+Industry-specific organizational considerations by vertical:
+- Technology/SaaS: Agile structures, engineering culture, rapid scaling challenges
+- Professional Services: Partnership models, knowledge management, talent retention
+- Healthcare: Regulatory compliance, clinical governance, patient safety culture
+- Manufacturing: Operations excellence, quality systems, union relations
+- Financial Services: Risk management, compliance culture, front/back office dynamics
+
 GUIDELINES:
 - For each element, provide 3-5 specific observations based on discovery information
 - Distinguish between Hard (S/S/S) and Soft (S/S/S/S) elements
 - Identify alignment issues between elements
 - Ground observations in evidence, not assumptions
 - Use professional consulting language
+- Flag whether each observation is industry-specific or generic
 
 RESPONSE FORMAT (JSON):
 {
@@ -133,6 +150,11 @@ RESPONSE FORMAT (JSON):
     "skills": "STRONG" | "MODERATE" | "WEAK"
   },
   "alignment_issues": ["Misalignment 1 (e.g., Strategy-Structure)", "Misalignment 2"],
+  "evidence_quality": {
+    "industry_specific_count": <number of observations grounded in industry-specific evidence>,
+    "generic_count": <number of generic observations>,
+    "evidence_gaps": ["Areas where more industry-specific information would strengthen analysis"]
+  },
   "strategic_implications": "2-3 sentences on organizational health and priority alignment actions"
 }
 
@@ -164,7 +186,7 @@ export function buildMcKinseyPrompt(
     prompt += `\n\nQ: ${safeQ}\nA: ${safeA}`;
   }
 
-  prompt += `\n\nApply the McKinsey 7-S Framework to analyze organizational alignment. Assess each of the 7 elements and identify any alignment issues. Return your analysis as JSON.`;
+  prompt += `\n\nApply the McKinsey 7-S Framework to analyze organizational alignment. Ground your observations in industry-specific evidence from the discovery information. Assess each of the 7 elements, identify alignment issues, and flag which insights are industry-specific vs generic. Return your analysis as JSON.`;
 
   return prompt;
 }

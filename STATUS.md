@@ -61,7 +61,7 @@ Last updated: 2026-01-23 (evening)
 
 | Task | FR | Branch | Started | Notes |
 |------|-----|--------|---------|-------|
-| — | — | — | — | FR-451, FR-452 complete! |
+| — | — | — | — | Session complete. PR pending review. |
 
 ## Next (Priority Order)
 
@@ -86,12 +86,12 @@ Last updated: 2026-01-23 (evening)
 
 ## Shipped (This Week)
 
-| Task | FR | PR | Date |
-|------|-----|-----|------|
-| Porter prompt enhancement | FR-451, FR-452 | — | 01-23 |
-| McKinsey 7-S prompt enhancement | FR-451, FR-452 | — | 01-23 |
-| SWOT prompt enhancement | FR-451, FR-452 | — | 01-23 |
-| Prompt versioning system | FR-451 | — | 01-23 |
+| Task | FR | Commit | Date |
+|------|-----|--------|------|
+| Porter prompt enhancement | FR-451, FR-452 | 8f7823c | 01-23 |
+| McKinsey 7-S prompt enhancement | FR-451, FR-452 | 8f7823c | 01-23 |
+| SWOT prompt enhancement | FR-451, FR-452 | 8f7823c | 01-23 |
+| Prompt versioning system | FR-451 | 8f7823c | 01-23 |
 | Business Model Canvas node | FR-304 | — | 01-23 |
 | Framework content caching | — | — | 01-23 |
 | PROMO daily AI limit (env) | — | — | 01-23 |

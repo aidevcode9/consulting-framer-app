@@ -123,6 +123,7 @@ Industry-specific organizational considerations by vertical:
 
 GUIDELINES:
 - For each element, provide 3-5 specific observations based on discovery information
+- KEEP EACH OBSERVATION CONCISE: Maximum 15 words per bullet point
 - Distinguish between Hard (S/S/S) and Soft (S/S/S/S) elements
 - Identify alignment issues between elements
 - Ground observations in evidence, not assumptions

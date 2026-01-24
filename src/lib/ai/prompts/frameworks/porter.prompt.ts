@@ -110,6 +110,7 @@ Industry-specific considerations by vertical:
 
 GUIDELINES:
 - For each force, provide 3-5 specific observations based on the discovery information
+- KEEP EACH OBSERVATION CONCISE: Maximum 15 words per bullet point
 - Assign an intensity rating (HIGH/MEDIUM/LOW) for each force
 - Ground observations in evidence from the discovery, not assumptions
 - Use professional consulting language

@@ -126,6 +126,7 @@ Industry-specific business model considerations by vertical:
 
 GUIDELINES:
 - For each block, provide 3-5 specific observations based on discovery information
+- KEEP EACH OBSERVATION CONCISE: Maximum 15 words per bullet point
 - Identify connections between blocks (coherence)
 - Flag potential gaps or misalignments
 - Ground observations in evidence from discovery

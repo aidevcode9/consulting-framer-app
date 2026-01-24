@@ -114,6 +114,7 @@ Industry-specific SWOT considerations by vertical:
 
 GUIDELINES:
 - For each quadrant, provide 3-5 specific, evidence-based observations
+- KEEP EACH OBSERVATION CONCISE: Maximum 15 words per bullet point
 - Internal factors should be within the organization's control
 - External factors should be market/environment conditions
 - Each observation should be actionable and specific to the client

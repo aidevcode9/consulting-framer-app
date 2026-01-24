@@ -172,9 +172,17 @@ export function Canvas({ onSave, readOnly = false }: CanvasProps) {
         cache.frameworks[frameworkType]
       ) {
         const cachedData = cache.frameworks[frameworkType];
-        const sections = convertSectionsToNodeItems(cachedData.sections);
+        const convertedData = convertSectionsToNodeItems(cachedData.sections);
         // FR-454: Include cached strategic insights
-        const nodeUpdate: Record<string, unknown> = { sections };
+        // Map to correct property name based on framework type
+        const nodeUpdate: Record<string, unknown> = {};
+        if (frameworkType === "porter") {
+          nodeUpdate.forces = convertedData;
+        } else if (frameworkType === "mckinsey7s") {
+          nodeUpdate.elements = convertedData;
+        } else {
+          nodeUpdate.sections = convertedData;
+        }
         if (cachedData.strategic_insights) {
           nodeUpdate.strategic_insights = cachedData.strategic_insights;
         }
@@ -223,11 +231,19 @@ export function Canvas({ onSave, readOnly = false }: CanvasProps) {
             strategic_insights: apiData.strategic_insights,
           };
 
-          const sections = convertSectionsToNodeItems(rawSections);
-          console.log("Updating node with sections:", sections);
+          const convertedData = convertSectionsToNodeItems(rawSections);
+          console.log("Updating node with data:", convertedData);
 
           // FR-454: Include strategic insights from AI response
-          const nodeUpdate: Record<string, unknown> = { sections };
+          // Map to correct property name based on framework type
+          const nodeUpdate: Record<string, unknown> = {};
+          if (frameworkType === "porter") {
+            nodeUpdate.forces = convertedData;
+          } else if (frameworkType === "mckinsey7s") {
+            nodeUpdate.elements = convertedData;
+          } else {
+            nodeUpdate.sections = convertedData;
+          }
           if (apiData.strategic_insights) {
             nodeUpdate.strategic_insights = apiData.strategic_insights;
           }

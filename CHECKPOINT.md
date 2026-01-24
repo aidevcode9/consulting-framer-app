@@ -74,7 +74,7 @@ Each framework now has a dedicated prompt file with:
 - Graceful fallback for unsupported frameworks
 - All security measures maintained
 
-**Commit:** [pending]
+**Commit:** 8f7823c
 
 **Notes:**
 - BMC prompt enhancement is P1 (next priority)

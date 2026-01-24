@@ -1,6 +1,6 @@
 # STATUS.md — Consulting Framer
 
-Last updated: 2026-01-22 (evening)
+Last updated: 2026-01-23 (evening)
 
 ---
 
@@ -14,7 +14,7 @@ Last updated: 2026-01-22 (evening)
 - ✅ Sign out functionality
 - ✅ Workspace UI at `/app`
 - ✅ Canvas with drag-drop, zoom, pan, undo/redo
-- ✅ 3 framework nodes: SWOT, Porter, McKinsey
+- ✅ 4 framework nodes: SWOT, Porter, McKinsey, BMC
 - ✅ **Discovery panel with branching** (FR-407)
 - ✅ **Industry templates** (FR-408: Tech, Healthcare, Retail, Finance, Manufacturing)
 - ✅ Framework panel (drag-drop to canvas)
@@ -22,6 +22,7 @@ Last updated: 2026-01-22 (evening)
 - ✅ **Framework recommendations** (FR-405, needs API key)
 - ✅ **Discovery summary** (FR-404, needs API key)
 - ✅ **Canvas auto-populate** (FR-406, needs API key)
+- ✅ **Framework-specific prompts** (FR-451: Porter, McKinsey, SWOT with methodology v2.0.0)
 - ✅ **Usage limits enforcement** (tier-based limits)
 - ✅ **Prompt injection defense** (input sanitization)
 - ✅ Note block
@@ -60,12 +61,15 @@ Last updated: 2026-01-22 (evening)
 
 | Task | FR | Branch | Started | Notes |
 |------|-----|--------|---------|-------|
-| — | — | — | — | Phase 3 complete! |
+| — | — | — | — | FR-451, FR-452 complete! |
 
 ## Next (Priority Order)
 
 | Task | FR | Depends On | Notes |
 |------|-----|------------|-------|
+| **BMC prompt enhancement** | FR-451 | — | Value proposition fit, 9-block methodology |
+| **Industry context** | FR-453 | FR-451 | Industry-specific evidence |
+| **Strategic implications** | FR-454 | FR-451 | Display intensity_ratings, element_health, tows_strategies already in AI response |
 | **Real Stripe** | FR-902 | End of project | See "Deferred" section |
 
 ## Deferred (End of Project)
@@ -84,6 +88,13 @@ Last updated: 2026-01-22 (evening)
 
 | Task | FR | PR | Date |
 |------|-----|-----|------|
+| Porter prompt enhancement | FR-451, FR-452 | — | 01-23 |
+| McKinsey 7-S prompt enhancement | FR-451, FR-452 | — | 01-23 |
+| SWOT prompt enhancement | FR-451, FR-452 | — | 01-23 |
+| Prompt versioning system | FR-451 | — | 01-23 |
+| Business Model Canvas node | FR-304 | — | 01-23 |
+| Framework content caching | — | — | 01-23 |
+| PROMO daily AI limit (env) | — | — | 01-23 |
 | Generate Proposal | FR-502 | — | 01-22 |
 | Export PDF | FR-503 | — | 01-22 |
 | Export DOCX | FR-504 | — | 01-22 |
@@ -159,6 +170,7 @@ Last updated: 2026-01-22 (evening)
 - [x] FR-301: SWOT Analysis
 - [x] FR-302: Porter's Five Forces
 - [x] FR-303: McKinsey 7-S
+- [x] FR-304: Business Model Canvas ✅
 - [x] FR-310: Note block
 
 ### Engagement Management (FR-700) ✅ Complete
@@ -203,10 +215,35 @@ Last updated: 2026-01-22 (evening)
 
 ---
 
+## Framework Intelligence Checklist (FR-450)
+
+### Framework-Specific Prompts (FR-451) ✅ Partially Complete
+- [x] Porter's Five Forces — 5 forces with intensity ratings ✅
+- [x] McKinsey 7-S — Hard vs Soft elements, alignment analysis ✅
+- [x] SWOT Analysis — TOWS matrix, strategic options ✅
+- [ ] Business Model Canvas — Value proposition fit (P1)
+
+### Methodology & Sources (FR-452) ✅ Complete
+- [x] Add source citations to prompts (Porter 1979, McKinsey 1980, TOWS 1982) ✅
+- [x] Methodology notes in system prompts ✅
+- [x] Prompt versioning with changelog ✅
+
+### Industry Context (FR-453)
+- [ ] Industry-specific evidence requirements
+- [ ] Competitive intensity benchmarks by vertical
+
+### Strategic Implications (FR-454)
+- [ ] "So what" recommendations in output
+- [ ] Actionable strategic options
+
+---
+
 ## Decisions
 
 | Date | Decision | Rationale |
 |------|----------|-----------|
+| 01-23 | Prompt versioning with metadata | Track prompt versions (semver), changelog, last updated; logged in AI usage tracking |
+| 01-23 | Framework-specific prompts in /frameworks folder | Separate files per framework with methodology sources; fallback to generic prompt for unsupported types |
 | 01-22 | Stripe stub mode for development | Build billing UI without real credentials; defer real Stripe to end |
 | 01-22 | Thin routes, fat services pattern | Matches ARCHITECTURE.md; testable |
 | 01-22 | 5-second auto-save debounce | Balance between data safety and API load |

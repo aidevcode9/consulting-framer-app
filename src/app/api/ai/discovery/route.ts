@@ -51,17 +51,15 @@ export async function POST(req: NextRequest) {
 
     const { engagementId, question, answer, context } = parsed.data;
 
-    // Check if API key is configured
+    // Require API key
     const hasApiKey =
       process.env.ANTHROPIC_API_KEY || process.env.GEMINI_API_KEY;
 
     if (!hasApiKey) {
-      // Return mock response when no API key configured
-      return NextResponse.json({
-        followUp: null,
-        isComplete: true,
-        message: "AI not configured - using mock response",
-      });
+      return NextResponse.json(
+        { error: "AI service not configured. Set ANTHROPIC_API_KEY or GEMINI_API_KEY." },
+        { status: 503 }
+      );
     }
 
     const aiService = new AIService(supabase);

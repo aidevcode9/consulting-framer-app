@@ -26,7 +26,7 @@ import { CanvasWithProvider } from "@/components/canvas/Canvas";
 import { DiscoveryPanel } from "@/components/discovery/DiscoveryPanel";
 import { SOWPreviewModal } from "@/components/sow/SOWPreviewModal";
 import { ProposalPreviewModal } from "@/components/proposal/ProposalPreviewModal";
-import { useUIStore, useEngagementStore, useCanvasStore } from "@/lib/store";
+import { useUIStore, useEngagementStore, useCanvasStore, useDiscoveryStore } from "@/lib/store";
 
 import type { Engagement, EngagementStatus, GeneratedScope, GeneratedProposal } from "@/types";
 
@@ -36,7 +36,8 @@ type RightPanelTab = "discovery" | "scope" | null;
 export default function AppPage() {
   const { sidebarOpen, setSidebarOpen } = useUIStore();
   const { currentEngagement, setCurrentEngagement } = useEngagementStore();
-  const { markSaved, getCanvasData, setNodes, setEdges } = useCanvasStore();
+  const { markSaved, getCanvasData, loadCanvas } = useCanvasStore();
+  const { answers, isComplete: discoveryComplete, loadAnswers, setComplete, reset: resetDiscovery } = useDiscoveryStore();
 
   const [rightPanelTab, setRightPanelTab] = useState<RightPanelTab>("discovery");
   const [showNewEngagementModal, setShowNewEngagementModal] = useState(false);
@@ -56,6 +57,8 @@ export default function AppPage() {
   const [isGeneratingProposal, setIsGeneratingProposal] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const discoveryAutoSaveRef = useRef<NodeJS.Timeout | null>(null);
+  const lastSavedAnswersRef = useRef<string>("");
 
   // Filter engagements based on search, status, and archive state
   // "on_hold" status is treated as archived (FR-704)
@@ -126,6 +129,57 @@ export default function AppPage() {
     }
   }, [currentEngagement, getCanvasData, markSaved]);
 
+  // Save discovery answers to database
+  const saveDiscoveryToDb = useCallback(async () => {
+    if (!currentEngagement) return;
+
+    const answersJson = JSON.stringify(answers);
+    // Skip if nothing changed
+    if (answersJson === lastSavedAnswersRef.current) return;
+
+    try {
+      const res = await fetch(`/api/engagements/${currentEngagement.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          discovery_answers: answers,
+          discovery_completed: discoveryComplete,
+        }),
+      });
+
+      if (res.ok) {
+        lastSavedAnswersRef.current = answersJson;
+        // Update engagement in list with new discovery data
+        const data = await res.json();
+        setEngagements((prev) =>
+          prev.map((e) => (e.id === data.engagement.id ? data.engagement : e))
+        );
+      }
+    } catch (error) {
+      console.error("Failed to save discovery:", error);
+    }
+  }, [currentEngagement, answers, discoveryComplete]);
+
+  // Auto-save discovery when answers change
+  useEffect(() => {
+    if (!currentEngagement || Object.keys(answers).length === 0) return;
+
+    // Debounce save by 2 seconds
+    if (discoveryAutoSaveRef.current) {
+      clearTimeout(discoveryAutoSaveRef.current);
+    }
+
+    discoveryAutoSaveRef.current = setTimeout(() => {
+      saveDiscoveryToDb();
+    }, 2000);
+
+    return () => {
+      if (discoveryAutoSaveRef.current) {
+        clearTimeout(discoveryAutoSaveRef.current);
+      }
+    };
+  }, [answers, discoveryComplete, currentEngagement, saveDiscoveryToDb]);
+
   // Auto-save every 5 seconds when dirty
   const handleSave = useCallback(() => {
     // Clear existing timer
@@ -139,11 +193,14 @@ export default function AppPage() {
     }, 5000);
   }, [saveCanvasToDb]);
 
-  // Cleanup auto-save timer on unmount
+  // Cleanup auto-save timers on unmount
   useEffect(() => {
     return () => {
       if (autoSaveTimerRef.current) {
         clearTimeout(autoSaveTimerRef.current);
+      }
+      if (discoveryAutoSaveRef.current) {
+        clearTimeout(discoveryAutoSaveRef.current);
       }
     };
   }, []);
@@ -264,11 +321,11 @@ export default function AppPage() {
   }, []);
 
   const handleSelectEngagement = (engagement: Engagement) => {
-    // Load canvas data from the engagement
-    if (engagement.canvas_data) {
-      setNodes(engagement.canvas_data.nodes || []);
-      setEdges(engagement.canvas_data.edges || []);
-    }
+    // Load canvas data from the engagement (uses loadCanvas to avoid marking as dirty)
+    loadCanvas(engagement.canvas_data || { nodes: [], edges: [], viewport: { x: 0, y: 0, zoom: 1 } });
+    // Load discovery answers from the engagement
+    loadAnswers(engagement.discovery_answers || {});
+    setComplete(engagement.discovery_completed || false);
     setCurrentEngagement(engagement);
   };
 
@@ -288,8 +345,8 @@ export default function AppPage() {
         const { engagement } = await res.json();
         setEngagements((prev) => [engagement, ...prev]);
         setCurrentEngagement(engagement);
-        setNodes([]);
-        setEdges([]);
+        loadCanvas({ nodes: [], edges: [], viewport: { x: 0, y: 0, zoom: 1 } });
+        resetDiscovery(); // Reset discovery state for new engagement
         setShowNewEngagementModal(false);
       }
     } catch (error) {

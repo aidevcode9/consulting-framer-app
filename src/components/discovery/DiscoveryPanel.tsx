@@ -35,7 +35,6 @@ export function DiscoveryPanel({ onComplete }: DiscoveryPanelProps) {
     setCurrentQuestionIndex,
     setComplete,
     setAIFollowUp,
-    setProcessing,
     setSelectedTemplate,
   } = useDiscoveryStore();
 
@@ -117,33 +116,9 @@ export function DiscoveryPanel({ onComplete }: DiscoveryPanelProps) {
     };
     setAnswer(currentQuestion.id, answer);
 
-    // Check if we should get AI follow-up
-    if (currentQuestion.ai_context && inputValue.trim()) {
-      setProcessing(true);
-      try {
-        // In production, call the AI service
-        // const result = await generateDiscoveryFollowUp({...});
-        // For demo, simulate AI response
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
-        // Simulate AI deciding if follow-up is needed
-        const needsFollowUp = Math.random() > 0.6;
-        if (needsFollowUp) {
-          setAIFollowUp(
-            `Could you elaborate on how this relates to the ${currentQuestion.category.replace("_", " ")}?`
-          );
-        } else {
-          moveToNext();
-        }
-      } catch (error) {
-        console.error("AI follow-up error:", error);
-        moveToNext();
-      } finally {
-        setProcessing(false);
-      }
-    } else {
-      moveToNext();
-    }
+    // Move to next question (AI follow-ups disabled in mock mode)
+    // In production with API key, this would call /api/ai/discovery for intelligent follow-ups
+    moveToNext();
   };
 
   const handleFollowUpSubmit = () => {
@@ -201,19 +176,42 @@ export function DiscoveryPanel({ onComplete }: DiscoveryPanelProps) {
         <h3 className="mb-2 text-xl font-semibold text-gray-800">
           Discovery Complete!
         </h3>
-        <p className="mb-6 text-gray-600">
-          You&apos;ve answered all the discovery questions. The AI will now recommend
-          frameworks based on your responses.
+        <p className="mb-4 text-gray-600">
+          Great job! You&apos;ve completed the discovery questionnaire.
         </p>
-        <button
-          onClick={() => {
-            setComplete(false);
-            setCurrentQuestionIndex(0);
-          }}
-          className="rounded-md bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200"
-        >
-          Review Answers
-        </button>
+
+        {/* Next Steps */}
+        <div className="mb-6 w-full max-w-xs rounded-lg border border-blue-200 bg-blue-50 p-4 text-left">
+          <h4 className="mb-2 text-sm font-semibold text-blue-800">Next Steps:</h4>
+          <ol className="space-y-1 text-sm text-blue-700">
+            <li>1. Open the <strong>Frameworks</strong> panel on the left</li>
+            <li>2. Click <strong>AI Recommended</strong> to get suggestions</li>
+            <li>3. Drag frameworks to the canvas to analyze</li>
+            <li>4. Generate your <strong>SOW</strong> or <strong>Proposal</strong></li>
+          </ol>
+        </div>
+
+        <div className="flex gap-3">
+          <button
+            onClick={() => {
+              setComplete(false);
+              setCurrentQuestionIndex(0);
+            }}
+            className="rounded-md bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200"
+          >
+            Review Answers
+          </button>
+          <button
+            onClick={() => {
+              // Reset to allow re-discovery with different template
+              setSelectedTemplate(null);
+              setComplete(false);
+            }}
+            className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+          >
+            Start New Discovery
+          </button>
+        </div>
       </div>
     );
   }

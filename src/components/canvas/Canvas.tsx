@@ -18,10 +18,11 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 
-import { useCanvasStore } from "@/lib/store";
+import { useCanvasStore, useDiscoveryStore, useEngagementStore } from "@/lib/store";
 import { SWOTNode } from "./nodes/SWOTNode";
 import { PorterNode } from "./nodes/PorterNode";
 import { McKinseyNode } from "./nodes/McKinseyNode";
+import { BMCNode } from "./nodes/BMCNode";
 import { NoteNode } from "./nodes/NoteNode";
 import { CanvasToolbar } from "./CanvasToolbar";
 import { FrameworkPanel } from "./FrameworkPanel";
@@ -32,6 +33,7 @@ const nodeTypes = {
   swot: SWOTNode,
   porter: PorterNode,
   mckinsey7s: McKinseyNode,
+  bmc: BMCNode,
   note: NoteNode,
 } as unknown as NodeTypes;
 
@@ -47,8 +49,16 @@ interface CanvasProps {
   readOnly?: boolean;
 }
 
+// Cache for AI-generated framework content to avoid redundant API calls
+interface CacheEntry {
+  engagementId: string;
+  answersHash: string;
+  frameworks: Record<string, Record<string, string[]>>;
+}
+
 export function Canvas({ onSave, readOnly = false }: CanvasProps) {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
+  const frameworkCacheRef = useRef<CacheEntry | null>(null);
   const { screenToFlowPosition } = useReactFlow();
 
   const {
@@ -59,10 +69,14 @@ export function Canvas({ onSave, readOnly = false }: CanvasProps) {
     setEdges,
     setViewport,
     addNode,
+    updateNode,
     addEdge: addEdgeToStore,
     saveToHistory,
     isDirty,
   } = useCanvasStore();
+
+  const { isComplete: discoveryComplete, answers } = useDiscoveryStore();
+  const { currentEngagement } = useEngagementStore();
 
   // Handle node changes (position, selection, etc.)
   const onNodesChange = useCallback(
@@ -96,6 +110,120 @@ export function Canvas({ onSave, readOnly = false }: CanvasProps) {
     [addEdgeToStore, saveToHistory]
   );
 
+  // Helper to create a hash of discovery answers for cache invalidation
+  const getAnswersHash = useCallback((answersObj: typeof answers): string => {
+    const sorted = Object.entries(answersObj)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([k, v]) => `${k}:${v.value}`)
+      .join("|");
+    // Simple hash - just use length and first/last chars for quick comparison
+    return `${sorted.length}-${sorted.slice(0, 50)}-${sorted.slice(-50)}`;
+  }, []);
+
+  // Convert raw sections (string arrays) to NodeItem arrays
+  const convertSectionsToNodeItems = useCallback(
+    (rawSections: Record<string, string[]>): Record<string, Array<{ id: string; text: string; created_at: string }>> => {
+      const sections: Record<string, Array<{ id: string; text: string; created_at: string }>> = {};
+      for (const [category, points] of Object.entries(rawSections)) {
+        sections[category] = points.map((text, idx) => ({
+          id: `${category}-${Date.now()}-${idx}-${Math.random().toString(36).slice(2, 9)}`,
+          text,
+          created_at: new Date().toISOString(),
+        }));
+      }
+      return sections;
+    },
+    []
+  );
+
+  // Auto-populate framework with AI content (with caching)
+  const populateFramework = useCallback(
+    async (nodeId: string, frameworkType: string) => {
+      // Check if we have any discovery answers to use
+      const hasAnswers = Object.keys(answers).length > 0;
+
+      // Need engagement and some answers to populate
+      if (!currentEngagement || !hasAnswers) {
+        console.log("Cannot populate: no engagement or no answers", {
+          hasEngagement: !!currentEngagement,
+          hasAnswers,
+          discoveryComplete,
+        });
+        return;
+      }
+
+      // Only populate strategy frameworks (not notes)
+      const supportedTypes = ["swot", "porter", "mckinsey7s", "bmc"];
+      if (!supportedTypes.includes(frameworkType)) return;
+
+      const answersHash = getAnswersHash(answers);
+      const cache = frameworkCacheRef.current;
+
+      // Check cache: same engagement and same answers?
+      if (
+        cache &&
+        cache.engagementId === currentEngagement.id &&
+        cache.answersHash === answersHash &&
+        cache.frameworks[frameworkType]
+      ) {
+        console.log("Using cached framework content:", { frameworkType });
+        const sections = convertSectionsToNodeItems(cache.frameworks[frameworkType]);
+        updateNode(nodeId, { sections });
+        return;
+      }
+
+      console.log("Populating framework (API call):", { nodeId, frameworkType, answerCount: Object.keys(answers).length });
+
+      try {
+        const response = await fetch("/api/ai/populate-canvas", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            engagementId: currentEngagement.id,
+            frameworkType,
+            discoveryAnswers: Object.entries(answers).map(([id, answer]) => ({
+              question: id,
+              answer: answer.value,
+            })),
+            context: {
+              clientName: currentEngagement.client_name,
+              industry: currentEngagement.client_industry || undefined,
+            },
+          }),
+        });
+
+        if (response.ok) {
+          const apiData = await response.json();
+          console.log("Populate response:", apiData);
+          const rawSections = apiData.sections || {};
+
+          // Store in cache
+          if (!frameworkCacheRef.current ||
+              frameworkCacheRef.current.engagementId !== currentEngagement.id ||
+              frameworkCacheRef.current.answersHash !== answersHash) {
+            // Reset cache for new engagement/answers
+            frameworkCacheRef.current = {
+              engagementId: currentEngagement.id,
+              answersHash,
+              frameworks: {},
+            };
+          }
+          frameworkCacheRef.current.frameworks[frameworkType] = rawSections;
+          console.log("Cached framework content:", { frameworkType });
+
+          const sections = convertSectionsToNodeItems(rawSections);
+          console.log("Updating node with sections:", sections);
+          updateNode(nodeId, { sections });
+        } else {
+          console.error("Populate API error:", response.status, await response.text());
+        }
+      } catch (error) {
+        console.error("Failed to populate framework:", error);
+      }
+    },
+    [currentEngagement, discoveryComplete, answers, updateNode, getAnswersHash, convertSectionsToNodeItems]
+  );
+
   // Handle dropping new nodes
   const onDrop = useCallback(
     (event: React.DragEvent) => {
@@ -109,16 +237,23 @@ export function Canvas({ onSave, readOnly = false }: CanvasProps) {
         y: event.clientY,
       });
 
+      const nodeId = `${type}-${Date.now()}`;
       const newNode: FrameworkNode = {
-        id: `${type}-${Date.now()}`,
+        id: nodeId,
         type: type as FrameworkNode["type"],
         position,
         data: getDefaultNodeData(type),
       };
 
       addNode(newNode);
+
+      // Auto-populate if we have discovery answers
+      const hasAnswers = Object.keys(answers).length > 0;
+      if (hasAnswers && currentEngagement) {
+        populateFramework(nodeId, type);
+      }
     },
-    [screenToFlowPosition, addNode]
+    [screenToFlowPosition, addNode, answers, currentEngagement, populateFramework]
   );
 
   const onDragOver = useCallback((event: React.DragEvent) => {
@@ -241,6 +376,12 @@ function getDefaultNodeData(type: string) {
       color: "#6366f1",
       items: [],
       description: "Organizational alignment analysis",
+    },
+    bmc: {
+      label: "Business Model Canvas",
+      color: "#10b981",
+      items: [],
+      description: "9-block business model visualization",
     },
     note: {
       label: "Note",

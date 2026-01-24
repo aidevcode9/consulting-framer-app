@@ -6,6 +6,7 @@ const log = createLogger("UsageRepo");
 export interface UsageCounts {
   engagements: number;
   ai_queries_this_month: number;
+  ai_queries_today: number;
   sow_generations: number;
 }
 
@@ -21,8 +22,12 @@ export class UsageRepository {
     startOfMonth.setDate(1);
     startOfMonth.setHours(0, 0, 0, 0);
 
+    // Get start of today for daily AI query counting
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+
     // Run all queries in parallel
-    const [engagementsResult, aiQueriesResult, sowResult] = await Promise.all([
+    const [engagementsResult, aiQueriesMonthResult, aiQueriesTodayResult, sowResult] = await Promise.all([
       // Count engagements (excluding archived/on_hold)
       this.supabase
         .from("engagements")
@@ -37,6 +42,13 @@ export class UsageRepository {
         .eq("user_id", userId)
         .gte("created_at", startOfMonth.toISOString()),
 
+      // Count AI interactions today
+      this.supabase
+        .from("ai_interactions")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", userId)
+        .gte("created_at", startOfDay.toISOString()),
+
       // Count SOW deliverables
       this.supabase
         .from("deliverables")
@@ -48,8 +60,11 @@ export class UsageRepository {
     if (engagementsResult.error) {
       log.error("Failed to count engagements", engagementsResult.error);
     }
-    if (aiQueriesResult.error) {
-      log.error("Failed to count AI queries", aiQueriesResult.error);
+    if (aiQueriesMonthResult.error) {
+      log.error("Failed to count AI queries (month)", aiQueriesMonthResult.error);
+    }
+    if (aiQueriesTodayResult.error) {
+      log.error("Failed to count AI queries (today)", aiQueriesTodayResult.error);
     }
     if (sowResult.error) {
       log.error("Failed to count SOW generations", sowResult.error);
@@ -57,7 +72,8 @@ export class UsageRepository {
 
     return {
       engagements: engagementsResult.count ?? 0,
-      ai_queries_this_month: aiQueriesResult.count ?? 0,
+      ai_queries_this_month: aiQueriesMonthResult.count ?? 0,
+      ai_queries_today: aiQueriesTodayResult.count ?? 0,
       sow_generations: sowResult.count ?? 0,
     };
   }

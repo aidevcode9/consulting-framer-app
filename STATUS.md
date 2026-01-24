@@ -1,6 +1,6 @@
 # STATUS.md — Consulting Framer
 
-Last updated: 2026-01-23 (evening)
+Last updated: 2026-01-24 (morning)
 
 ---
 
@@ -22,7 +22,9 @@ Last updated: 2026-01-23 (evening)
 - ✅ **Framework recommendations** (FR-405, needs API key)
 - ✅ **Discovery summary** (FR-404, needs API key)
 - ✅ **Canvas auto-populate** (FR-406, needs API key)
-- ✅ **Framework-specific prompts** (FR-451: Porter, McKinsey, SWOT with methodology v2.0.0)
+- ✅ **Framework-specific prompts** (FR-451: Porter, McKinsey, SWOT, BMC with methodology v2.1.0)
+- ✅ **Industry context in prompts** (FR-453: vertical-specific evidence)
+- ✅ **Strategic insights UI** (FR-454: intensity ratings, TOWS strategies, element health)
 - ✅ **Usage limits enforcement** (tier-based limits)
 - ✅ **Prompt injection defense** (input sanitization)
 - ✅ Note block
@@ -67,9 +69,6 @@ Last updated: 2026-01-23 (evening)
 
 | Task | FR | Depends On | Notes |
 |------|-----|------------|-------|
-| **BMC prompt enhancement** | FR-451 | — | Value proposition fit, 9-block methodology |
-| **Industry context** | FR-453 | FR-451 | Industry-specific evidence |
-| **Strategic implications** | FR-454 | FR-451 | Display intensity_ratings, element_health, tows_strategies already in AI response |
 | **Real Stripe** | FR-902 | End of project | See "Deferred" section |
 
 ## Deferred (End of Project)
@@ -88,6 +87,9 @@ Last updated: 2026-01-23 (evening)
 
 | Task | FR | Commit | Date |
 |------|-----|--------|------|
+| Industry context in prompts | FR-453 | 700241d | 01-24 |
+| Strategic insights UI | FR-454 | 700241d | 01-24 |
+| BMC prompt enhancement | FR-451 | 700241d | 01-24 |
 | Porter prompt enhancement | FR-451, FR-452 | 8f7823c | 01-23 |
 | McKinsey 7-S prompt enhancement | FR-451, FR-452 | 8f7823c | 01-23 |
 | SWOT prompt enhancement | FR-451, FR-452 | 8f7823c | 01-23 |
@@ -215,26 +217,31 @@ Last updated: 2026-01-23 (evening)
 
 ---
 
-## Framework Intelligence Checklist (FR-450)
+## Framework Intelligence Checklist (FR-450) ✅ COMPLETE
 
-### Framework-Specific Prompts (FR-451) ✅ Partially Complete
+### Framework-Specific Prompts (FR-451) ✅ Complete
 - [x] Porter's Five Forces — 5 forces with intensity ratings ✅
 - [x] McKinsey 7-S — Hard vs Soft elements, alignment analysis ✅
 - [x] SWOT Analysis — TOWS matrix, strategic options ✅
-- [ ] Business Model Canvas — Value proposition fit (P1)
+- [x] Business Model Canvas — Value proposition fit, 9-block methodology ✅
 
 ### Methodology & Sources (FR-452) ✅ Complete
-- [x] Add source citations to prompts (Porter 1979, McKinsey 1980, TOWS 1982) ✅
+- [x] Add source citations to prompts (Porter 1979, McKinsey 1980, TOWS 1982, BMC 2010) ✅
 - [x] Methodology notes in system prompts ✅
-- [x] Prompt versioning with changelog ✅
+- [x] Prompt versioning with changelog (v2.1.0) ✅
 
-### Industry Context (FR-453)
-- [ ] Industry-specific evidence requirements
-- [ ] Competitive intensity benchmarks by vertical
+### Industry Context (FR-453) ✅ Complete
+- [x] Industry-specific evidence requirements ✅
+- [x] Competitive intensity benchmarks by vertical ✅
+- [x] Evidence quality tracking (industry_specific_count, generic_count) ✅
 
-### Strategic Implications (FR-454)
-- [ ] "So what" recommendations in output
-- [ ] Actionable strategic options
+### Strategic Implications (FR-454) ✅ Complete
+- [x] Strategic insights UI panel (collapsible) ✅
+- [x] Intensity ratings display (Porter) ✅
+- [x] Element health display (McKinsey) ✅
+- [x] TOWS strategies display (SWOT) ✅
+- [x] Value proposition fit display (BMC) ✅
+- [x] Cache structure for strategic insights ✅
 
 ---
 

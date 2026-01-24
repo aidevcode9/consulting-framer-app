@@ -2,6 +2,87 @@
 
 ---
 
+## [2026-01-23] FR-451, FR-452: Framework Intelligence Prompts
+
+**Status:** ✅ Complete
+**Branch:** feat/auth-email-google
+
+**Files created:**
+- src/lib/ai/prompts/frameworks/porter.prompt.ts (new) - Porter's Five Forces v2.0.0
+- src/lib/ai/prompts/frameworks/mckinsey.prompt.ts (new) - McKinsey 7-S v2.0.0
+- src/lib/ai/prompts/frameworks/swot.prompt.ts (new) - SWOT Analysis v2.0.0
+- src/lib/ai/prompts/frameworks/index.ts (new) - Framework prompts registry
+
+**Files modified:**
+- src/lib/ai/prompts/index.ts - Added framework prompt exports, updated getAllPromptMetadata()
+- src/services/ai.service.ts - Updated generateCanvasContent() to use framework-specific prompts
+
+**What was implemented:**
+
+### FR-451: Framework-Specific Prompts
+Each framework now has a dedicated prompt file with:
+- **Porter's Five Forces (v2.0.0)**
+  - 5 forces with intensity ratings (HIGH/MEDIUM/LOW)
+  - Detailed methodology for each force (rivalry, entrants, suppliers, buyers, substitutes)
+  - Strategic implications summary
+  - Source: Porter, M.E. (1979, 2008). Harvard Business Review.
+
+- **McKinsey 7-S (v2.0.0)**
+  - Hard elements: Strategy, Structure, Systems
+  - Soft elements: Shared Values, Style, Staff, Skills
+  - Element health assessment (STRONG/MODERATE/WEAK)
+  - Alignment issue detection
+  - Source: Waterman, Peters & Phillips (1980). Business Horizons.
+
+- **SWOT Analysis (v2.0.0)**
+  - Internal factors (Strengths, Weaknesses) vs External factors (Opportunities, Threats)
+  - TOWS Matrix strategic options (SO, WO, ST, WT strategies)
+  - Factor prioritization
+  - Source: Humphrey/SRI (1960s), Weihrich TOWS (1982).
+
+### FR-452: Methodology Sources
+- Each prompt includes academic citations
+- SOURCE objects exported for reference
+- Methodology guidance embedded in system prompts
+
+### Prompt Versioning System
+- PromptMetadata with id, version, description, lastUpdated, changelog
+- Version logged in AI usage tracking
+- getFrameworkPrompt() helper returns null for unsupported types (graceful fallback)
+- getAllFrameworkPromptMetadata() for monitoring/debugging
+
+### AIService Updates
+- generateCanvasContent() now checks for enhanced prompts via getFrameworkPrompt()
+- Uses framework-specific systemPrompt and buildUserPrompt when available
+- Falls back to generic CANVAS_POPULATE_PROMPT for BMC/Note
+- Increased maxTokens (2048) for enhanced prompts
+- Logs prompt version in usage telemetry
+
+**Security:**
+- All user inputs sanitized via sanitizeForPrompt()
+- Injection detection logging preserved
+- Usage limits enforced before AI calls
+
+**Verification:**
+- lint: ✅
+- typecheck: ✅
+- build: ✅
+
+**Skeptic Review:** ✅ Ship it
+- Prompt versioning implemented
+- Sources included
+- Graceful fallback for unsupported frameworks
+- All security measures maintained
+
+**Commit:** [pending]
+
+**Notes:**
+- BMC prompt enhancement is P1 (next priority)
+- Industry context (FR-453) and Strategic implications (FR-454) are next
+- Enhanced prompts use ~2x tokens due to detailed methodology
+
+---
+
 ## [2026-01-22] FR-502: Generate Proposal
 
 **Status:** ✅ Complete

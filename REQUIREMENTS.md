@@ -13,6 +13,7 @@
 
 | Version | Date | Changes |
 |---------|------|---------|
+| v1.2 | Jan 2026 | Added FR-450 (Framework Intelligence) — professional-grade framework prompts with methodology sources |
 | v1.1 | Jan 2026 | Added FR-900 (Billing), FR-1000 (Organizations), NFR-500 (Scale) |
 | v1.0 | Jan 2026 | Initial release — 60 FRs, 16 NFRs |
 
@@ -137,6 +138,48 @@ Consultants waste **7+ hours per engagement** on administrative work:
 | FR-408 | Discovery templates | Different question sets by industry | P1 |
 | FR-409 | Export discovery notes | PDF/DOCX of Q&A transcript | P2 |
 | FR-410 | Client discovery form | Shareable link for async input | P2 |
+
+### FR-450: Framework Intelligence (Phase 2)
+
+Professional-grade framework analysis that veteran consultants will recognize and trust.
+
+| ID | Requirement | Acceptance Criteria | Priority |
+|----|-------------|---------------------|----------|
+| FR-451 | Framework-specific prompts | Each framework (SWOT, Porter, McKinsey 7-S, BMC) has dedicated prompt with proper methodology; output matches academic/practitioner standards | P0 |
+| FR-452 | Methodology sources | Each framework prompt includes original source attribution (Porter 1979, McKinsey, Humphrey); output includes methodology notes | P0 |
+| FR-453 | Industry context | Framework analysis incorporates industry-specific benchmarks and competitive dynamics; prompts request industry evidence | P1 |
+| FR-454 | Strategic implications | Each framework output includes actionable "so what" recommendations; not just observations but strategic options | P1 |
+| FR-455 | Framework validation | Output validated against expected structure (e.g., SWOT has 4 quadrants, Porter has 5 forces with ratings) | P1 |
+
+**Acceptance Criteria Details:**
+
+**FR-451: Framework-Specific Prompts**
+- SWOT: Internal vs External distinction; SO/WO/ST/WT strategic options
+- Porter: 5 forces with intensity ratings (High/Medium/Low); industry-specific evidence
+- McKinsey 7-S: Hard elements (Strategy, Structure, Systems) vs Soft elements; alignment analysis
+- BMC: Value proposition fit; segment-block coherence
+
+**FR-452: Methodology Sources**
+- SWOT: Albert Humphrey, Stanford Research Institute (1960s)
+- Porter: Michael Porter, "How Competitive Forces Shape Strategy" (HBR, 1979)
+- McKinsey 7-S: Tom Peters, Robert Waterman, McKinsey & Company (1980s)
+- BMC: Alexander Osterwalder, "Business Model Generation" (2010)
+
+**FR-453: Industry Context**
+- Prompt requests specific industry evidence for each insight
+- Considers typical competitive intensity by industry vertical
+- Flags generic vs industry-specific observations
+
+**FR-454: Strategic Implications**
+- Display AI-generated metadata already in enhanced prompts (v2.0.0):
+  - Porter: `intensity_ratings` (HIGH/MEDIUM/LOW per force), `strategic_implications`
+  - McKinsey: `element_health` (STRONG/MODERATE/WEAK), `alignment_issues`
+  - SWOT: `factor_priority`, `tows_strategies` (SO/WO/ST/WT options)
+- Add "Strategic Insights" panel to framework nodes showing:
+  - Overall assessment summary
+  - Top priority actions
+  - Key risks/opportunities
+- Link strategic implications to SOW generation for context
 
 ### FR-500: Deliverable Generation (Phase 3)
 

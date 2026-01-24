@@ -23,10 +23,13 @@ import {
   buildCanvasPopulatePrompt,
   buildSOWGenerationPrompt,
   buildProposalGenerationPrompt,
+  // FR-451: Framework-specific prompts
+  getFrameworkPrompt,
   type DiscoveryContext,
   type PopulateFrameworkType,
 } from "@/lib/ai/prompts";
 import { detectInjectionAttempt } from "@/lib/ai/sanitize";
+import { stripMarkdownCodeBlocks } from "@/lib/ai/utils";
 import { createLogger } from "@/lib/logger";
 import type { GeneratedScope, GeneratedProposal, CanvasData, Engagement } from "@/types";
 
@@ -170,9 +173,10 @@ export class AIService {
       }
     );
 
-    // Parse JSON response
+    // Parse JSON response (strip markdown code blocks if present)
     try {
-      const parsed = JSON.parse(result.content);
+      const cleanedContent = stripMarkdownCodeBlocks(result.content);
+      const parsed = JSON.parse(cleanedContent);
       return {
         recommendations: parsed.recommendations || [],
         summary: parsed.summary || "",
@@ -245,6 +249,7 @@ export class AIService {
   /**
    * Generate content to populate a framework on the canvas
    * FR-406: Auto-populate canvas
+   * FR-451: Framework-specific prompts with methodology
    */
   async generateCanvasContent(
     userId: string,
@@ -268,27 +273,45 @@ export class AIService {
       });
     }
 
-    log.info("Generating canvas content", { userId, engagementId, frameworkType });
+    // FR-451: Check for enhanced framework-specific prompt
+    const frameworkPrompt = getFrameworkPrompt(frameworkType);
+    const useEnhancedPrompt = frameworkPrompt !== null;
 
-    const userPrompt = buildCanvasPopulatePrompt(
+    log.info("Generating canvas content", {
+      userId,
+      engagementId,
       frameworkType,
-      discoveryAnswers,
-      context
-    );
+      promptVersion: useEnhancedPrompt ? frameworkPrompt.metadata.version : "1.0.0 (generic)",
+    });
+
+    // Build prompt using framework-specific or generic prompt
+    const userPrompt = useEnhancedPrompt
+      ? frameworkPrompt.buildUserPrompt(discoveryAnswers, context)
+      : buildCanvasPopulatePrompt(frameworkType, discoveryAnswers, context);
+
+    const systemPrompt = useEnhancedPrompt
+      ? frameworkPrompt.systemPrompt
+      : CANVAS_POPULATE_PROMPT;
+
     const messages: AIMessage[] = [{ role: "user", content: userPrompt }];
 
     const result = await generateCompletion(messages, {
-      systemPrompt: CANVAS_POPULATE_PROMPT,
-      maxTokens: 1024,
+      systemPrompt,
+      maxTokens: useEnhancedPrompt ? 2048 : 1024, // Enhanced prompts need more tokens
       temperature: 0.6,
     });
 
-    // Track usage with telemetry
+    // Track usage with telemetry (include prompt version)
     await this.usageService.trackAIUsage(
       userId,
       engagementId,
       "canvas_populate",
-      { frameworkType, discoveryAnswers, context },
+      {
+        frameworkType,
+        discoveryAnswers,
+        context,
+        promptVersion: useEnhancedPrompt ? frameworkPrompt.metadata.version : "1.0.0",
+      },
       { content: result.content, requestId: result.requestId },
       {
         tokensUsed: result.tokensUsed.input + result.tokensUsed.output,
@@ -297,15 +320,18 @@ export class AIService {
       }
     );
 
-    // Parse JSON response
+    // Parse JSON response (strip markdown code blocks if present)
     try {
-      const parsed = JSON.parse(result.content);
+      const cleanedContent = stripMarkdownCodeBlocks(result.content);
+      const parsed = JSON.parse(cleanedContent);
       return {
         sections: parsed.sections || {},
       };
     } catch {
       log.warn("Failed to parse canvas populate JSON", {
         content: result.content,
+        frameworkType,
+        promptVersion: useEnhancedPrompt ? frameworkPrompt.metadata.version : "1.0.0",
       });
       // Return empty sections if parsing fails
       return {
@@ -379,9 +405,10 @@ export class AIService {
       }
     );
 
-    // Parse JSON response
+    // Parse JSON response (strip markdown code blocks if present)
     try {
-      const parsed = JSON.parse(result.content) as GeneratedScope;
+      const cleanedContent = stripMarkdownCodeBlocks(result.content);
+      const parsed = JSON.parse(cleanedContent) as GeneratedScope;
 
       // Ensure all required fields exist with defaults
       return {
@@ -520,9 +547,10 @@ export class AIService {
       }
     );
 
-    // Parse JSON response
+    // Parse JSON response (strip markdown code blocks if present)
     try {
-      const parsed = JSON.parse(result.content) as GeneratedProposal;
+      const cleanedContent = stripMarkdownCodeBlocks(result.content);
+      const parsed = JSON.parse(cleanedContent) as GeneratedProposal;
 
       // Ensure all required fields exist with defaults
       return {

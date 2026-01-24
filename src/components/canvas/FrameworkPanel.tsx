@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   ChevronDown,
   ChevronRight,
@@ -44,6 +44,13 @@ const FRAMEWORKS: FrameworkItem[] = [
     icon: Layers,
     color: "#6366f1",
   },
+  {
+    type: "bmc",
+    name: "Business Model Canvas",
+    description: "Business model visualization",
+    icon: Grid3X3,
+    color: "#10b981",
+  },
 ];
 
 const OTHER_NODES = [
@@ -74,11 +81,27 @@ export function FrameworkPanel() {
 
   const answeredCount = Object.keys(answers).length;
 
+  // Debug: Log state changes
+  useEffect(() => {
+    console.log("[FrameworkPanel] State:", {
+      recommendations: recommendations.length,
+      discoveryComplete,
+      answeredCount,
+      expandedSection,
+    });
+  }, [recommendations, discoveryComplete, answeredCount, expandedSection]);
+
   const handleGetRecommendations = async () => {
     if (!currentEngagement) {
       setRecsError("No engagement selected");
       return;
     }
+
+    console.log("[FrameworkPanel] Getting recommendations...", {
+      discoveryComplete,
+      answeredCount,
+      expandedSection,
+    });
 
     setIsLoadingRecs(true);
     setRecsError(null);
@@ -100,14 +123,22 @@ export function FrameworkPanel() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to get recommendations");
+        const errorData = await response.json().catch(() => null);
+        console.error("[FrameworkPanel] API error:", response.status, errorData);
+        // Show the actual error message from the API
+        const errorMessage = errorData?.message || "Failed to get recommendations";
+        throw new Error(errorMessage);
       }
 
       const data = await response.json();
+      console.log("[FrameworkPanel] API response:", data);
+      console.log("[FrameworkPanel] Setting recommendations:", data.recommendations);
       setRecommendations(data.recommendations || []);
     } catch (error) {
       console.error("Recommendations error:", error);
-      setRecsError("Could not get recommendations. Try again.");
+      // Show the actual error message if available
+      const message = error instanceof Error ? error.message : "Could not get recommendations. Try again.";
+      setRecsError(message);
     } finally {
       setIsLoadingRecs(false);
     }
@@ -224,7 +255,10 @@ export function FrameworkPanel() {
                 <div className="space-y-2">
                   {recommendations.map((rec) => {
                     const framework = FRAMEWORKS.find((f) => f.type === rec.framework);
-                    if (!framework) return null;
+                    // Handle unknown framework types gracefully
+                    const displayName = framework?.name || rec.framework.toUpperCase();
+                    const displayColor = framework?.color || "#64748b";
+                    const Icon = framework?.icon || Grid3X3;
                     return (
                       <div
                         key={rec.framework}
@@ -233,12 +267,12 @@ export function FrameworkPanel() {
                         className="cursor-grab rounded-md border border-amber-200 bg-amber-50 p-2 hover:border-amber-300 active:cursor-grabbing"
                       >
                         <div className="flex items-center gap-2">
-                          <framework.icon
+                          <Icon
                             className="h-4 w-4"
-                            style={{ color: framework.color }}
+                            style={{ color: displayColor }}
                           />
                           <span className="text-sm font-medium text-gray-800">
-                            {framework.name}
+                            {displayName}
                           </span>
                           <span className="ml-auto text-xs text-amber-600">
                             {Math.round(rec.confidence * 100)}%

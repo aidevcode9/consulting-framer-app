@@ -31,6 +31,7 @@ Framework-specific guidance:
 - SWOT: Internal (Strengths, Weaknesses) and External (Opportunities, Threats)
 - Porter: Analyze each of the 5 competitive forces
 - McKinsey 7S: Cover Strategy, Structure, Systems, Shared Values, Style, Staff, Skills
+- BMC: Business Model Canvas with 9 building blocks
 
 Response format (JSON):
 {
@@ -41,9 +42,10 @@ Response format (JSON):
 
 For SWOT, use section IDs: strengths, weaknesses, opportunities, threats
 For Porter, use section IDs: rivalry, suppliers, buyers, substitutes, entrants
-For McKinsey 7S, use section IDs: strategy, structure, systems, shared_values, style, staff, skills`;
+For McKinsey 7S, use section IDs: strategy, structure, systems, shared_values, style, staff, skills
+For BMC, use section IDs: key_partners, key_activities, key_resources, value_propositions, customer_relationships, channels, customer_segments, cost_structure, revenue_streams`;
 
-export type PopulateFrameworkType = "swot" | "porter" | "mckinsey7s";
+export type PopulateFrameworkType = "swot" | "porter" | "mckinsey7s" | "bmc";
 
 export interface CanvasContext {
   clientName: string;
@@ -64,6 +66,7 @@ export function buildCanvasPopulatePrompt(
     swot: "SWOT Analysis",
     porter: "Porter's Five Forces",
     mckinsey7s: "McKinsey 7-S Framework",
+    bmc: "Business Model Canvas",
   };
 
   let prompt = `Framework: ${frameworkNames[frameworkType]}`;

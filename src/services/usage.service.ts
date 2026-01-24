@@ -10,6 +10,14 @@ const log = createLogger("UsageService");
 
 export type UsageAction = "create_engagement" | "ai_query" | "sow_generation";
 
+// PROMO period - all users get expanded access until this date
+const PROMO_END_DATE = new Date("2026-03-15T23:59:59Z");
+const PROMO_DAILY_AI_LIMIT = parseInt(process.env.PROMO_AI_QUERY_COUNT || "20", 10);
+
+function isPromoPeriod(): boolean {
+  return new Date() < PROMO_END_DATE;
+}
+
 export interface UsageInfo {
   tier: SubscriptionTier;
   counts: UsageCounts;
@@ -128,6 +136,34 @@ export class UsageService {
         break;
 
       case "ai_query":
+        // PROMO: Allow up to 20 AI queries per day during promo period
+        if (isPromoPeriod()) {
+          if (usage.counts.ai_queries_today >= PROMO_DAILY_AI_LIMIT) {
+            log.warn("PROMO daily AI limit reached", {
+              userId,
+              tier: usage.tier,
+              today: usage.counts.ai_queries_today,
+              limit: PROMO_DAILY_AI_LIMIT,
+            });
+            throw new UsageLimitError(
+              "ai_query_limit",
+              `You've used all ${PROMO_DAILY_AI_LIMIT} AI queries for today. Try again tomorrow!`,
+              {
+                current: usage.counts.ai_queries_today,
+                limit: PROMO_DAILY_AI_LIMIT,
+                tier: usage.tier,
+                isPromo: true,
+              }
+            );
+          }
+          log.info("AI query allowed (PROMO period)", {
+            userId,
+            tier: usage.tier,
+            todayUsed: usage.counts.ai_queries_today,
+            dailyLimit: PROMO_DAILY_AI_LIMIT,
+          });
+          break;
+        }
         if (usage.remaining.ai_queries_per_month <= 0) {
           log.warn("AI query limit reached", { userId, tier: usage.tier });
           throw new UsageLimitError(
@@ -143,6 +179,11 @@ export class UsageService {
         break;
 
       case "sow_generation":
+        // PROMO: Allow SOW for all tiers during promo period
+        if (isPromoPeriod()) {
+          log.info("SOW generation allowed (PROMO period)", { userId, tier: usage.tier });
+          break;
+        }
         if (usage.limits.sow_generations === 0) {
           log.warn("SOW generation not available", { userId, tier: usage.tier });
           throw new UsageLimitError(

@@ -12,7 +12,7 @@ import { z } from "zod";
 
 const requestSchema = z.object({
   engagementId: z.string().uuid(),
-  frameworkType: z.enum(["swot", "porter", "mckinsey7s"]),
+  frameworkType: z.enum(["swot", "porter", "mckinsey7s", "bmc"]),
   discoveryAnswers: z.array(
     z.object({
       question: z.string(),

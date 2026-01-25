@@ -120,7 +120,10 @@ export function StrategicInsightsPanel({
                   <BookOpen className="h-3 w-3" />
                   Methodology
                 </span>
-                <span className="rounded bg-blue-100 px-1.5 py-0.5 font-mono text-xs text-blue-700">
+                <span
+                  className="cursor-help rounded bg-blue-100 px-1.5 py-0.5 font-mono text-xs text-blue-700"
+                  title="Prompt version used to generate this analysis. Higher versions include improved methodology and industry context."
+                >
                   v{methodology.prompt_version}
                 </span>
               </div>
@@ -171,18 +174,27 @@ export function StrategicInsightsPanel({
           {/* Evidence Quality - if available */}
           {insights?.evidence_quality && (
             <div className="rounded bg-gray-50 p-2">
-              <div className="mb-1 flex items-center gap-1 font-medium text-gray-700">
+              <div
+                className="mb-1 flex cursor-help items-center gap-1 font-medium text-gray-700"
+                title="AI self-reports how many observations are grounded in industry-specific evidence vs generic business insights. Higher industry-specific ratio = more actionable analysis."
+              >
                 <BarChart3 className="h-3 w-3" />
                 Evidence Quality
               </div>
               <div className="flex gap-3 text-gray-600">
-                <span>
+                <span
+                  className="cursor-help"
+                  title="Observations grounded in industry-specific evidence (e.g., 'Legal tech CAC is typically 40%')"
+                >
                   Industry-specific:{" "}
                   <span className="font-medium text-green-700">
                     {insights.evidence_quality.industry_specific_count}
                   </span>
                 </span>
-                <span>
+                <span
+                  className="cursor-help"
+                  title="General business observations not specific to the client's industry"
+                >
                   Generic:{" "}
                   <span className="font-medium text-gray-500">
                     {insights.evidence_quality.generic_count}

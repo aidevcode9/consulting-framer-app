@@ -396,11 +396,13 @@ export const useDiscoveryStore = create<DiscoveryState>()(
 
 interface UIState {
   sidebarOpen: boolean;
+  rightPanelOpen: boolean;
   frameworkPanelOpen: boolean;
   discoveryPanelOpen: boolean;
   activeTab: "canvas" | "discovery" | "scope" | "deliverables";
 
   setSidebarOpen: (open: boolean) => void;
+  setRightPanelOpen: (open: boolean) => void;
   setFrameworkPanelOpen: (open: boolean) => void;
   setDiscoveryPanelOpen: (open: boolean) => void;
   setActiveTab: (tab: UIState["activeTab"]) => void;
@@ -410,11 +412,13 @@ export const useUIStore = create<UIState>()(
   persist(
     (set) => ({
       sidebarOpen: true,
+      rightPanelOpen: true,
       frameworkPanelOpen: true,
       discoveryPanelOpen: false,
       activeTab: "canvas",
 
       setSidebarOpen: (sidebarOpen) => set({ sidebarOpen }),
+      setRightPanelOpen: (rightPanelOpen) => set({ rightPanelOpen }),
       setFrameworkPanelOpen: (frameworkPanelOpen) => set({ frameworkPanelOpen }),
       setDiscoveryPanelOpen: (discoveryPanelOpen) => set({ discoveryPanelOpen }),
       setActiveTab: (activeTab) => set({ activeTab }),

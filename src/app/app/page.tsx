@@ -6,6 +6,8 @@ import {
   Layers,
   PanelLeftClose,
   PanelLeft,
+  PanelRightClose,
+  PanelRight,
   Settings,
   Plus,
   FolderOpen,
@@ -34,7 +36,7 @@ import type { Engagement, EngagementStatus, GeneratedScope, GeneratedProposal } 
 type RightPanelTab = "discovery" | "scope" | null;
 
 export default function AppPage() {
-  const { sidebarOpen, setSidebarOpen } = useUIStore();
+  const { sidebarOpen, setSidebarOpen, rightPanelOpen, setRightPanelOpen } = useUIStore();
   const { currentEngagement, setCurrentEngagement } = useEngagementStore();
   const { markSaved, getCanvasData, loadCanvas } = useCanvasStore();
   const { answers, isComplete: discoveryComplete, loadAnswers, setComplete, reset: resetDiscovery } = useDiscoveryStore();
@@ -679,41 +681,103 @@ export default function AppPage() {
 
           {/* Right Panel */}
           {currentEngagement && (
-            <aside className="flex w-80 flex-col border-l bg-white">
-              {/* Panel Tabs */}
-              <div className="flex border-b">
-                <PanelTabButton
-                  icon={Sparkles}
-                  label="Discovery"
-                  active={rightPanelTab === "discovery"}
-                  onClick={() => setRightPanelTab("discovery")}
-                />
-                <PanelTabButton
-                  icon={ClipboardList}
-                  label="Scope"
-                  active={rightPanelTab === "scope"}
-                  onClick={() => setRightPanelTab("scope")}
-                />
+            <aside
+              className={`flex flex-col border-l bg-white transition-all duration-300 ${
+                rightPanelOpen ? "w-80" : "w-12"
+              }`}
+            >
+              {/* Panel Header with Toggle */}
+              <div className="flex items-center justify-between border-b px-2 py-2">
+                {rightPanelOpen ? (
+                  <>
+                    {/* Panel Tabs */}
+                    <div className="flex flex-1">
+                      <PanelTabButton
+                        icon={Sparkles}
+                        label="Discovery"
+                        active={rightPanelTab === "discovery"}
+                        onClick={() => setRightPanelTab("discovery")}
+                      />
+                      <PanelTabButton
+                        icon={ClipboardList}
+                        label="Scope"
+                        active={rightPanelTab === "scope"}
+                        onClick={() => setRightPanelTab("scope")}
+                      />
+                    </div>
+                    <button
+                      onClick={() => setRightPanelOpen(false)}
+                      className="ml-2 rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                      title="Collapse panel"
+                    >
+                      <PanelRightClose className="h-4 w-4" />
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    onClick={() => setRightPanelOpen(true)}
+                    className="mx-auto rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                    title="Expand panel"
+                  >
+                    <PanelRight className="h-4 w-4" />
+                  </button>
+                )}
               </div>
 
               {/* Panel Content */}
-              <div className="flex-1 overflow-hidden">
-                {rightPanelTab === "discovery" && (
-                  <DiscoveryPanel
-                    onComplete={() => {
-                      console.log("Discovery complete!");
+              {rightPanelOpen && (
+                <div className="flex-1 overflow-hidden">
+                  {rightPanelTab === "discovery" && (
+                    <DiscoveryPanel
+                      onComplete={() => {
+                        console.log("Discovery complete!");
+                      }}
+                    />
+                  )}
+                  {rightPanelTab === "scope" && (
+                    <ScopePanel
+                      onGenerateSOW={generateSOW}
+                      isGeneratingSOW={isGeneratingSOW}
+                      onGenerateProposal={generateProposal}
+                      isGeneratingProposal={isGeneratingProposal}
+                    />
+                  )}
+                </div>
+              )}
+
+              {/* Collapsed state icons */}
+              {!rightPanelOpen && (
+                <div className="flex flex-col items-center gap-2 py-4">
+                  <button
+                    onClick={() => {
+                      setRightPanelOpen(true);
+                      setRightPanelTab("discovery");
                     }}
-                  />
-                )}
-                {rightPanelTab === "scope" && (
-                  <ScopePanel
-                    onGenerateSOW={generateSOW}
-                    isGeneratingSOW={isGeneratingSOW}
-                    onGenerateProposal={generateProposal}
-                    isGeneratingProposal={isGeneratingProposal}
-                  />
-                )}
-              </div>
+                    className={`rounded p-2 ${
+                      rightPanelTab === "discovery"
+                        ? "bg-blue-100 text-blue-600"
+                        : "text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                    }`}
+                    title="Discovery"
+                  >
+                    <Sparkles className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => {
+                      setRightPanelOpen(true);
+                      setRightPanelTab("scope");
+                    }}
+                    className={`rounded p-2 ${
+                      rightPanelTab === "scope"
+                        ? "bg-blue-100 text-blue-600"
+                        : "text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                    }`}
+                    title="Scope"
+                  >
+                    <ClipboardList className="h-4 w-4" />
+                  </button>
+                </div>
+              )}
             </aside>
           )}
         </div>

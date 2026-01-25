@@ -6,7 +6,7 @@ import { Group, Panel, Separator } from "react-resizable-panels";
 import { Plus, Trash2, GripVertical } from "lucide-react";
 import { useCanvasStore } from "@/lib/store";
 import { StrategicInsightsPanel } from "../StrategicInsightsPanel";
-import type { BaseNodeData, NodeItem, SWOTStrategicInsights } from "@/types";
+import type { BaseNodeData, NodeItem, SWOTStrategicInsights, FrameworkMethodology } from "@/types";
 
 interface SWOTSection {
   id: "strengths" | "weaknesses" | "opportunities" | "threats";
@@ -25,6 +25,7 @@ const SWOT_SECTIONS: SWOTSection[] = [
 interface SWOTData extends BaseNodeData {
   sections?: Record<string, NodeItem[]>;
   strategic_insights?: SWOTStrategicInsights;
+  methodology?: FrameworkMethodology; // FR-456: Methodology transparency
 }
 
 type SWOTNodeProps = {
@@ -178,10 +179,12 @@ export const SWOTNode = memo(function SWOTNode({ id, data, selected }: SWOTNodeP
       </div>
 
       {/* FR-454: Strategic Insights Panel */}
+      {/* FR-456: Added methodology prop */}
       <div className="px-4 pb-2">
         <StrategicInsightsPanel
           frameworkType="swot"
           insights={data.strategic_insights}
+          methodology={data.methodology}
         />
       </div>
 

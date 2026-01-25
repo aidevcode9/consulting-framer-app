@@ -866,6 +866,67 @@ Each framework now has a dedicated prompt file with:
 
 ---
 
+## [2026-01-24] FR-456: Methodology Transparency
+
+**Status:** ✅ Complete
+**Branch:** main
+
+**Files modified:**
+- src/types/index.ts - Added MethodologySource, FrameworkMethodology types
+- src/lib/ai/prompts/frameworks/index.ts - Added getFrameworkSource(), getFrameworkDisplayName() helpers
+- src/lib/ai/prompts/frameworks/swot.prompt.ts - Fixed source structure (swot/tows → primary/extended)
+- src/lib/ai/prompts/frameworks/bmc.prompt.ts - Fixed source structure (vpd → extended)
+- src/lib/ai/prompts/index.ts - Added methodology helper exports
+- src/services/ai.service.ts - Added buildMethodology(), summarizeDiscoveryInputs() methods
+- src/components/canvas/StrategicInsightsPanel.tsx - Added Methodology section with citations
+- src/components/canvas/Canvas.tsx - Added methodology to cache and node updates
+- src/components/canvas/nodes/PorterNode.tsx - Added methodology prop
+- src/components/canvas/nodes/McKinseyNode.tsx - Added methodology prop
+- src/components/canvas/nodes/SWOTNode.tsx - Added methodology prop
+- src/components/canvas/nodes/BMCNode.tsx - Added methodology prop
+- REQUIREMENTS.md - Added FR-456
+- STATUS.md - Added FR-456 task
+
+**What was implemented:**
+
+### Types (MethodologySource, FrameworkMethodology)
+- MethodologySource: author, authors, year, title, publication, note
+- FrameworkMethodology: framework_name, source, prompt_version, last_updated, discovery_inputs_summary
+
+### Helper Functions
+- getFrameworkSource(type) - Returns framework source definition
+- getFrameworkDisplayName(type) - Returns display name (e.g., "Porter's Five Forces")
+
+### AI Service Updates
+- buildMethodology() - Constructs methodology object from framework config
+- summarizeDiscoveryInputs() - "X questions answered" summary
+
+### StrategicInsightsPanel Methodology Section
+- Version badge (e.g., "v2.1.0")
+- Primary citation with academic formatting
+- Optional "Updated" and "Extended" sources
+- Discovery inputs summary
+
+### Framework Source Fixes
+- SWOT_SOURCE: Changed keys from swot/tows to primary/extended
+- BMC_SOURCE: Changed key from vpd to extended
+
+**Verification:**
+- lint: ✅
+- typecheck: ✅
+- build: ✅
+
+**Skeptic Review:** ✅ Pass
+- Fixed: Extended source display was missing (now renders for SWOT/BMC)
+
+**Notes:**
+- PE technology advisors can now see academic citations for framework methodology
+- Prompt version visible for transparency
+- Discovery context shows how many inputs informed the analysis
+- Completes FR-450 Framework Intelligence group
+
+---
+
 ## [2026-01-21] FR-101, FR-102: Supabase Auth
 
 **Status:** ✅ Complete

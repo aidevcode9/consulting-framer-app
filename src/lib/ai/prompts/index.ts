@@ -57,7 +57,7 @@ export {
   type ProposalEngagement,
 } from "./proposal.prompt";
 
-// Framework-Specific Prompts (FR-451, FR-452)
+// Framework-Specific Prompts (FR-451, FR-452, FR-456)
 export {
   PORTER_PROMPT_METADATA,
   PORTER_SYSTEM_PROMPT,
@@ -78,6 +78,9 @@ export {
   hasEnhancedPrompt,
   getFrameworkPrompt,
   getAllFrameworkPromptMetadata,
+  // FR-456: Methodology transparency helpers
+  getFrameworkSource,
+  getFrameworkDisplayName,
   type EnhancedFrameworkType,
   type FrameworkPromptConfig,
 } from "./frameworks";

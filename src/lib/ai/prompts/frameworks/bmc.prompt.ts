@@ -34,7 +34,7 @@ export const BMC_SOURCE = {
     publication: "Wiley",
     note: "Original Business Model Canvas framework",
   },
-  vpd: {
+  extended: {
     authors: "Osterwalder, A., Pigneur, Y., Bernarda, G., & Smith, A.",
     year: 2014,
     title: "Value Proposition Design",

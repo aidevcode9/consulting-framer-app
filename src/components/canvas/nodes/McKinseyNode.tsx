@@ -6,7 +6,7 @@ import { Group, Panel, Separator } from "react-resizable-panels";
 import { Plus, Trash2, GripVertical } from "lucide-react";
 import { useCanvasStore } from "@/lib/store";
 import { StrategicInsightsPanel } from "../StrategicInsightsPanel";
-import type { BaseNodeData, NodeItem, McKinseyStrategicInsights } from "@/types";
+import type { BaseNodeData, NodeItem, McKinseyStrategicInsights, FrameworkMethodology } from "@/types";
 
 interface McKinseyElement {
   id: string;
@@ -31,6 +31,7 @@ const MCKINSEY_ELEMENTS: McKinseyElement[] = [
 interface McKinseyData extends BaseNodeData {
   elements?: Record<string, NodeItem[]>;
   strategic_insights?: McKinseyStrategicInsights;
+  methodology?: FrameworkMethodology; // FR-456: Methodology transparency
 }
 
 type McKinseyNodeProps = {
@@ -230,9 +231,11 @@ export const McKinseyNode = memo(function McKinseyNode({
         </Group>
 
         {/* FR-454: Strategic Insights Panel */}
+        {/* FR-456: Added methodology prop */}
         <StrategicInsightsPanel
           frameworkType="mckinsey7s"
           insights={data.strategic_insights}
+          methodology={data.methodology}
         />
       </div>
 

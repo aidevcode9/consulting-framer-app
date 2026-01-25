@@ -2,12 +2,14 @@
  * Framework-Specific Prompts Index
  * FR-451: Framework-specific prompts
  * FR-452: Methodology sources
+ * FR-456: Methodology transparency
  *
  * Exports individual framework prompts with versioning metadata and
  * provides helper functions for framework-specific prompt selection.
  */
 
 import type { PromptMetadata } from "../types";
+import type { MethodologySource } from "@/types";
 
 // Porter's Five Forces
 export {
@@ -46,10 +48,10 @@ export {
 } from "./bmc.prompt";
 
 // Import for aggregation
-import { PORTER_PROMPT_METADATA, PORTER_SYSTEM_PROMPT, buildPorterPrompt } from "./porter.prompt";
-import { MCKINSEY_PROMPT_METADATA, MCKINSEY_SYSTEM_PROMPT, buildMcKinseyPrompt } from "./mckinsey.prompt";
-import { SWOT_PROMPT_METADATA, SWOT_SYSTEM_PROMPT, buildSWOTPrompt } from "./swot.prompt";
-import { BMC_PROMPT_METADATA, BMC_SYSTEM_PROMPT, buildBMCPrompt } from "./bmc.prompt";
+import { PORTER_PROMPT_METADATA, PORTER_SYSTEM_PROMPT, PORTER_SOURCE, buildPorterPrompt } from "./porter.prompt";
+import { MCKINSEY_PROMPT_METADATA, MCKINSEY_SYSTEM_PROMPT, MCKINSEY_SOURCE, buildMcKinseyPrompt } from "./mckinsey.prompt";
+import { SWOT_PROMPT_METADATA, SWOT_SYSTEM_PROMPT, SWOT_SOURCE, buildSWOTPrompt } from "./swot.prompt";
+import { BMC_PROMPT_METADATA, BMC_SYSTEM_PROMPT, BMC_SOURCE, buildBMCPrompt } from "./bmc.prompt";
 
 /**
  * Supported framework types for enhanced prompts
@@ -124,4 +126,61 @@ export function getAllFrameworkPromptMetadata(): Record<string, PromptMetadata> 
     swot: SWOT_PROMPT_METADATA,
     bmc: BMC_PROMPT_METADATA,
   };
+}
+
+// ============================================
+// FR-456: METHODOLOGY TRANSPARENCY HELPERS
+// ============================================
+
+/**
+ * Human-readable display names for frameworks
+ */
+const FRAMEWORK_DISPLAY_NAMES: Record<EnhancedFrameworkType, string> = {
+  porter: "Porter's Five Forces",
+  mckinsey7s: "McKinsey 7-S Framework",
+  swot: "SWOT Analysis",
+  bmc: "Business Model Canvas",
+};
+
+/**
+ * Source type for framework methodology
+ */
+interface FrameworkSourceDefinition {
+  primary: MethodologySource;
+  updated?: MethodologySource;
+  extended?: MethodologySource;
+}
+
+/**
+ * Registry of framework methodology sources
+ */
+const FRAMEWORK_SOURCES: Record<EnhancedFrameworkType, FrameworkSourceDefinition> = {
+  porter: PORTER_SOURCE,
+  mckinsey7s: MCKINSEY_SOURCE,
+  swot: SWOT_SOURCE,
+  bmc: BMC_SOURCE,
+};
+
+/**
+ * Get methodology source for a framework type
+ * Returns null if framework doesn't have enhanced methodology
+ */
+export function getFrameworkSource(
+  frameworkType: string
+): FrameworkSourceDefinition | null {
+  if (hasEnhancedPrompt(frameworkType)) {
+    return FRAMEWORK_SOURCES[frameworkType];
+  }
+  return null;
+}
+
+/**
+ * Get human-readable display name for a framework type
+ * Falls back to the raw type string if not found
+ */
+export function getFrameworkDisplayName(frameworkType: string): string {
+  if (hasEnhancedPrompt(frameworkType)) {
+    return FRAMEWORK_DISPLAY_NAMES[frameworkType];
+  }
+  return frameworkType;
 }

@@ -13,6 +13,7 @@
 
 | Version | Date | Changes |
 |---------|------|---------|
+| v1.4 | Jan 2026 | Added FR-456 (Methodology Transparency) — show academic sources, version, and inputs in Strategic Insights |
 | v1.3 | Jan 2026 | Added FR-211 (Delete individual nodes) — single node deletion from canvas |
 | v1.2 | Jan 2026 | Added FR-450 (Framework Intelligence) — professional-grade framework prompts with methodology sources |
 | v1.1 | Jan 2026 | Added FR-900 (Billing), FR-1000 (Organizations), NFR-500 (Scale) |
@@ -152,6 +153,7 @@ Professional-grade framework analysis that veteran consultants will recognize an
 | FR-453 | Industry context | Framework analysis incorporates industry-specific benchmarks and competitive dynamics; prompts request industry evidence | P1 |
 | FR-454 | Strategic implications | Each framework output includes actionable "so what" recommendations; not just observations but strategic options | P1 |
 | FR-455 | Framework validation | Output validated against expected structure (e.g., SWOT has 4 quadrants, Porter has 5 forces with ratings) | P1 |
+| FR-456 | Methodology transparency | Display academic sources (author, year, publication), prompt version, and discovery inputs summary in Strategic Insights panel | P1 |
 
 **Acceptance Criteria Details:**
 

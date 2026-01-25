@@ -1,6 +1,6 @@
 # STATUS.md — Consulting Framer
 
-Last updated: 2026-01-24 (afternoon)
+Last updated: 2026-01-24 (evening)
 
 ---
 
@@ -28,6 +28,7 @@ Last updated: 2026-01-24 (afternoon)
 - ✅ **Framework-specific prompts** (FR-451: Porter, McKinsey, SWOT, BMC with methodology v2.1.0)
 - ✅ **Industry context in prompts** (FR-453: vertical-specific evidence)
 - ✅ **Strategic insights UI** (FR-454: intensity ratings, TOWS strategies, element health)
+- ✅ **Methodology transparency** (FR-456: academic sources, version, discovery inputs)
 - ✅ **Usage limits enforcement** (tier-based limits)
 - ✅ **Prompt injection defense** (input sanitization)
 - ✅ Note block
@@ -66,7 +67,7 @@ Last updated: 2026-01-24 (afternoon)
 
 | Task | FR | Branch | Started | Notes |
 |------|-----|--------|---------|-------|
-| — | — | — | — | FR-211 complete. Security review passed. Changes uncommitted. |
+| — | — | — | — | — |
 
 ## Next (Priority Order)
 
@@ -90,6 +91,7 @@ Last updated: 2026-01-24 (afternoon)
 
 | Task | FR | Commit | Date |
 |------|-----|--------|------|
+| Methodology transparency | FR-456 | — | 01-24 |
 | Delete individual nodes | FR-211 | 4068c65 | 01-24 |
 | Resizable internal panels | — | 6b714b8 | 01-24 |
 | Resizable framework nodes | — | fe6d073 | 01-24 |
@@ -249,6 +251,13 @@ Last updated: 2026-01-24 (afternoon)
 - [x] TOWS strategies display (SWOT) ✅
 - [x] Value proposition fit display (BMC) ✅
 - [x] Cache structure for strategic insights ✅
+
+### Methodology Transparency (FR-456) ✅ Complete
+- [x] Add MethodologySource and FrameworkMethodology types ✅
+- [x] Add getFrameworkSource() and getFrameworkDisplayName() helpers ✅
+- [x] Update AI service to return methodology object ✅
+- [x] Add Methodology section to StrategicInsightsPanel ✅
+- [x] Update framework nodes to pass methodology prop ✅
 
 ---
 

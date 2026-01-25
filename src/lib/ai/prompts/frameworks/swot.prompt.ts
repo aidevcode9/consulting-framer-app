@@ -32,14 +32,14 @@ export const SWOT_PROMPT_METADATA: PromptMetadata = {
  * Methodology sources for inclusion in outputs
  */
 export const SWOT_SOURCE = {
-  swot: {
+  primary: {
     author: "Humphrey, A.",
     year: 1960,
     title: "SWOT Analysis origins",
     publication: "Stanford Research Institute (SRI International)",
     note: "Framework development during SRI planning research",
   },
-  tows: {
+  extended: {
     author: "Weihrich, H.",
     year: 1982,
     title: "The TOWS Matrix—A Tool for Situational Analysis",

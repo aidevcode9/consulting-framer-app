@@ -53,6 +53,7 @@ interface CanvasProps {
 interface FrameworkCacheData {
   sections: Record<string, string[]>;
   strategic_insights?: unknown; // FR-454: Cache strategic insights too
+  methodology?: unknown; // FR-456: Cache methodology transparency
 }
 
 interface CacheEntry {
@@ -186,6 +187,10 @@ export function Canvas({ onSave, readOnly = false }: CanvasProps) {
         if (cachedData.strategic_insights) {
           nodeUpdate.strategic_insights = cachedData.strategic_insights;
         }
+        // FR-456: Include cached methodology
+        if (cachedData.methodology) {
+          nodeUpdate.methodology = cachedData.methodology;
+        }
         updateNode(nodeId, nodeUpdate);
         return;
       }
@@ -229,6 +234,7 @@ export function Canvas({ onSave, readOnly = false }: CanvasProps) {
           frameworkCacheRef.current.frameworks[frameworkType] = {
             sections: rawSections,
             strategic_insights: apiData.strategic_insights,
+            methodology: apiData.methodology, // FR-456: Cache methodology
           };
 
           const convertedData = convertSectionsToNodeItems(rawSections);
@@ -246,6 +252,10 @@ export function Canvas({ onSave, readOnly = false }: CanvasProps) {
           }
           if (apiData.strategic_insights) {
             nodeUpdate.strategic_insights = apiData.strategic_insights;
+          }
+          // FR-456: Include methodology from AI response
+          if (apiData.methodology) {
+            nodeUpdate.methodology = apiData.methodology;
           }
           updateNode(nodeId, nodeUpdate);
         } else {

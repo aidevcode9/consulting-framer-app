@@ -25,6 +25,9 @@ import {
   buildProposalGenerationPrompt,
   // FR-451: Framework-specific prompts
   getFrameworkPrompt,
+  // FR-456: Methodology transparency helpers
+  getFrameworkSource,
+  getFrameworkDisplayName,
   type DiscoveryContext,
   type PopulateFrameworkType,
 } from "@/lib/ai/prompts";
@@ -42,6 +45,7 @@ import type {
   SWOTStrategicInsights,
   BMCStrategicInsights,
   EvidenceQuality,
+  FrameworkMethodology,
 } from "@/types";
 
 const log = createLogger("AIService");
@@ -67,6 +71,7 @@ export type { PopulateFrameworkType };
 export interface CanvasPopulateResult {
   sections: Record<string, string[]>;
   strategic_insights?: FrameworkStrategicInsights;
+  methodology?: FrameworkMethodology; // FR-456: Methodology transparency
 }
 
 export class AIService {
@@ -340,9 +345,17 @@ export class AIService {
       // FR-454: Extract strategic insights based on framework type
       const strategicInsights = this.extractStrategicInsights(frameworkType, parsed);
 
+      // FR-456: Build methodology object for transparency
+      const methodology = this.buildMethodology(
+        frameworkType,
+        frameworkPrompt,
+        discoveryAnswers
+      );
+
       return {
         sections: parsed.sections || {},
         strategic_insights: strategicInsights,
+        methodology,
       };
     } catch {
       log.warn("Failed to parse canvas populate JSON", {
@@ -410,6 +423,48 @@ export class AIService {
         break;
     }
     return undefined;
+  }
+
+  /**
+   * Build methodology object for transparency
+   * FR-456: Methodology transparency
+   */
+  private buildMethodology(
+    frameworkType: PopulateFrameworkType,
+    frameworkPrompt: ReturnType<typeof getFrameworkPrompt>,
+    discoveryAnswers: Array<{ question: string; answer: string }>
+  ): FrameworkMethodology | undefined {
+    // Only build methodology for enhanced prompts with sources
+    if (!frameworkPrompt) {
+      return undefined;
+    }
+
+    const source = getFrameworkSource(frameworkType);
+    if (!source) {
+      return undefined;
+    }
+
+    return {
+      framework_name: getFrameworkDisplayName(frameworkType),
+      source: source as FrameworkMethodology["source"],
+      prompt_version: frameworkPrompt.metadata.version,
+      last_updated: frameworkPrompt.metadata.lastUpdated,
+      discovery_inputs_summary: this.summarizeDiscoveryInputs(discoveryAnswers),
+    };
+  }
+
+  /**
+   * Summarize discovery inputs for methodology display
+   * FR-456: Methodology transparency
+   */
+  private summarizeDiscoveryInputs(
+    answers: Array<{ question: string; answer: string }>
+  ): string {
+    const count = answers.length;
+    if (count === 0) {
+      return "No discovery inputs";
+    }
+    return `${count} question${count !== 1 ? "s" : ""} answered`;
   }
 
   /**

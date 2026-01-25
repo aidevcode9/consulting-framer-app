@@ -439,6 +439,33 @@ export type FrameworkStrategicInsights =
   | BMCStrategicInsights;
 
 // ============================================
+// METHODOLOGY TRANSPARENCY TYPES (FR-456)
+// ============================================
+
+/** Academic source citation for framework methodology */
+export interface MethodologySource {
+  author?: string;
+  authors?: string;
+  year: number;
+  title: string;
+  publication: string;
+  note?: string;
+}
+
+/** Framework methodology metadata for transparency */
+export interface FrameworkMethodology {
+  framework_name: string;
+  source: {
+    primary: MethodologySource;
+    updated?: MethodologySource;
+    extended?: MethodologySource;
+  };
+  prompt_version: string;
+  last_updated: string;
+  discovery_inputs_summary: string;
+}
+
+// ============================================
 // UI TYPES
 // ============================================
 

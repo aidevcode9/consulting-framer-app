@@ -6,7 +6,7 @@ import { Group, Panel, Separator } from "react-resizable-panels";
 import { Plus, Trash2, GripVertical } from "lucide-react";
 import { useCanvasStore } from "@/lib/store";
 import { StrategicInsightsPanel } from "../StrategicInsightsPanel";
-import type { BaseNodeData, NodeItem, BMCStrategicInsights } from "@/types";
+import type { BaseNodeData, NodeItem, BMCStrategicInsights, FrameworkMethodology } from "@/types";
 
 interface BMCSection {
   id: string;
@@ -30,6 +30,7 @@ const BMC_SECTIONS: BMCSection[] = [
 interface BMCData extends BaseNodeData {
   sections?: Record<string, NodeItem[]>;
   strategic_insights?: BMCStrategicInsights;
+  methodology?: FrameworkMethodology; // FR-456: Methodology transparency
 }
 
 type BMCNodeProps = {
@@ -285,10 +286,12 @@ export const BMCNode = memo(function BMCNode({ id, data, selected }: BMCNodeProp
       </div>
 
       {/* FR-454: Strategic Insights Panel */}
+      {/* FR-456: Added methodology prop */}
       <div className="px-4 pb-2">
         <StrategicInsightsPanel
           frameworkType="bmc"
           insights={data.strategic_insights}
+          methodology={data.methodology}
         />
       </div>
 

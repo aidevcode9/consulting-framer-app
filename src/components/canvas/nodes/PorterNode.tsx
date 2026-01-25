@@ -6,7 +6,7 @@ import { Group, Panel, Separator } from "react-resizable-panels";
 import { Plus, Trash2, GripVertical } from "lucide-react";
 import { useCanvasStore } from "@/lib/store";
 import { StrategicInsightsPanel } from "../StrategicInsightsPanel";
-import type { BaseNodeData, NodeItem, PorterStrategicInsights } from "@/types";
+import type { BaseNodeData, NodeItem, PorterStrategicInsights, FrameworkMethodology } from "@/types";
 
 interface PorterForce {
   id: "rivalry" | "suppliers" | "buyers" | "substitutes" | "entrants";
@@ -57,6 +57,7 @@ const PORTER_FORCES: PorterForce[] = [
 interface PorterData extends BaseNodeData {
   forces?: Record<string, NodeItem[]>;
   strategic_insights?: PorterStrategicInsights;
+  methodology?: FrameworkMethodology; // FR-456: Methodology transparency
 }
 
 type PorterNodeProps = {
@@ -284,9 +285,11 @@ export const PorterNode = memo(function PorterNode({
         </Group>
 
         {/* FR-454: Strategic Insights Panel */}
+        {/* FR-456: Added methodology prop */}
         <StrategicInsightsPanel
           frameworkType="porter"
           insights={data.strategic_insights}
+          methodology={data.methodology}
         />
       </div>
 

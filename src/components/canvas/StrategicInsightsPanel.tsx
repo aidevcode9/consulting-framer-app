@@ -8,6 +8,7 @@ import {
   AlertTriangle,
   TrendingUp,
   BarChart3,
+  BookOpen,
 } from "lucide-react";
 import type {
   FrameworkStrategicInsights,
@@ -16,11 +17,14 @@ import type {
   SWOTStrategicInsights,
   BMCStrategicInsights,
   RatingLevel,
+  FrameworkMethodology,
+  MethodologySource,
 } from "@/types";
 
 interface StrategicInsightsPanelProps {
   frameworkType: "swot" | "porter" | "mckinsey7s" | "bmc";
   insights?: FrameworkStrategicInsights;
+  methodology?: FrameworkMethodology; // FR-456: Methodology transparency
 }
 
 // Type guards for specific insights
@@ -69,13 +73,21 @@ function getRatingColor(rating: RatingLevel): string {
   }
 }
 
+// FR-456: Format academic citation
+function formatCitation(source: MethodologySource): string {
+  const author = source.authors || source.author || "Unknown";
+  return `${author} (${source.year}). "${source.title}", ${source.publication}.`;
+}
+
 export function StrategicInsightsPanel({
   frameworkType,
   insights,
+  methodology,
 }: StrategicInsightsPanelProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  if (!insights) {
+  // Show panel if we have insights or methodology
+  if (!insights && !methodology) {
     return null;
   }
 
@@ -100,22 +112,53 @@ export function StrategicInsightsPanel({
       {/* Expanded Content */}
       {isExpanded && (
         <div className="mt-2 space-y-3 px-2 text-xs">
+          {/* FR-456: Methodology section */}
+          {methodology && (
+            <div className="rounded bg-slate-50 p-2">
+              <div className="mb-1 flex items-center justify-between">
+                <span className="flex items-center gap-1 font-medium text-slate-700">
+                  <BookOpen className="h-3 w-3" />
+                  Methodology
+                </span>
+                <span className="rounded bg-blue-100 px-1.5 py-0.5 font-mono text-xs text-blue-700">
+                  v{methodology.prompt_version}
+                </span>
+              </div>
+              <p className="text-xs text-slate-600">
+                {formatCitation(methodology.source.primary)}
+              </p>
+              {methodology.source.updated && (
+                <p className="mt-0.5 text-xs text-slate-500">
+                  Updated: {formatCitation(methodology.source.updated)}
+                </p>
+              )}
+              {methodology.source.extended && (
+                <p className="mt-0.5 text-xs text-slate-500">
+                  Extended: {formatCitation(methodology.source.extended)}
+                </p>
+              )}
+              <p className="mt-1 text-xs text-slate-400">
+                Based on: {methodology.discovery_inputs_summary}
+              </p>
+            </div>
+          )}
+
           {/* Framework-specific content */}
-          {isPorterInsights(insights, frameworkType) && (
+          {insights && isPorterInsights(insights, frameworkType) && (
             <PorterInsightsContent insights={insights} />
           )}
-          {isMcKinseyInsights(insights, frameworkType) && (
+          {insights && isMcKinseyInsights(insights, frameworkType) && (
             <McKinseyInsightsContent insights={insights} />
           )}
-          {isSWOTInsights(insights, frameworkType) && (
+          {insights && isSWOTInsights(insights, frameworkType) && (
             <SWOTInsightsContent insights={insights} />
           )}
-          {isBMCInsights(insights, frameworkType) && (
+          {insights && isBMCInsights(insights, frameworkType) && (
             <BMCInsightsContent insights={insights} />
           )}
 
           {/* Strategic Implications - common to all */}
-          {insights.strategic_implications && (
+          {insights?.strategic_implications && (
             <div className="rounded bg-blue-50 p-2">
               <div className="mb-1 flex items-center gap-1 font-medium text-blue-800">
                 <TrendingUp className="h-3 w-3" />
@@ -126,7 +169,7 @@ export function StrategicInsightsPanel({
           )}
 
           {/* Evidence Quality - if available */}
-          {insights.evidence_quality && (
+          {insights?.evidence_quality && (
             <div className="rounded bg-gray-50 p-2">
               <div className="mb-1 flex items-center gap-1 font-medium text-gray-700">
                 <BarChart3 className="h-3 w-3" />

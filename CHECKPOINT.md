@@ -6,6 +6,7 @@
 
 **Status:** ✅ Complete
 **Branch:** main
+**Commit:** 4068c65
 
 **Files modified:**
 - src/lib/store.ts - Added `deleteSelectedNodes()` action to CanvasState

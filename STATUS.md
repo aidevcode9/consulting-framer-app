@@ -90,7 +90,7 @@ Last updated: 2026-01-24 (afternoon)
 
 | Task | FR | Commit | Date |
 |------|-----|--------|------|
-| Delete individual nodes | FR-211 | pending | 01-24 |
+| Delete individual nodes | FR-211 | 4068c65 | 01-24 |
 | Resizable internal panels | — | 6b714b8 | 01-24 |
 | Resizable framework nodes | — | fe6d073 | 01-24 |
 | Industry context in prompts | FR-453 | 700241d | 01-24 |

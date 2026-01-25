@@ -2,6 +2,7 @@
 
 import { memo, useState } from "react";
 import { Handle, Position, NodeResizer } from "@xyflow/react";
+import { Group, Panel, Separator } from "react-resizable-panels";
 import { Plus, Trash2, GripVertical } from "lucide-react";
 import { useCanvasStore } from "@/lib/store";
 import { StrategicInsightsPanel } from "../StrategicInsightsPanel";
@@ -109,106 +110,124 @@ export const McKinseyNode = memo(function McKinseyNode({
         </span>
       </div>
 
-      <div className="p-4">
-        {/* Legend */}
-        <div className="mb-4 flex items-center justify-center gap-6 text-xs">
-          <div className="flex items-center gap-1">
-            <div className="h-2 w-2 rounded-full bg-indigo-500" />
-            <span className="text-gray-600">Hard Elements (easier to change)</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <div className="h-2 w-2 rounded-full bg-pink-500" />
-            <span className="text-gray-600">Soft Elements (harder to change)</span>
-          </div>
-        </div>
-
-        {/* Hard Elements Row */}
-        <div className="mb-3 grid grid-cols-3 gap-3">
-          {hardElements.map((element) => (
-            <ElementCard
-              key={element.id}
-              element={element}
-              items={elements[element.id] || []}
-              isEditing={editingElement === element.id}
-              onEdit={() => setEditingElement(element.id)}
-              onAdd={() => handleAddItem(element.id)}
-              onRemove={(itemId) => handleRemoveItem(element.id, itemId)}
-              newItemText={newItemText}
-              setNewItemText={setNewItemText}
-              onCancel={() => setEditingElement(null)}
-            />
-          ))}
-        </div>
-
-        {/* Center: Shared Values (larger, connecting element) */}
-        <div className="mb-3 flex justify-center">
-          <div
-            className="w-[280px] rounded-lg border-2 p-4"
-            style={{
-              borderColor: sharedValues.color,
-              backgroundColor: sharedValues.bgColor,
-            }}
-          >
-            <div className="mb-2 flex items-center justify-between">
-              <h4
-                className="text-sm font-bold"
-                style={{ color: sharedValues.color }}
-              >
-                {sharedValues.label}
-              </h4>
-              <button
-                onClick={() => setEditingElement("shared_values")}
-                className="rounded p-1 hover:bg-black/10"
-              >
-                <Plus className="h-4 w-4" style={{ color: sharedValues.color }} />
-              </button>
-            </div>
-            <p className="mb-2 text-xs text-gray-500">
-              Core values that underpin the organization
-            </p>
-
-            <div className="space-y-1">
-              {elements.shared_values?.map((item) => (
-                <ItemRow
-                  key={item.id}
-                  item={item}
-                  onRemove={() => handleRemoveItem("shared_values", item.id)}
-                />
+      <div className="h-[calc(100%-48px)] p-2">
+        <Group orientation="vertical" className="h-full">
+          {/* Hard Elements Row: Strategy | Structure | Systems */}
+          <Panel defaultSize={35} minSize={20}>
+            <Group orientation="horizontal" className="h-full">
+              {hardElements.map((element, idx) => (
+                <>
+                  {idx > 0 && (
+                    <Separator key={`sep-${element.id}`} className="group flex w-2 items-center justify-center">
+                      <div className="h-12 w-1 rounded-full bg-gray-200 transition-colors group-hover:bg-indigo-400 group-active:bg-indigo-500" />
+                    </Separator>
+                  )}
+                  <Panel key={element.id} defaultSize={33.33} minSize={20}>
+                    <div className="h-full p-1">
+                      <ElementCard
+                        element={element}
+                        items={elements[element.id] || []}
+                        isEditing={editingElement === element.id}
+                        onEdit={() => setEditingElement(element.id)}
+                        onAdd={() => handleAddItem(element.id)}
+                        onRemove={(itemId) => handleRemoveItem(element.id, itemId)}
+                        newItemText={newItemText}
+                        setNewItemText={setNewItemText}
+                        onCancel={() => setEditingElement(null)}
+                      />
+                    </div>
+                  </Panel>
+                </>
               ))}
-              {editingElement === "shared_values" && (
-                <AddItemInput
-                  value={newItemText}
-                  onChange={setNewItemText}
-                  onAdd={() => handleAddItem("shared_values")}
-                  onCancel={() => setEditingElement(null)}
-                />
-              )}
-              {!elements.shared_values?.length && editingElement !== "shared_values" && (
-                <p className="text-xs italic text-gray-400">Click + to add core values</p>
-              )}
-            </div>
-          </div>
-        </div>
+            </Group>
+          </Panel>
 
-        {/* Soft Elements Row (excluding Shared Values) */}
-        <div className="grid grid-cols-3 gap-3">
-          {softElements
-            .filter((e) => e.id !== "shared_values")
-            .map((element) => (
-              <ElementCard
-                key={element.id}
-                element={element}
-                items={elements[element.id] || []}
-                isEditing={editingElement === element.id}
-                onEdit={() => setEditingElement(element.id)}
-                onAdd={() => handleAddItem(element.id)}
-                onRemove={(itemId) => handleRemoveItem(element.id, itemId)}
-                newItemText={newItemText}
-                setNewItemText={setNewItemText}
-                onCancel={() => setEditingElement(null)}
-              />
-            ))}
-        </div>
+          <Separator className="group flex h-2 items-center justify-center">
+            <div className="h-1 w-12 rounded-full bg-gray-200 transition-colors group-hover:bg-indigo-400 group-active:bg-indigo-500" />
+          </Separator>
+
+          {/* Center: Shared Values */}
+          <Panel defaultSize={30} minSize={15}>
+            <div className="flex h-full justify-center p-1">
+              <div
+                className="h-full w-full overflow-auto rounded-lg border-2 p-3"
+                style={{
+                  borderColor: sharedValues.color,
+                  backgroundColor: sharedValues.bgColor,
+                }}
+              >
+                <div className="mb-2 flex items-center justify-between">
+                  <h4 className="text-sm font-bold" style={{ color: sharedValues.color }}>
+                    {sharedValues.label}
+                  </h4>
+                  <button
+                    onClick={() => setEditingElement("shared_values")}
+                    className="rounded p-1 hover:bg-black/10"
+                  >
+                    <Plus className="h-4 w-4" style={{ color: sharedValues.color }} />
+                  </button>
+                </div>
+
+                <div className="space-y-1">
+                  {elements.shared_values?.map((item) => (
+                    <ItemRow
+                      key={item.id}
+                      item={item}
+                      onRemove={() => handleRemoveItem("shared_values", item.id)}
+                    />
+                  ))}
+                  {editingElement === "shared_values" && (
+                    <AddItemInput
+                      value={newItemText}
+                      onChange={setNewItemText}
+                      onAdd={() => handleAddItem("shared_values")}
+                      onCancel={() => setEditingElement(null)}
+                    />
+                  )}
+                  {!elements.shared_values?.length && editingElement !== "shared_values" && (
+                    <p className="text-xs italic text-gray-400">Click + to add core values</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </Panel>
+
+          <Separator className="group flex h-2 items-center justify-center">
+            <div className="h-1 w-12 rounded-full bg-gray-200 transition-colors group-hover:bg-indigo-400 group-active:bg-indigo-500" />
+          </Separator>
+
+          {/* Soft Elements Row: Style | Staff | Skills */}
+          <Panel defaultSize={35} minSize={20}>
+            <Group orientation="horizontal" className="h-full">
+              {softElements
+                .filter((e) => e.id !== "shared_values")
+                .map((element, idx) => (
+                  <>
+                    {idx > 0 && (
+                      <Separator key={`sep-${element.id}`} className="group flex w-2 items-center justify-center">
+                        <div className="h-12 w-1 rounded-full bg-gray-200 transition-colors group-hover:bg-indigo-400 group-active:bg-indigo-500" />
+                      </Separator>
+                    )}
+                    <Panel key={element.id} defaultSize={33.33} minSize={20}>
+                      <div className="h-full p-1">
+                        <ElementCard
+                          element={element}
+                          items={elements[element.id] || []}
+                          isEditing={editingElement === element.id}
+                          onEdit={() => setEditingElement(element.id)}
+                          onAdd={() => handleAddItem(element.id)}
+                          onRemove={(itemId) => handleRemoveItem(element.id, itemId)}
+                          newItemText={newItemText}
+                          setNewItemText={setNewItemText}
+                          onCancel={() => setEditingElement(null)}
+                        />
+                      </div>
+                    </Panel>
+                  </>
+                ))}
+            </Group>
+          </Panel>
+        </Group>
 
         {/* FR-454: Strategic Insights Panel */}
         <StrategicInsightsPanel
@@ -252,7 +271,7 @@ function ElementCard({
 }: ElementCardProps) {
   return (
     <div
-      className="rounded-lg border p-3"
+      className="h-full overflow-auto rounded-lg border p-3"
       style={{ borderColor: element.color, backgroundColor: element.bgColor }}
     >
       <div className="mb-2 flex items-center justify-between">
@@ -264,7 +283,7 @@ function ElementCard({
         </button>
       </div>
 
-      <div className="min-h-[60px] space-y-1">
+      <div className="space-y-1">
         {items.map((item) => (
           <ItemRow key={item.id} item={item} onRemove={() => onRemove(item.id)} />
         ))}

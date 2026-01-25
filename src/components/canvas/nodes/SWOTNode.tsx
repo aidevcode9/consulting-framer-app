@@ -2,6 +2,7 @@
 
 import { memo, useState } from "react";
 import { Handle, Position, NodeResizer } from "@xyflow/react";
+import { Group, Panel, Separator } from "react-resizable-panels";
 import { Plus, Trash2, GripVertical } from "lucide-react";
 import { useCanvasStore } from "@/lib/store";
 import { StrategicInsightsPanel } from "../StrategicInsightsPanel";
@@ -93,81 +94,87 @@ export const SWOTNode = memo(function SWOTNode({ id, data, selected }: SWOTNodeP
         </span>
       </div>
 
-      {/* 2x2 Grid */}
-      <div className="grid grid-cols-2 gap-px bg-gray-200 p-px">
-        {SWOT_SECTIONS.map((section) => (
-          <div
-            key={section.id}
-            className="min-h-[150px] p-3"
-            style={{ backgroundColor: section.bgColor }}
-          >
-            {/* Section Header */}
-            <div className="mb-2 flex items-center justify-between">
-              <h4
-                className="text-sm font-semibold"
-                style={{ color: section.color }}
-              >
-                {section.label}
-              </h4>
-              <button
-                onClick={() => setEditingSection(section.id)}
-                className="rounded p-1 transition-colors hover:bg-black/10"
-                title={`Add ${section.label.toLowerCase()}`}
-              >
-                <Plus className="h-4 w-4" style={{ color: section.color }} />
-              </button>
-            </div>
+      {/* 2x2 Resizable Grid */}
+      <div className="h-[calc(100%-48px)] p-2">
+        <Group orientation="vertical" className="h-full">
+          {/* Top Row: Strengths | Weaknesses */}
+          <Panel defaultSize={50} minSize={25}>
+            <Group orientation="horizontal" className="h-full">
+              <Panel defaultSize={50} minSize={25}>
+                <SWOTQuadrant
+                  section={SWOT_SECTIONS[0]}
+                  items={sections.strengths || []}
+                  isEditing={editingSection === "strengths"}
+                  onEdit={() => setEditingSection("strengths")}
+                  onAdd={() => handleAddItem("strengths")}
+                  onRemove={(itemId) => handleRemoveItem("strengths", itemId)}
+                  newItemText={newItemText}
+                  setNewItemText={setNewItemText}
+                  onCancel={() => setEditingSection(null)}
+                />
+              </Panel>
 
-            {/* Items */}
-            <div className="space-y-1">
-              {sections[section.id]?.map((item) => (
-                <div
-                  key={item.id}
-                  className="group flex items-start justify-between rounded bg-white/70 px-2 py-1 text-sm"
-                >
-                  <span className="flex-1 text-gray-700">{item.text}</span>
-                  <button
-                    onClick={() => handleRemoveItem(section.id, item.id)}
-                    className="ml-2 opacity-0 transition-opacity group-hover:opacity-100"
-                  >
-                    <Trash2 className="h-3 w-3 text-gray-400 hover:text-red-500" />
-                  </button>
-                </div>
-              ))}
+              <Separator className="group flex w-2 items-center justify-center">
+                <div className="h-12 w-1 rounded-full bg-gray-300 transition-colors group-hover:bg-blue-400 group-active:bg-blue-500" />
+              </Separator>
 
-              {/* Add item input */}
-              {editingSection === section.id && (
-                <div className="flex gap-1">
-                  <input
-                    type="text"
-                    value={newItemText}
-                    onChange={(e) => setNewItemText(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") handleAddItem(section.id);
-                      if (e.key === "Escape") setEditingSection(null);
-                    }}
-                    placeholder={`Add ${section.label.toLowerCase()}...`}
-                    className="flex-1 rounded border border-gray-300 px-2 py-1 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                    autoFocus
-                  />
-                  <button
-                    onClick={() => handleAddItem(section.id)}
-                    className="rounded bg-gray-800 px-2 py-1 text-sm text-white hover:bg-gray-700"
-                  >
-                    Add
-                  </button>
-                </div>
-              )}
+              <Panel defaultSize={50} minSize={25}>
+                <SWOTQuadrant
+                  section={SWOT_SECTIONS[1]}
+                  items={sections.weaknesses || []}
+                  isEditing={editingSection === "weaknesses"}
+                  onEdit={() => setEditingSection("weaknesses")}
+                  onAdd={() => handleAddItem("weaknesses")}
+                  onRemove={(itemId) => handleRemoveItem("weaknesses", itemId)}
+                  newItemText={newItemText}
+                  setNewItemText={setNewItemText}
+                  onCancel={() => setEditingSection(null)}
+                />
+              </Panel>
+            </Group>
+          </Panel>
 
-              {/* Empty state */}
-              {!sections[section.id]?.length && editingSection !== section.id && (
-                <p className="text-xs italic text-gray-400">
-                  Click + to add items
-                </p>
-              )}
-            </div>
-          </div>
-        ))}
+          <Separator className="group flex h-2 items-center justify-center">
+            <div className="h-1 w-12 rounded-full bg-gray-300 transition-colors group-hover:bg-blue-400 group-active:bg-blue-500" />
+          </Separator>
+
+          {/* Bottom Row: Opportunities | Threats */}
+          <Panel defaultSize={50} minSize={25}>
+            <Group orientation="horizontal" className="h-full">
+              <Panel defaultSize={50} minSize={25}>
+                <SWOTQuadrant
+                  section={SWOT_SECTIONS[2]}
+                  items={sections.opportunities || []}
+                  isEditing={editingSection === "opportunities"}
+                  onEdit={() => setEditingSection("opportunities")}
+                  onAdd={() => handleAddItem("opportunities")}
+                  onRemove={(itemId) => handleRemoveItem("opportunities", itemId)}
+                  newItemText={newItemText}
+                  setNewItemText={setNewItemText}
+                  onCancel={() => setEditingSection(null)}
+                />
+              </Panel>
+
+              <Separator className="group flex w-2 items-center justify-center">
+                <div className="h-12 w-1 rounded-full bg-gray-300 transition-colors group-hover:bg-blue-400 group-active:bg-blue-500" />
+              </Separator>
+
+              <Panel defaultSize={50} minSize={25}>
+                <SWOTQuadrant
+                  section={SWOT_SECTIONS[3]}
+                  items={sections.threats || []}
+                  isEditing={editingSection === "threats"}
+                  onEdit={() => setEditingSection("threats")}
+                  onAdd={() => handleAddItem("threats")}
+                  onRemove={(itemId) => handleRemoveItem("threats", itemId)}
+                  newItemText={newItemText}
+                  setNewItemText={setNewItemText}
+                  onCancel={() => setEditingSection(null)}
+                />
+              </Panel>
+            </Group>
+          </Panel>
+        </Group>
       </div>
 
       {/* FR-454: Strategic Insights Panel */}
@@ -186,3 +193,96 @@ export const SWOTNode = memo(function SWOTNode({ id, data, selected }: SWOTNodeP
     </div>
   );
 });
+
+// Reusable SWOT Quadrant component
+interface SWOTQuadrantProps {
+  section: SWOTSection;
+  items: NodeItem[];
+  isEditing: boolean;
+  onEdit: () => void;
+  onAdd: () => void;
+  onRemove: (itemId: string) => void;
+  newItemText: string;
+  setNewItemText: (text: string) => void;
+  onCancel: () => void;
+}
+
+function SWOTQuadrant({
+  section,
+  items,
+  isEditing,
+  onEdit,
+  onAdd,
+  onRemove,
+  newItemText,
+  setNewItemText,
+  onCancel,
+}: SWOTQuadrantProps) {
+  return (
+    <div
+      className="h-full overflow-auto p-3"
+      style={{ backgroundColor: section.bgColor }}
+    >
+      {/* Section Header */}
+      <div className="mb-2 flex items-center justify-between">
+        <h4 className="text-sm font-semibold" style={{ color: section.color }}>
+          {section.label}
+        </h4>
+        <button
+          onClick={onEdit}
+          className="rounded p-1 transition-colors hover:bg-black/10"
+          title={`Add ${section.label.toLowerCase()}`}
+        >
+          <Plus className="h-4 w-4" style={{ color: section.color }} />
+        </button>
+      </div>
+
+      {/* Items */}
+      <div className="space-y-1">
+        {items.map((item) => (
+          <div
+            key={item.id}
+            className="group flex items-start justify-between rounded bg-white/70 px-2 py-1 text-sm"
+          >
+            <span className="flex-1 text-gray-700">{item.text}</span>
+            <button
+              onClick={() => onRemove(item.id)}
+              className="ml-2 opacity-0 transition-opacity group-hover:opacity-100"
+            >
+              <Trash2 className="h-3 w-3 text-gray-400 hover:text-red-500" />
+            </button>
+          </div>
+        ))}
+
+        {/* Add item input */}
+        {isEditing && (
+          <div className="flex gap-1">
+            <input
+              type="text"
+              value={newItemText}
+              onChange={(e) => setNewItemText(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && newItemText.trim()) onAdd();
+                if (e.key === "Escape") onCancel();
+              }}
+              placeholder={`Add ${section.label.toLowerCase()}...`}
+              className="flex-1 rounded border border-gray-300 px-2 py-1 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              autoFocus
+            />
+            <button
+              onClick={onAdd}
+              className="rounded bg-gray-800 px-2 py-1 text-sm text-white hover:bg-gray-700"
+            >
+              Add
+            </button>
+          </div>
+        )}
+
+        {/* Empty state */}
+        {!items.length && !isEditing && (
+          <p className="text-xs italic text-gray-400">Click + to add items</p>
+        )}
+      </div>
+    </div>
+  );
+}

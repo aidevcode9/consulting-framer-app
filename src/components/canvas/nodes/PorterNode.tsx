@@ -2,6 +2,7 @@
 
 import { memo, useState } from "react";
 import { Handle, Position, NodeResizer } from "@xyflow/react";
+import { Group, Panel, Separator } from "react-resizable-panels";
 import { Plus, Trash2, GripVertical } from "lucide-react";
 import { useCanvasStore } from "@/lib/store";
 import { StrategicInsightsPanel } from "../StrategicInsightsPanel";
@@ -133,119 +134,154 @@ export const PorterNode = memo(function PorterNode({
         </span>
       </div>
 
-      {/* Five Forces Layout - Diamond pattern */}
-      <div className="p-4">
-        {/* Top: New Entrants */}
-        <div className="mb-3 flex justify-center">
-          <ForceCard
-            force={surroundingForces.find((f) => f.id === "entrants")!}
-            items={forces.entrants || []}
-            isEditing={editingForce === "entrants"}
-            onEdit={() => setEditingForce("entrants")}
-            onAdd={(text) => {
-              setNewItemText(text);
-              handleAddItem("entrants");
-            }}
-            onRemove={(itemId) => handleRemoveItem("entrants", itemId)}
-            newItemText={newItemText}
-            setNewItemText={setNewItemText}
-            onCancel={() => setEditingForce(null)}
-          />
-        </div>
-
-        {/* Middle Row: Suppliers - Rivalry - Buyers */}
-        <div className="mb-3 flex items-center justify-between gap-3">
-          <ForceCard
-            force={surroundingForces.find((f) => f.id === "suppliers")!}
-            items={forces.suppliers || []}
-            isEditing={editingForce === "suppliers"}
-            onEdit={() => setEditingForce("suppliers")}
-            onAdd={(text) => {
-              setNewItemText(text);
-              handleAddItem("suppliers");
-            }}
-            onRemove={(itemId) => handleRemoveItem("suppliers", itemId)}
-            newItemText={newItemText}
-            setNewItemText={setNewItemText}
-            onCancel={() => setEditingForce(null)}
-          />
-
-          {/* Center: Rivalry (larger) */}
-          <div
-            className="flex-1 rounded-lg border-2 p-4"
-            style={{
-              borderColor: centerForce.color,
-              backgroundColor: centerForce.bgColor,
-            }}
-          >
-            <div className="mb-2 flex items-center justify-between">
-              <h4
-                className="text-sm font-bold"
-                style={{ color: centerForce.color }}
-              >
-                {centerForce.label}
-              </h4>
-              <button
-                onClick={() => setEditingForce("rivalry")}
-                className="rounded p-1 hover:bg-black/10"
-              >
-                <Plus className="h-4 w-4" style={{ color: centerForce.color }} />
-              </button>
+      {/* Five Forces Layout - Resizable panels */}
+      <div className="h-[calc(100%-48px)] p-2">
+        <Group orientation="vertical" className="h-full">
+          {/* Top: New Entrants */}
+          <Panel defaultSize={25} minSize={15}>
+            <div className="flex h-full justify-center p-1">
+              <ForceCard
+                force={surroundingForces.find((f) => f.id === "entrants")!}
+                items={forces.entrants || []}
+                isEditing={editingForce === "entrants"}
+                onEdit={() => setEditingForce("entrants")}
+                onAdd={(text) => {
+                  setNewItemText(text);
+                  handleAddItem("entrants");
+                }}
+                onRemove={(itemId) => handleRemoveItem("entrants", itemId)}
+                newItemText={newItemText}
+                setNewItemText={setNewItemText}
+                onCancel={() => setEditingForce(null)}
+              />
             </div>
-            <p className="mb-2 text-xs text-gray-500">{centerForce.description}</p>
+          </Panel>
 
-            <div className="space-y-1">
-              {forces.rivalry?.map((item) => (
-                <ItemRow
-                  key={item.id}
-                  item={item}
-                  onRemove={() => handleRemoveItem("rivalry", item.id)}
-                />
-              ))}
-              {editingForce === "rivalry" && (
-                <AddItemInput
-                  value={newItemText}
-                  onChange={setNewItemText}
-                  onAdd={() => handleAddItem("rivalry")}
-                  onCancel={() => setEditingForce(null)}
-                />
-              )}
+          <Separator className="group flex h-2 items-center justify-center">
+            <div className="h-1 w-12 rounded-full bg-gray-200 transition-colors group-hover:bg-purple-400 group-active:bg-purple-500" />
+          </Separator>
+
+          {/* Middle Row: Suppliers - Rivalry - Buyers */}
+          <Panel defaultSize={50} minSize={25}>
+            <Group orientation="horizontal" className="h-full">
+              <Panel defaultSize={25} minSize={15}>
+                <div className="h-full p-1">
+                  <ForceCard
+                    force={surroundingForces.find((f) => f.id === "suppliers")!}
+                    items={forces.suppliers || []}
+                    isEditing={editingForce === "suppliers"}
+                    onEdit={() => setEditingForce("suppliers")}
+                    onAdd={(text) => {
+                      setNewItemText(text);
+                      handleAddItem("suppliers");
+                    }}
+                    onRemove={(itemId) => handleRemoveItem("suppliers", itemId)}
+                    newItemText={newItemText}
+                    setNewItemText={setNewItemText}
+                    onCancel={() => setEditingForce(null)}
+                  />
+                </div>
+              </Panel>
+
+              <Separator className="group flex w-2 items-center justify-center">
+                <div className="h-12 w-1 rounded-full bg-gray-200 transition-colors group-hover:bg-purple-400 group-active:bg-purple-500" />
+              </Separator>
+
+              {/* Center: Rivalry */}
+              <Panel defaultSize={50} minSize={20}>
+                <div className="h-full overflow-auto p-1">
+                  <div
+                    className="h-full rounded-lg border-2 p-3"
+                    style={{
+                      borderColor: centerForce.color,
+                      backgroundColor: centerForce.bgColor,
+                    }}
+                  >
+                    <div className="mb-2 flex items-center justify-between">
+                      <h4
+                        className="text-sm font-bold"
+                        style={{ color: centerForce.color }}
+                      >
+                        {centerForce.label}
+                      </h4>
+                      <button
+                        onClick={() => setEditingForce("rivalry")}
+                        className="rounded p-1 hover:bg-black/10"
+                      >
+                        <Plus className="h-4 w-4" style={{ color: centerForce.color }} />
+                      </button>
+                    </div>
+
+                    <div className="space-y-1">
+                      {forces.rivalry?.map((item) => (
+                        <ItemRow
+                          key={item.id}
+                          item={item}
+                          onRemove={() => handleRemoveItem("rivalry", item.id)}
+                        />
+                      ))}
+                      {editingForce === "rivalry" && (
+                        <AddItemInput
+                          value={newItemText}
+                          onChange={setNewItemText}
+                          onAdd={() => handleAddItem("rivalry")}
+                          onCancel={() => setEditingForce(null)}
+                        />
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </Panel>
+
+              <Separator className="group flex w-2 items-center justify-center">
+                <div className="h-12 w-1 rounded-full bg-gray-200 transition-colors group-hover:bg-purple-400 group-active:bg-purple-500" />
+              </Separator>
+
+              <Panel defaultSize={25} minSize={15}>
+                <div className="h-full p-1">
+                  <ForceCard
+                    force={surroundingForces.find((f) => f.id === "buyers")!}
+                    items={forces.buyers || []}
+                    isEditing={editingForce === "buyers"}
+                    onEdit={() => setEditingForce("buyers")}
+                    onAdd={(text) => {
+                      setNewItemText(text);
+                      handleAddItem("buyers");
+                    }}
+                    onRemove={(itemId) => handleRemoveItem("buyers", itemId)}
+                    newItemText={newItemText}
+                    setNewItemText={setNewItemText}
+                    onCancel={() => setEditingForce(null)}
+                  />
+                </div>
+              </Panel>
+            </Group>
+          </Panel>
+
+          <Separator className="group flex h-2 items-center justify-center">
+            <div className="h-1 w-12 rounded-full bg-gray-200 transition-colors group-hover:bg-purple-400 group-active:bg-purple-500" />
+          </Separator>
+
+          {/* Bottom: Substitutes */}
+          <Panel defaultSize={25} minSize={15}>
+            <div className="flex h-full justify-center p-1">
+              <ForceCard
+                force={surroundingForces.find((f) => f.id === "substitutes")!}
+                items={forces.substitutes || []}
+                isEditing={editingForce === "substitutes"}
+                onEdit={() => setEditingForce("substitutes")}
+                onAdd={(text) => {
+                  setNewItemText(text);
+                  handleAddItem("substitutes");
+                }}
+                onRemove={(itemId) => handleRemoveItem("substitutes", itemId)}
+                newItemText={newItemText}
+                setNewItemText={setNewItemText}
+                onCancel={() => setEditingForce(null)}
+              />
             </div>
-          </div>
-
-          <ForceCard
-            force={surroundingForces.find((f) => f.id === "buyers")!}
-            items={forces.buyers || []}
-            isEditing={editingForce === "buyers"}
-            onEdit={() => setEditingForce("buyers")}
-            onAdd={(text) => {
-              setNewItemText(text);
-              handleAddItem("buyers");
-            }}
-            onRemove={(itemId) => handleRemoveItem("buyers", itemId)}
-            newItemText={newItemText}
-            setNewItemText={setNewItemText}
-            onCancel={() => setEditingForce(null)}
-          />
-        </div>
-
-        {/* Bottom: Substitutes */}
-        <div className="flex justify-center">
-          <ForceCard
-            force={surroundingForces.find((f) => f.id === "substitutes")!}
-            items={forces.substitutes || []}
-            isEditing={editingForce === "substitutes"}
-            onEdit={() => setEditingForce("substitutes")}
-            onAdd={(text) => {
-              setNewItemText(text);
-              handleAddItem("substitutes");
-            }}
-            onRemove={(itemId) => handleRemoveItem("substitutes", itemId)}
-            newItemText={newItemText}
-            setNewItemText={setNewItemText}
-            onCancel={() => setEditingForce(null)}
-          />
-        </div>
+          </Panel>
+        </Group>
 
         {/* FR-454: Strategic Insights Panel */}
         <StrategicInsightsPanel
@@ -289,7 +325,7 @@ function ForceCard({
 }: ForceCardProps) {
   return (
     <div
-      className="w-[160px] rounded-lg border p-3"
+      className="h-full w-full overflow-auto rounded-lg border p-3"
       style={{ borderColor: force.color, backgroundColor: force.bgColor }}
     >
       <div className="mb-2 flex items-center justify-between">

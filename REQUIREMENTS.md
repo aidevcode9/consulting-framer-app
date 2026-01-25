@@ -1,10 +1,10 @@
-# Consulting Framer — Requirements v1.1
+# Consulting Framer — Requirements v1.5
 
 > **Visual engagement builder: AI discovery → frameworks → professional deliverables in minutes.**
 
-**Version:** 1.1  
-**Last Updated:** January 2026  
-**Target:** 100-1000 paying users  
+**Version:** 1.5
+**Last Updated:** January 2026
+**Target:** 100-1000 paying users
 **Status:** Active Development
 
 ---
@@ -13,6 +13,7 @@
 
 | Version | Date | Changes |
 |---------|------|---------|
+| v1.5 | Jan 2026 | Added FR-1104 (Unit tests for methodology helpers), FR-1105 (Tooltip component) |
 | v1.4 | Jan 2026 | Added FR-456 (Methodology Transparency) — show academic sources, version, and inputs in Strategic Insights |
 | v1.3 | Jan 2026 | Added FR-211 (Delete individual nodes) — single node deletion from canvas |
 | v1.2 | Jan 2026 | Added FR-450 (Framework Intelligence) — professional-grade framework prompts with methodology sources |
@@ -269,6 +270,29 @@ Professional-grade framework analysis that veteran consultants will recognize an
 | FR-1101 | Logger utility | Consistent prefixes `[Module]`; dev/prod modes; timestamp option | P2 |
 | FR-1102 | Error tracking | Client-side error capture; optional Sentry integration | P2 |
 | FR-1103 | Feature flags | Simple flags for gradual rollout | P2 |
+| FR-1104 | Unit tests for methodology helpers | Tests for `getFrameworkSource`, `getFrameworkDisplayName`, `hasEnhancedPrompt`, `summarizeDiscoveryInputs`; Vitest; >90% coverage for tested functions | P1 |
+| FR-1105 | Tooltip component | Reusable Tooltip component using Radix UI; configurable delay; styled to match app; replaces native `title` attributes | P2 |
+
+**FR-1104: Unit Tests for Methodology Helpers**
+
+Test coverage for FR-456 methodology transparency helpers:
+- `getFrameworkSource(type)` — returns correct source for each framework type, null for unknown
+- `getFrameworkDisplayName(type)` — returns human-readable names, falls back to raw type
+- `hasEnhancedPrompt(type)` — type guard for supported frameworks
+- `summarizeDiscoveryInputs(answers)` — pluralization, empty case, count accuracy
+
+**FR-1105: Tooltip Component**
+
+Currently 6+ components use native HTML `title` attributes. A reusable Tooltip would provide:
+- Consistent styling across the app
+- Configurable hover delay (native is ~500ms)
+- Better accessibility with Radix UI primitives
+- Rich content support (not just text)
+
+Files currently using `title`:
+- `StrategicInsightsPanel.tsx` (version badge, evidence quality)
+- `CanvasToolbar.tsx`, `FrameworkPanel.tsx`, `NoteNode.tsx`
+- Various node components
 
 ---
 

@@ -1,6 +1,6 @@
 # STATUS.md — Consulting Framer
 
-Last updated: 2026-01-24 (evening)
+Last updated: 2026-01-24 (night)
 
 ---
 
@@ -73,6 +73,8 @@ Last updated: 2026-01-24 (evening)
 
 | Task | FR | Depends On | Notes |
 |------|-----|------------|-------|
+| Unit tests for methodology helpers | FR-1104 | — | Test `getFrameworkSource`, `getFrameworkDisplayName`, `summarizeDiscoveryInputs` |
+| Tooltip component | FR-1105 | — | P2 - Replace native `title` with Radix Tooltip |
 | **Real Stripe** | FR-902 | End of project | See "Deferred" section |
 
 ## Deferred (End of Project)

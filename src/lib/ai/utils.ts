@@ -31,3 +31,21 @@ export function stripMarkdownCodeBlocks(content: string): string {
 
   return cleaned.trim();
 }
+
+/**
+ * Summarize discovery inputs for methodology display
+ * FR-456: Methodology transparency
+ *
+ * @example
+ * // Input: [{question: "Q1", answer: "A1"}, {question: "Q2", answer: "A2"}]
+ * // Output: "2 questions answered"
+ */
+export function summarizeDiscoveryInputs(
+  answers: Array<{ question: string; answer: string }>
+): string {
+  const count = answers.length;
+  if (count === 0) {
+    return "No discovery inputs";
+  }
+  return `${count} question${count !== 1 ? "s" : ""} answered`;
+}

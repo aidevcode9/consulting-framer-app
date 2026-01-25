@@ -32,7 +32,7 @@ import {
   type PopulateFrameworkType,
 } from "@/lib/ai/prompts";
 import { detectInjectionAttempt } from "@/lib/ai/sanitize";
-import { stripMarkdownCodeBlocks } from "@/lib/ai/utils";
+import { stripMarkdownCodeBlocks, summarizeDiscoveryInputs } from "@/lib/ai/utils";
 import { createLogger } from "@/lib/logger";
 import type {
   GeneratedScope,
@@ -449,22 +449,8 @@ export class AIService {
       source: source as FrameworkMethodology["source"],
       prompt_version: frameworkPrompt.metadata.version,
       last_updated: frameworkPrompt.metadata.lastUpdated,
-      discovery_inputs_summary: this.summarizeDiscoveryInputs(discoveryAnswers),
+      discovery_inputs_summary: summarizeDiscoveryInputs(discoveryAnswers),
     };
-  }
-
-  /**
-   * Summarize discovery inputs for methodology display
-   * FR-456: Methodology transparency
-   */
-  private summarizeDiscoveryInputs(
-    answers: Array<{ question: string; answer: string }>
-  ): string {
-    const count = answers.length;
-    if (count === 0) {
-      return "No discovery inputs";
-    }
-    return `${count} question${count !== 1 ? "s" : ""} answered`;
   }
 
   /**

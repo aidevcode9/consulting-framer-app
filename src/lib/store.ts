@@ -58,6 +58,7 @@ interface CanvasState {
   selectNodes: (nodeIds: string[]) => void;
   selectEdges: (edgeIds: string[]) => void;
   clearSelection: () => void;
+  deleteSelectedNodes: () => void;
 
   setMode: (mode: CanvasMode) => void;
 
@@ -192,6 +193,19 @@ export const useCanvasStore = create<CanvasState>()(
       selectNodes: (nodeIds) => set({ selectedNodes: nodeIds }),
       selectEdges: (edgeIds) => set({ selectedEdges: edgeIds }),
       clearSelection: () => set({ selectedNodes: [], selectedEdges: [] }),
+
+      // FR-211: Delete selected nodes
+      deleteSelectedNodes: () => {
+        const state = get();
+        if (state.selectedNodes.length === 0) return;
+        state.saveToHistory();
+        const nodesToDelete = new Set(state.selectedNodes);
+        const nodes = state.nodes.filter((node) => !nodesToDelete.has(node.id));
+        const edges = state.edges.filter(
+          (edge) => !nodesToDelete.has(edge.source) && !nodesToDelete.has(edge.target)
+        );
+        set({ nodes, edges, selectedNodes: [], isDirty: true });
+      },
 
       // Mode
       setMode: (mode) => set({ mode }),

@@ -1,6 +1,6 @@
 # STATUS.md — Consulting Framer
 
-Last updated: 2026-01-24 (morning)
+Last updated: 2026-01-24 (afternoon)
 
 ---
 
@@ -14,6 +14,9 @@ Last updated: 2026-01-24 (morning)
 - ✅ Sign out functionality
 - ✅ Workspace UI at `/app`
 - ✅ Canvas with drag-drop, zoom, pan, undo/redo
+- ✅ **Delete individual nodes** (FR-211: select + Delete/Backspace)
+- ✅ **Resizable framework nodes** (drag handles when selected)
+- ✅ **Resizable internal panels** (draggable dividers in frameworks)
 - ✅ 4 framework nodes: SWOT, Porter, McKinsey, BMC
 - ✅ **Discovery panel with branching** (FR-407)
 - ✅ **Industry templates** (FR-408: Tech, Healthcare, Retail, Finance, Manufacturing)
@@ -63,7 +66,7 @@ Last updated: 2026-01-24 (morning)
 
 | Task | FR | Branch | Started | Notes |
 |------|-----|--------|---------|-------|
-| — | — | — | — | Session complete. PR pending review. |
+| — | — | — | — | FR-211 complete. Security review passed. Changes uncommitted. |
 
 ## Next (Priority Order)
 
@@ -87,6 +90,9 @@ Last updated: 2026-01-24 (morning)
 
 | Task | FR | Commit | Date |
 |------|-----|--------|------|
+| Delete individual nodes | FR-211 | pending | 01-24 |
+| Resizable internal panels | — | 6b714b8 | 01-24 |
+| Resizable framework nodes | — | fe6d073 | 01-24 |
 | Industry context in prompts | FR-453 | 700241d | 01-24 |
 | Strategic insights UI | FR-454 | 700241d | 01-24 |
 | BMC prompt enhancement | FR-451 | 700241d | 01-24 |
@@ -167,6 +173,7 @@ Last updated: 2026-01-24 (morning)
 - [x] FR-205: Zoom/pan
 - [x] FR-206: Undo/redo
 - [x] FR-207: Auto-save to database ✅
+- [x] FR-211: Delete individual nodes ✅
 
 ### Frameworks (FR-300) ✅ Complete
 - [x] FR-301: SWOT Analysis

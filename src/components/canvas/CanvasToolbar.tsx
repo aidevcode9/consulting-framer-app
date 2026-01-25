@@ -24,7 +24,7 @@ interface CanvasToolbarProps {
 
 export function CanvasToolbar({ onSave, isDirty, readOnly }: CanvasToolbarProps) {
   const { zoomIn, zoomOut, fitView, getNodes } = useReactFlow();
-  const { undo, redo, clearCanvas, mode, setMode, history, historyIndex } = useCanvasStore();
+  const { undo, redo, clearCanvas, deleteSelectedNodes, selectedNodes, mode, setMode, history, historyIndex } = useCanvasStore();
 
   const canUndo = historyIndex > 0;
   const canRedo = historyIndex < history.length - 1;
@@ -114,13 +114,15 @@ export function CanvasToolbar({ onSave, isDirty, readOnly }: CanvasToolbarProps)
         disabled={getNodes().length === 0}
       />
 
-      {/* Clear */}
+      {/* Delete Selected / Clear Canvas */}
       {!readOnly && (
         <ToolbarButton
           icon={Trash2}
-          tooltip="Clear canvas"
+          tooltip={selectedNodes.length > 0 ? `Delete selected (${selectedNodes.length})` : "Clear canvas"}
           onClick={() => {
-            if (confirm("Clear all items from the canvas?")) {
+            if (selectedNodes.length > 0) {
+              deleteSelectedNodes();
+            } else if (confirm("Clear all items from the canvas?")) {
               clearCanvas();
             }
           }}

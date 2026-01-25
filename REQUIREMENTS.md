@@ -13,6 +13,7 @@
 
 | Version | Date | Changes |
 |---------|------|---------|
+| v1.3 | Jan 2026 | Added FR-211 (Delete individual nodes) — single node deletion from canvas |
 | v1.2 | Jan 2026 | Added FR-450 (Framework Intelligence) — professional-grade framework prompts with methodology sources |
 | v1.1 | Jan 2026 | Added FR-900 (Billing), FR-1000 (Organizations), NFR-500 (Scale) |
 | v1.0 | Jan 2026 | Initial release — 60 FRs, 16 NFRs |
@@ -108,6 +109,7 @@ Consultants waste **7+ hours per engagement** on administrative work:
 | FR-208 | Canvas templates | 5+ pre-built templates | P1 |
 | FR-209 | Duplicate canvas | Copy engagement with all content | P1 |
 | FR-210 | Version history | View/restore previous versions | P2 |
+| FR-211 | Delete individual nodes | Select node → delete removes only that node; undo supported | P0 |
 
 ### FR-300: Framework Library (Phase 1)
 

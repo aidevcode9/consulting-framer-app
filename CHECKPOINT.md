@@ -2,6 +2,45 @@
 
 ---
 
+## [2026-01-24] FR-211: Delete Individual Nodes
+
+**Status:** ✅ Complete
+**Branch:** main
+
+**Files modified:**
+- src/lib/store.ts - Added `deleteSelectedNodes()` action to CanvasState
+- src/components/canvas/CanvasToolbar.tsx - Updated trash button to delete selected nodes first
+- src/components/canvas/Canvas.tsx - Added Delete/Backspace keyboard shortcut
+
+**What was implemented:**
+
+### Store Changes (store.ts)
+- Added `deleteSelectedNodes: () => void` to interface
+- Implementation deletes all nodes in `selectedNodes` array
+- Properly removes connected edges
+- Calls `saveToHistory()` before deletion (undo support)
+- Clears selection after deletion
+
+### Toolbar Changes (CanvasToolbar.tsx)
+- Trash button now context-aware:
+  - If nodes selected: deletes selected nodes (no confirmation)
+  - If no selection: clears entire canvas (with confirmation)
+- Tooltip shows count of selected nodes
+
+### Keyboard Shortcut (Canvas.tsx)
+- Delete or Backspace key deletes selected nodes
+- Ignores keypress when user is typing in input/textarea
+- Works anywhere on the canvas
+
+**Verification:** lint ✅ | typecheck ✅ | build ✅
+
+**Notes:**
+- User can now select a node and press Delete/Backspace or click trash
+- Undo/redo fully supported via existing history mechanism
+- Multi-select deletion supported (select multiple nodes, delete all at once)
+
+---
+
 ## [2026-01-24] FR-454: Strategic Implications UI
 
 **Status:** ✅ Complete

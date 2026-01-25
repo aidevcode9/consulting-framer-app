@@ -320,6 +320,17 @@ export function Canvas({ onSave, readOnly = false }: CanvasProps) {
         event.preventDefault();
         onSave?.();
       }
+
+      // FR-211: Delete selected nodes with Delete or Backspace
+      if (event.key === "Delete" || event.key === "Backspace") {
+        // Don't delete if user is typing in an input/textarea
+        const target = event.target as HTMLElement;
+        if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable) {
+          return;
+        }
+        event.preventDefault();
+        useCanvasStore.getState().deleteSelectedNodes();
+      }
     };
 
     window.addEventListener("keydown", handleKeyDown);

@@ -73,7 +73,6 @@ Last updated: 2026-01-24 (night)
 
 | Task | FR | Depends On | Notes |
 |------|-----|------------|-------|
-| Unit tests for methodology helpers | FR-1104 | — | Test `getFrameworkSource`, `getFrameworkDisplayName`, `summarizeDiscoveryInputs` |
 | Tooltip component | FR-1105 | — | P2 - Replace native `title` with Radix Tooltip |
 | **Real Stripe** | FR-902 | End of project | See "Deferred" section |
 
@@ -93,6 +92,7 @@ Last updated: 2026-01-24 (night)
 
 | Task | FR | Commit | Date |
 |------|-----|--------|------|
+| Unit tests for methodology helpers | FR-1104 | 6dd66e7 | 01-24 |
 | Methodology transparency | FR-456 | — | 01-24 |
 | Delete individual nodes | FR-211 | 4068c65 | 01-24 |
 | Resizable internal panels | — | 6b714b8 | 01-24 |

@@ -65,7 +65,7 @@ Click **"Try Free"** or go to [http://localhost:3000/app](http://localhost:3000/
 
 ## Features (MVP)
 
-### ✅ Implemented
+### Implemented
 
 - **Landing Page** — Professional marketing page with features, pricing, how-it-works
 - **Visual Canvas** — React Flow-powered infinite canvas
@@ -91,7 +91,7 @@ Click **"Try Free"** or go to [http://localhost:3000/app](http://localhost:3000/
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 consulting-framer-app/
@@ -139,7 +139,7 @@ consulting-framer-app/
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Layer | Technology |
 |-------|------------|
@@ -357,7 +357,7 @@ pnpm db:types         # Generate TypeScript types
 
 ---
 
-## 📊 Database Schema
+## Database Schema
 
 See `supabase/schema.sql` for full DDL. Key tables:
 
@@ -372,7 +372,7 @@ All tables have Row Level Security (RLS) enabled.
 
 ---
 
-## 🔐 Environment Variables
+## Environment Variables
 
 | Variable | Required | Description |
 |----------|----------|-------------|
@@ -383,13 +383,13 @@ All tables have Row Level Security (RLS) enabled.
 
 ---
 
-## 📝 License
+## License
 
 MIT — see [LICENSE](./LICENSE)
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repo
 2. Create feature branch (`git checkout -b feat/amazing-feature`)
@@ -399,4 +399,4 @@ MIT — see [LICENSE](./LICENSE)
 
 ---
 
-Built with ❤️ for consultants who value their time.
+Built for consultants who value their time.

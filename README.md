@@ -2,7 +2,7 @@
 
 Visual engagement builder for consultants — AI-assisted discovery, strategic frameworks, and automated deliverables.
 
-![Consulting Framer](./docs/screenshot.png)
+![Consulting Framer](./docs/architecture-diagram.svg)
 
 ## Quick Start
 

@@ -4,7 +4,7 @@ Visual engagement builder for consultants — AI-assisted discovery, strategic f
 
 ![Consulting Framer](./docs/screenshot.png)
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -63,7 +63,7 @@ Click **"Try Free"** or go to [http://localhost:3000/app](http://localhost:3000/
 
 ---
 
-## 🎯 Features (MVP)
+## Features (MVP)
 
 ### ✅ Implemented
 
@@ -80,7 +80,7 @@ Click **"Try Free"** or go to [http://localhost:3000/app](http://localhost:3000/
 - **Engagement Management** — Create, select, track engagements
 - **State Management** — Zustand stores for canvas, engagement, discovery, UI
 
-### 🔜 Coming Next (Phase 2+)
+### Coming Next (Phase 2+)
 
 - [ ] Supabase auth integration
 - [ ] Persist engagements to database
@@ -186,7 +186,7 @@ pnpm db:types         # Generate TypeScript types
 
 ---
 
-## 🚨 Troubleshooting
+## Troubleshooting
 
 ### Environment Variables Not Working
 
@@ -196,10 +196,10 @@ pnpm db:types         # Generate TypeScript types
 1. Verify `.env.local` exists in project root (NOT `.env`)
 2. Check variable format (no quotes unless value contains spaces):
    ```bash
-   # ✅ Correct
+   # Correct
    NEXT_PUBLIC_SUPABASE_URL=https://abc.supabase.co
 
-   # ❌ Wrong
+   # Wrong
    NEXT_PUBLIC_SUPABASE_URL="https://abc.supabase.co"
    ```
 3. Restart dev server after changing env vars: `pnpm dev`

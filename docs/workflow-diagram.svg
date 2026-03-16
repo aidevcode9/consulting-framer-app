@@ -1,0 +1,142 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" font-family="'Segoe UI', system-ui, -apple-system, sans-serif">
+  <defs>
+    <linearGradient id="hdr" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#1a1a2e"/>
+      <stop offset="100%" stop-color="#16213e"/>
+    </linearGradient>
+    <linearGradient id="phase1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#dbeafe"/>
+      <stop offset="100%" stop-color="#eff6ff"/>
+    </linearGradient>
+    <linearGradient id="phase2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fef3c7"/>
+      <stop offset="100%" stop-color="#fffbeb"/>
+    </linearGradient>
+    <linearGradient id="phase3" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#d1fae5"/>
+      <stop offset="100%" stop-color="#ecfdf5"/>
+    </linearGradient>
+    <filter id="s" x="-3%" y="-6%" width="106%" height="116%">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#000" flood-opacity="0.1"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="960" height="540" fill="#ffffff"/>
+
+  <!-- Title -->
+  <rect width="960" height="52" fill="url(#hdr)"/>
+  <text x="32" y="33" fill="#ffffff" font-size="17" font-weight="600" letter-spacing="0.5">Consulting Framer</text>
+  <text x="225" y="33" fill="#94a3b8" font-size="13">Engagement Workflow</text>
+  <text x="790" y="33" fill="#64748b" font-size="11">7+ hrs → &lt; 1 hr  (85% time saved)</text>
+
+  <!-- Phase 1: AI Discovery -->
+  <rect x="32" y="72" width="284" height="388" rx="12" fill="url(#phase1)" stroke="#93c5fd" stroke-width="1.5" filter="url(#s)"/>
+  <rect x="32" y="72" width="284" height="40" rx="12" fill="#3b82f6"/>
+  <rect x="32" y="92" width="284" height="20" fill="#3b82f6"/>
+  <text x="52" y="98" fill="#ffffff" font-size="14" font-weight="700">① AI Discovery</text>
+  <text x="260" y="98" fill="#bfdbfe" font-size="10">~30 min</text>
+
+  <!-- Discovery items -->
+  <rect x="52" y="128" width="244" height="52" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="72" y="150" fill="#1e40af" font-size="11" font-weight="600">Adaptive Questionnaire</text>
+  <text x="72" y="166" fill="#64748b" font-size="10">7-15 questions per engagement type</text>
+
+  <rect x="52" y="192" width="244" height="52" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="72" y="214" fill="#1e40af" font-size="11" font-weight="600">Claude Follow-ups</text>
+  <text x="72" y="230" fill="#64748b" font-size="10">AI probes deeper based on responses</text>
+
+  <rect x="52" y="256" width="244" height="52" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="72" y="278" fill="#1e40af" font-size="11" font-weight="600">Framework Recommendations</text>
+  <text x="72" y="294" fill="#64748b" font-size="10">AI suggests SWOT, Porter, etc.</text>
+
+  <rect x="52" y="320" width="244" height="52" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="72" y="342" fill="#1e40af" font-size="11" font-weight="600">Executive Summary</text>
+  <text x="72" y="358" fill="#64748b" font-size="10">Auto-generated from answers</text>
+
+  <!-- Output badge -->
+  <rect x="52" y="390" width="244" height="32" rx="6" fill="#1e40af"/>
+  <text x="174" y="411" fill="#ffffff" font-size="10" font-weight="600" text-anchor="middle">OUTPUT: Structured Discovery Data</text>
+
+  <!-- Arrow 1→2 -->
+  <line x1="316" y1="266" x2="338" y2="266" stroke="#94a3b8" stroke-width="2"/>
+  <polygon points="335,261 344,266 335,271" fill="#94a3b8"/>
+
+  <!-- Phase 2: Visual Canvas -->
+  <rect x="338" y="72" width="284" height="388" rx="12" fill="url(#phase2)" stroke="#fcd34d" stroke-width="1.5" filter="url(#s)"/>
+  <rect x="338" y="72" width="284" height="40" rx="12" fill="#d97706"/>
+  <rect x="338" y="92" width="284" height="20" fill="#d97706"/>
+  <text x="358" y="98" fill="#ffffff" font-size="14" font-weight="700">② Visual Canvas</text>
+  <text x="566" y="98" fill="#fde68a" font-size="10">~15 min</text>
+
+  <!-- Canvas items -->
+  <rect x="358" y="128" width="244" height="52" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="378" y="150" fill="#92400e" font-size="11" font-weight="600">React Flow Canvas</text>
+  <text x="378" y="166" fill="#64748b" font-size="10">Infinite, zoomable workspace</text>
+
+  <rect x="358" y="192" width="244" height="76" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="378" y="214" fill="#92400e" font-size="11" font-weight="600">4 Framework Nodes</text>
+  <text x="378" y="230" fill="#64748b" font-size="10">SWOT · Porter's 5 Forces</text>
+  <text x="378" y="246" fill="#64748b" font-size="10">McKinsey 7-S · Business Model Canvas</text>
+  <text x="378" y="258" fill="#9ca3af" font-size="9">Each with methodology citations</text>
+
+  <rect x="358" y="280" width="244" height="52" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="378" y="302" fill="#92400e" font-size="11" font-weight="600">AI Auto-Populate</text>
+  <text x="378" y="318" fill="#64748b" font-size="10">Discovery → framework blocks</text>
+
+  <rect x="358" y="344" width="244" height="32" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="378" y="366" fill="#92400e" font-size="11" font-weight="600">Strategic Insights Panel</text>
+
+  <!-- Output badge -->
+  <rect x="358" y="390" width="244" height="32" rx="6" fill="#92400e"/>
+  <text x="480" y="411" fill="#ffffff" font-size="10" font-weight="600" text-anchor="middle">OUTPUT: Analyzed Canvas Data</text>
+
+  <!-- Arrow 2→3 -->
+  <line x1="622" y1="266" x2="644" y2="266" stroke="#94a3b8" stroke-width="2"/>
+  <polygon points="641,261 650,266 641,271" fill="#94a3b8"/>
+
+  <!-- Phase 3: Deliverables -->
+  <rect x="644" y="72" width="284" height="388" rx="12" fill="url(#phase3)" stroke="#6ee7b7" stroke-width="1.5" filter="url(#s)"/>
+  <rect x="644" y="72" width="284" height="40" rx="12" fill="#059669"/>
+  <rect x="644" y="92" width="284" height="20" fill="#059669"/>
+  <text x="664" y="98" fill="#ffffff" font-size="14" font-weight="700">③ Auto Deliverables</text>
+  <text x="872" y="98" fill="#a7f3d0" font-size="10">~15 min</text>
+
+  <!-- Deliverable items -->
+  <rect x="664" y="128" width="244" height="52" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="684" y="150" fill="#065f46" font-size="11" font-weight="600">SOW Generation</text>
+  <text x="684" y="166" fill="#64748b" font-size="10">Scope, timeline, pricing, risks</text>
+
+  <rect x="664" y="192" width="244" height="52" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="684" y="214" fill="#065f46" font-size="11" font-weight="600">Proposal Generation</text>
+  <text x="684" y="230" fill="#64748b" font-size="10">Client-facing persuasive doc</text>
+
+  <rect x="664" y="256" width="244" height="52" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="684" y="278" fill="#065f46" font-size="11" font-weight="600">Export PDF / DOCX</text>
+  <text x="684" y="294" fill="#64748b" font-size="10">Professional formatting, branding</text>
+
+  <rect x="664" y="320" width="244" height="52" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="684" y="342" fill="#065f46" font-size="11" font-weight="600">Verification Gate</text>
+  <text x="684" y="358" fill="#64748b" font-size="10">Source tracing + human approval</text>
+
+  <!-- Output badge -->
+  <rect x="664" y="390" width="244" height="32" rx="6" fill="#059669"/>
+  <text x="786" y="411" fill="#ffffff" font-size="10" font-weight="600" text-anchor="middle">OUTPUT: Professional Documents</text>
+
+  <!-- Bottom bar: key metrics -->
+  <rect x="32" y="476" width="896" height="48" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+
+  <text x="62" y="500" fill="#1e293b" font-size="10" font-weight="600">ARCHITECTURE PATTERNS</text>
+  <line x1="210" y1="486" x2="210" y2="510" stroke="#e2e8f0" stroke-width="1"/>
+
+  <text x="230" y="500" fill="#64748b" font-size="10">Thin Routes → Fat Services → Repository</text>
+  <line x1="472" y1="486" x2="472" y2="510" stroke="#e2e8f0" stroke-width="1"/>
+
+  <text x="492" y="500" fill="#64748b" font-size="10">RLS on all tables</text>
+  <line x1="600" y1="486" x2="600" y2="510" stroke="#e2e8f0" stroke-width="1"/>
+
+  <text x="620" y="500" fill="#64748b" font-size="10">Server-side AI keys</text>
+  <line x1="740" y1="486" x2="740" y2="510" stroke="#e2e8f0" stroke-width="1"/>
+
+  <text x="760" y="500" fill="#64748b" font-size="10">Inngest for async jobs</text>
+</svg>

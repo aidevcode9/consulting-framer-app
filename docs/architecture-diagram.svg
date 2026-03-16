@@ -1,0 +1,155 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 720" font-family="'Segoe UI', system-ui, -apple-system, sans-serif">
+  <defs>
+    <linearGradient id="headerGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#1a1a2e"/>
+      <stop offset="100%" stop-color="#16213e"/>
+    </linearGradient>
+    <linearGradient id="vercelGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f8f9fa"/>
+      <stop offset="100%" stop-color="#e9ecef"/>
+    </linearGradient>
+    <filter id="shadow" x="-4%" y="-4%" width="108%" height="112%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000" flood-opacity="0.08"/>
+    </filter>
+    <filter id="shadowDeep" x="-4%" y="-4%" width="108%" height="116%">
+      <feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="960" height="720" fill="#ffffff"/>
+
+  <!-- Title Bar -->
+  <rect width="960" height="56" fill="url(#headerGrad)" rx="0"/>
+  <text x="32" y="36" fill="#ffffff" font-size="18" font-weight="600" letter-spacing="0.5">Consulting Framer</text>
+  <text x="228" y="36" fill="#94a3b8" font-size="14" font-weight="400">System Architecture</text>
+
+  <!-- Client Layer -->
+  <rect x="340" y="76" width="280" height="44" rx="8" fill="#1e293b" filter="url(#shadow)"/>
+  <text x="480" y="103" fill="#ffffff" font-size="13" font-weight="500" text-anchor="middle">Browser / Mobile Web</text>
+  <text x="480" y="103" fill="#60a5fa" font-size="10" dy="-16" text-anchor="middle">CLIENTS</text>
+
+  <!-- Arrow down -->
+  <line x1="480" y1="120" x2="480" y2="146" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <polygon points="475,143 480,152 485,143" fill="#cbd5e1"/>
+  <text x="496" y="140" fill="#94a3b8" font-size="9">HTTPS</text>
+
+  <!-- Vercel Container -->
+  <rect x="40" y="152" width="880" height="340" rx="12" fill="url(#vercelGrad)" stroke="#dee2e6" stroke-width="1" filter="url(#shadowDeep)"/>
+  <text x="60" y="176" fill="#495057" font-size="11" font-weight="600" letter-spacing="1">VERCEL EDGE</text>
+  <rect x="130" y="167" width="6" height="6" rx="3" fill="#000000"/>
+  <text x="142" y="176" fill="#868e96" font-size="10">▲</text>
+
+  <!-- Next.js App -->
+  <rect x="64" y="192" width="180" height="64" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1" filter="url(#shadow)"/>
+  <text x="154" y="218" fill="#1e293b" font-size="12" font-weight="600" text-anchor="middle">Next.js 14</text>
+  <text x="154" y="236" fill="#64748b" font-size="10" text-anchor="middle">App Router + SSR</text>
+  <circle cx="80" cy="202" r="4" fill="#22c55e"/>
+
+  <!-- API Routes -->
+  <rect x="268" y="192" width="180" height="64" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1" filter="url(#shadow)"/>
+  <text x="358" y="218" fill="#1e293b" font-size="12" font-weight="600" text-anchor="middle">API Routes</text>
+  <text x="358" y="236" fill="#64748b" font-size="10" text-anchor="middle">/api/* (thin routes)</text>
+  <circle cx="284" cy="202" r="4" fill="#22c55e"/>
+
+  <!-- Middleware -->
+  <rect x="472" y="192" width="180" height="64" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1" filter="url(#shadow)"/>
+  <text x="562" y="218" fill="#1e293b" font-size="12" font-weight="600" text-anchor="middle">Middleware</text>
+  <text x="562" y="236" fill="#64748b" font-size="10" text-anchor="middle">Auth + JWT Validation</text>
+  <circle cx="488" cy="202" r="4" fill="#22c55e"/>
+
+  <!-- State -->
+  <rect x="676" y="192" width="220" height="64" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1" filter="url(#shadow)"/>
+  <text x="786" y="218" fill="#1e293b" font-size="12" font-weight="600" text-anchor="middle">Zustand + React Flow</text>
+  <text x="786" y="236" fill="#64748b" font-size="10" text-anchor="middle">Canvas State + UI</text>
+  <circle cx="692" cy="202" r="4" fill="#22c55e"/>
+
+  <!-- Arrow to Service Layer -->
+  <line x1="358" y1="256" x2="358" y2="278" stroke="#94a3b8" stroke-width="1.5"/>
+  <polygon points="353,275 358,284 363,275" fill="#94a3b8"/>
+
+  <!-- Service Layer -->
+  <rect x="120" y="284" width="480" height="80" rx="10" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1" filter="url(#shadow)"/>
+  <text x="140" y="304" fill="#1e40af" font-size="10" font-weight="600" letter-spacing="0.8">SERVICE LAYER</text>
+
+  <rect x="140" y="314" width="100" height="34" rx="6" fill="#ffffff" stroke="#dbeafe" stroke-width="1"/>
+  <text x="190" y="336" fill="#1e293b" font-size="10" font-weight="500" text-anchor="middle">AIService</text>
+
+  <rect x="252" y="314" width="120" height="34" rx="6" fill="#ffffff" stroke="#dbeafe" stroke-width="1"/>
+  <text x="312" y="336" fill="#1e293b" font-size="10" font-weight="500" text-anchor="middle">EngagementSvc</text>
+
+  <rect x="384" y="314" width="100" height="34" rx="6" fill="#ffffff" stroke="#dbeafe" stroke-width="1"/>
+  <text x="434" y="336" fill="#1e293b" font-size="10" font-weight="500" text-anchor="middle">BillingSvc</text>
+
+  <rect x="496" y="314" width="90" height="34" rx="6" fill="#ffffff" stroke="#dbeafe" stroke-width="1"/>
+  <text x="541" y="336" fill="#1e293b" font-size="10" font-weight="500" text-anchor="middle">UsageSvc</text>
+
+  <!-- Arrow to Repo Layer -->
+  <line x1="358" y1="364" x2="358" y2="382" stroke="#94a3b8" stroke-width="1.5"/>
+  <polygon points="353,379 358,388 363,379" fill="#94a3b8"/>
+
+  <!-- Repository Layer -->
+  <rect x="120" y="388" width="480" height="44" rx="8" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1" filter="url(#shadow)"/>
+  <text x="140" y="416" fill="#166534" font-size="10" font-weight="600" letter-spacing="0.8">REPOSITORY LAYER</text>
+  <text x="360" y="416" fill="#4b5563" font-size="10">EngagementRepo · UserRepo · UsageRepo · ProfileRepo</text>
+
+  <!-- Background Jobs -->
+  <rect x="640" y="290" width="260" height="142" rx="10" fill="#fefce8" stroke="#fde68a" stroke-width="1" filter="url(#shadow)"/>
+  <text x="660" y="312" fill="#92400e" font-size="10" font-weight="600" letter-spacing="0.8">BACKGROUND JOBS</text>
+  <text x="660" y="334" fill="#78716c" font-size="10">Inngest Functions</text>
+  <text x="660" y="356" fill="#57534e" font-size="11">• SOW Generation (async)</text>
+  <text x="660" y="376" fill="#57534e" font-size="11">• Proposal Generation</text>
+  <text x="660" y="396" fill="#57534e" font-size="11">• Usage Sync</text>
+  <text x="660" y="416" fill="#57534e" font-size="11">• Subscription Sync</text>
+
+  <!-- Connector from service to jobs -->
+  <line x1="600" y1="324" x2="640" y2="324" stroke="#d97706" stroke-width="1.5" stroke-dasharray="4,3"/>
+
+  <!-- External Services -->
+  <!-- Supabase -->
+  <rect x="64" y="520" width="260" height="120" rx="10" fill="#ecfdf5" stroke="#a7f3d0" stroke-width="1.5" filter="url(#shadowDeep)"/>
+  <text x="84" y="546" fill="#065f46" font-size="13" font-weight="700">Supabase</text>
+  <text x="180" y="546" fill="#6ee7b7" font-size="11">(PostgreSQL 15)</text>
+  <text x="84" y="570" fill="#374151" font-size="11">◆ Auth (GoTrue + OAuth)</text>
+  <text x="84" y="590" fill="#374151" font-size="11">◆ Row-Level Security</text>
+  <text x="84" y="610" fill="#374151" font-size="11">◆ 10 tables, full RLS policies</text>
+  <text x="84" y="628" fill="#9ca3af" font-size="9">Portable — standard Postgres, zero lock-in</text>
+
+  <!-- Anthropic -->
+  <rect x="350" y="520" width="260" height="120" rx="10" fill="#fef3c7" stroke="#fde68a" stroke-width="1.5" filter="url(#shadowDeep)"/>
+  <text x="370" y="546" fill="#92400e" font-size="13" font-weight="700">Anthropic Claude</text>
+  <text x="370" y="570" fill="#374151" font-size="11">◆ Discovery follow-ups</text>
+  <text x="370" y="590" fill="#374151" font-size="11">◆ Framework analysis (methodology-aware)</text>
+  <text x="370" y="610" fill="#374151" font-size="11">◆ SOW + Proposal generation</text>
+  <text x="370" y="628" fill="#9ca3af" font-size="9">Retry + timeout + structured output + audit</text>
+
+  <!-- Stripe -->
+  <rect x="636" y="520" width="260" height="120" rx="10" fill="#ede9fe" stroke="#c4b5fd" stroke-width="1.5" filter="url(#shadowDeep)"/>
+  <text x="656" y="546" fill="#5b21b6" font-size="13" font-weight="700">Stripe</text>
+  <text x="656" y="570" fill="#374151" font-size="11">◆ Checkout Sessions</text>
+  <text x="656" y="590" fill="#374151" font-size="11">◆ Subscription Management</text>
+  <text x="656" y="610" fill="#374151" font-size="11">◆ Webhook → billing truth</text>
+  <text x="656" y="628" fill="#9ca3af" font-size="9">Free → Pro ($49) → Team ($149)</text>
+
+  <!-- Arrows to external services -->
+  <line x1="240" y1="470" x2="194" y2="520" stroke="#10b981" stroke-width="1.5"/>
+  <polygon points="190,515 194,524 199,515" fill="#10b981"/>
+
+  <line x1="400" y1="470" x2="480" y2="520" stroke="#d97706" stroke-width="1.5"/>
+  <polygon points="475,515 480,524 485,515" fill="#d97706"/>
+
+  <line x1="560" y1="470" x2="700" y2="520" stroke="#7c3aed" stroke-width="1.5"/>
+  <polygon points="695,515 700,524 705,515" fill="#7c3aed"/>
+
+  <!-- Legend -->
+  <rect x="40" y="664" width="880" height="40" rx="6" fill="#f8f9fa" stroke="#e9ecef" stroke-width="1"/>
+  <circle cx="68" cy="684" r="4" fill="#22c55e"/>
+  <text x="80" y="688" fill="#6b7280" font-size="10">Implemented</text>
+  <rect x="158" y="679" width="8" height="10" rx="2" fill="#eff6ff" stroke="#bfdbfe" stroke-width="0.5"/>
+  <text x="174" y="688" fill="#6b7280" font-size="10">Service Layer</text>
+  <rect x="268" y="679" width="8" height="10" rx="2" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="0.5"/>
+  <text x="284" y="688" fill="#6b7280" font-size="10">Repository Layer</text>
+  <rect x="390" y="679" width="8" height="10" rx="2" fill="#fefce8" stroke="#fde68a" stroke-width="0.5"/>
+  <text x="406" y="688" fill="#6b7280" font-size="10">Background Jobs</text>
+  <text x="540" y="688" fill="#6b7280" font-size="10">Pattern: Thin Routes → Fat Services → Repository → DB</text>
+</svg>
